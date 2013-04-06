@@ -132,3 +132,7 @@ Content-Disposition: attachment; filename="me.jpg"'
 
 * Custom meta data
 * Multipart uploads
+
+## License
+
+This project is licensed under the MIT license, see `LICENSE.txt`.
