@@ -137,3 +137,8 @@ Content-Disposition: attachment; filename="me.jpg"'
 
 This protocol is licensed under the MIT license, see
 [LICENSE.txt](https://github.com/tus/tus-resumable-upload-protocol/blob/master/LICENSE.txt).
+
+## Contributing
+
+This protocol has it's own [Github repository](https://github.com/tus/tus-resumable-upload-protocol)
+where you can leave feedback and pull requests.
