@@ -105,6 +105,9 @@ up to the client to choose appropriate `PUT` requests to complete the upload.
 A completed upload will be indicated by a single range covering the entire file
 size (e.g. `Range: bytes=0-99` for a 100 byte file).
 
+**Note** If the server has not received anything so far, there will be no `Range`
+header present.
+
 ### GET &lt;fileUrl&gt;
 
 Used to download an uploaded file.
