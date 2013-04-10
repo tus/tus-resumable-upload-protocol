@@ -34,12 +34,12 @@ mechanism for resumable file uploads.
 Servers SHOULD provide one or more tus endpoints. A tus endpoint can be any URL
 that clients can use to create new file resource.
 
-All requests to a tus endpoint MUST use the `POST`, and include a
+All requests to a tus endpoint MUST use the `POST` method, and include a
 `Content-Range` and `Content-Length` header.
 
-The `Content-Length` defines the amount of bytes to be uploaded along with the
-request. For resumable uploads it SHOULD be set to `0`, but clients MAY choose
-to upload some or all of the file data to a tus endpoint.
+The `Content-Length` defines the amount of bytes to be uploaded in the request
+body. For resumable uploads it SHOULD be set to `0`, but clients MAY choose to
+upload some or all bytes of a file to a tus endpoint.
 
 The `Content-Range` defines the total size of the file, and optionally the data
 range included in the body of the request. When `Content-Length` is `0`, the
