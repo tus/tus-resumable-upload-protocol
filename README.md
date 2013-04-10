@@ -1,25 +1,26 @@
 # tus resumable upload protocol
 
-**Status:** Work in progress
+**Version:** 0.1 (Draft)
 
-Part of the tus mission is to create a simple protocol for http file uploads
-that supports the following features:
+This document uses [SemVer](http://semver.org/).
 
-* Resumable file uploads
-* Multiple upload connections per file
-* File meta data
-* Cross domain uploads
-* Legacy clients / multipart uploads
+Interested developers are encouraged to implement prototypes for early versions
+of this document and submit their feedback in form of comments of patches.
 
-Ideally this will be accomplished in the spirit of REST while avoiding the
-custom headers and http status codes used by other protocols.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
-**Prior art:**
+## Abstract
 
-* [YouTube Data API - Resumable Upload](https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol)
-* [Google Drive - Upload Files](https://developers.google.com/drive/manage-uploads)
-* [Resumable Media Uploads in the Google Data Protocol](https://developers.google.com/gdata/docs/resumable_upload) (deprecated)
-* [ResumableHttpRequestsProposal from Gears](http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal) (deprecated)
+The tus resumable upload protocol describes a light-weigh mechanism for file
+uploads over http that can be resumed in the event of a network failure.
+
+Features of the protocol include:
+
+* Uploading files via HTTP
+* Resuming interrupted uploads
+* Transferring parts of a file in parallel
 
 ### POST /files
 
@@ -130,6 +131,15 @@ Content-Disposition: attachment; filename="me.jpg"'
 ```
 [file data]
 ```
+
+## Appendix A - Discussion of Prior Art
+
+**Prior art:**
+
+* [YouTube Data API - Resumable Upload](https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol)
+* [Google Drive - Upload Files](https://developers.google.com/drive/manage-uploads)
+* [Resumable Media Uploads in the Google Data Protocol](https://developers.google.com/gdata/docs/resumable_upload) (deprecated)
+* [ResumableHttpRequestsProposal from Gears](http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal) (deprecated)
 
 ## Todo
 
