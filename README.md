@@ -148,7 +148,8 @@ Content-Disposition: attachment; filename="me.jpg"'
 
 ## License
 
-This protocol is licensed under the MIT license, see
+Copyright (c) 2013 Transloadit Ltd and Contributors. Licensed under the MIT
+license, see
 [LICENSE.txt](https://github.com/tus/tus-resumable-upload-protocol/blob/master/LICENSE.txt).
 
 ## Contributing
