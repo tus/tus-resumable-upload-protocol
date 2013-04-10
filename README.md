@@ -24,7 +24,7 @@ Features of the protocol include:
 
 ## Protocol
 
-This protocol describes SHALL BE defined as subset of
+This protocol is defined as subset of
 [RFC 2616](http://tools.ietf.org/html/rfc2616) (HTTP 1.1) to provide a
 [RESTful](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
 mechanism for resumable file uploads.
