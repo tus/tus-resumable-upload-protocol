@@ -1,15 +1,15 @@
 # tus resumable upload protocol
 
-**Version:** 0.1 (Draft)
-
-This document uses [SemVer](http://semver.org/).
-
-Interested developers are encouraged to implement prototypes for early versions
-of this document and submit their feedback in form of comments of patches.
+**Version:** 0.1 ([SemVer](http://semver))
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
+
+## Status
+
+Interested developers are encouraged to implement prototypes for early versions
+of this document and submit their feedback in form of comments of patches.
 
 ## Abstract
 
