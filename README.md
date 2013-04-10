@@ -24,11 +24,26 @@ Features of the protocol include:
 
 ## Protocol
 
-### Uploading New Files
+This protocol describes SHALL BE defined as subset of
+[RFC 2616](http://tools.ietf.org/html/rfc2616) (HTTP 1.1) to provide a
+[RESTful](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
+mechanism for resumable file uploads.
 
-Servers MUST provide one or more tus endpoints. A tus endpoint can be any URL,
-that processes `POST` request as described below.
+### Uploading new files
 
+Servers SHOULD provide one or more tus endpoints. A tus endpoint can be any URL
+that clients can use to create new file resource.
+
+All requests to a tus endpoint MUST use the `POST`, and include a
+`Content-Range` and `Content-Length` header.
+
+The `Content-Length` defines the amount of bytes to be uploaded along with the
+request. For resumable uploads it SHOULD be set to `0`, but clients MAY choose
+to upload some or all of the file data to a tus endpoint.
+
+The `Content-Range` defines the total size of the file, and optionally the data
+range included in the body of the request. When `Content-Length` is `0`, the
+`Content-Range` 
 
 *... this part of the document has not been updated yet ...*
 
@@ -144,6 +159,8 @@ Content-Disposition: attachment; filename="me.jpg"'
 
 ## Appendix A - Discussion of Prior Art
 
+*to be written ...*
+
 **Prior art:**
 
 * [YouTube Data API - Resumable Upload](https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol)
@@ -151,10 +168,13 @@ Content-Disposition: attachment; filename="me.jpg"'
 * [Resumable Media Uploads in the Google Data Protocol](https://developers.google.com/gdata/docs/resumable_upload) (deprecated)
 * [ResumableHttpRequestsProposal from Gears](http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal) (deprecated)
 
-## Todo
+## Appendix B - Cross Domain Uploads
 
-* Custom meta data
-* Multipart uploads
+*to be written ...*
+
+## Appendix C - Support for legacy / multipart clients
+
+*to be written ...*
 
 ## License
 
