@@ -8,8 +8,8 @@ interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
 ## Status
 
-Interested developers are encouraged to implement prototypes for early versions
-of this document and submit their feedback in form of comments of patches.
+Interested developers are encouraged to implement prototypes of this protocol
+and submit their feedback in form of comments of patches.
 
 ## Abstract
 
@@ -21,6 +21,16 @@ Features of the protocol include:
 * Uploading files via HTTP
 * Resuming interrupted uploads
 * Transferring parts of a file in parallel
+
+## Protocol
+
+### Uploading New Files
+
+Servers MUST provide one or more tus endpoints. A tus endpoint can be any URL,
+that processes `POST` request as described below.
+
+
+*... this part of the document has not been updated yet ...*
 
 ### POST /files
 
