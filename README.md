@@ -184,6 +184,15 @@ Clients and servers MAY choose to include additional headers for application
 specific purposes, such as `Content-Type`, `Content-Disposition`, etc. to
 provide meta information or processing directives to the server.
 
+
+... continue work here ...
+
+A completed upload will be indicated by a single range covering the entire file
+size (e.g. `Range: bytes=0-99` for a 100 byte file).
+
+**Note** If the server has not received anything so far, there will be no `Range`
+header present.
+
 **Request Example:**
 
 The request below creates an empty file resource against a tus endpoint at
@@ -205,83 +214,6 @@ Content-Range: bytes */100
 HTTP/1.1 201 Created
 Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 Content-Length: 0
-```
-
-### PUT &lt;fileUrl&gt;
-
-**Request Example:**
-
-```
-PUT /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
-Host: tus.example.org
-Content-Length: 100
-Content-Range: bytes 0-99/100
-```
-```
-<bytes 0-99>
-```
-
-**Response Example:**
-
-```
-HTTP/1.1 200 Ok
-Content-Type: image/jpg
-Content-Disposition: attachment; filename="me.jpg"'
-Range: bytes=0-99
-Content-Length: 0
-```
-
-### HEAD &lt;fileUrl&gt;
-
-**Request Example:**
-
-```
-HEAD /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
-Host: tus.example.org
-```
-
-**Response Example:**
-
-```
-HTTP/1.1 200 Ok
-Content-Length: 100
-Content-Type: image/jpg
-Content-Disposition: attachment; filename="me.jpg"'
-Range: bytes=0-20,40-99
-```
-
-The `Range` header holds a [byte
-range](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1) that
-informs the client which parts of the file have been received so far. It is
-up to the client to choose appropriate `PUT` requests to complete the upload.
-
-A completed upload will be indicated by a single range covering the entire file
-size (e.g. `Range: bytes=0-99` for a 100 byte file).
-
-**Note** If the server has not received anything so far, there will be no `Range`
-header present.
-
-### GET &lt;fileUrl&gt;
-
-Used to download an uploaded file.
-
-**Request:**
-
-```
-GET /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
-Host: tus.example.org
-```
-
-**Response:**
-
-```
-HTTP/1.1 200 Ok
-Content-Length: 100
-Content-Type: image/jpg
-Content-Disposition: attachment; filename="me.jpg"'
-```
-```
-[file data]
 ```
 
 ## Appendix A - Discussion of Prior Art
