@@ -11,6 +11,11 @@ interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
 This protocol is under development and is not ready for general adoption yet.
 
+The goal is to have 1.0 release candidate in a few weeks, at which point only
+minor revision will be made to the protocol. After a few months 1.0 will be
+frozen, and changes will be considered very carefully. Ideally there will be no
+need for a version 2.0.
+
 ## Contributing
 
 This protocol is authored and owned by the tus community. We welcome patches
@@ -24,28 +29,18 @@ if you'd like to be listed on the
 
 ## Abstract
 
-The tus resumable upload protocol describes a light-weigh mechanism for file
-uploads over http that can be resumed in the event of a network failure.
-
-Features of the protocol include:
-
-* Uploading files via HTTP
-* Resuming interrupted uploads
-
-## Protocol
-
-This protocol adds a small layer on top of 
-[RFC 2616](http://tools.ietf.org/html/rfc2616) (HTTP 1.1) to provide a
+The protocol describes the use of a subset of [RFC
+2616](http://tools.ietf.org/html/rfc2616) (HTTP 1.1) in order to achieve a
 [RESTful](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
 mechanism for resumable file uploads.
 
-### Example: Resumable Upload
+## Example: Resumable Upload
 
 The example below is meant to give you a quick overview over the protocol, but
 is not part of the protocol definition.
 
-A new file resource is created by sending POST request to an URL defined by the
-server:
+A new file resource is created by sending a POST request to an URL defined by
+the server:
 
 **Request:**
 
@@ -111,7 +106,7 @@ Range: bytes=0-69
 ```
 
 The `Range` tells the client how much data made it to the server, so he
-continue from there:
+can continue from there:
 
 ```
 PUT /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
@@ -131,13 +126,15 @@ Range: bytes=0-99
 Content-Length: 0
 ```
 
+## Protocol
+
 ### Error Handling
 
 Well defined error handling is the core of this protocol, so it is the first
 thing you should pay attention to.
 
 Servers MUST use appropriate http status codes for all error responses. In
-particular, they SHOULD use `400 Bad Request` for invalid requests, `501 Not
+particular, they MUST use `400 Bad Request` for invalid requests, `501 Not
 Implemented` for unsupported features and `500 Internal Error` for internal
 problems.
 
