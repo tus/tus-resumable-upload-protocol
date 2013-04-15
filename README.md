@@ -30,7 +30,7 @@ if you'd like to be listed on the
 
 ## Abstract
 
-The protocol describes the use of a subset of [RFC
+The protocol describes the use of [RFC
 2616](http://tools.ietf.org/html/rfc2616) (HTTP 1.1) in order to achieve a
 [RESTful](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
 mechanism for resumable file uploads.
@@ -150,9 +150,13 @@ Content-Length: 0
 
 ## Protocol
 
+Unless declared otherwise, all rules defined in [RFC
+2616](http://tools.ietf.org/html/rfc2616) apply when implementing this
+protocol.
+
 ### Response Codes
 
-Servers MUST use the following http status codes:
+Servers MUST implement the following http status codes:
 
 * `200 Ok` per default
 * `201 Created` after creating new resources
@@ -163,6 +167,24 @@ Servers MUST use the following http status codes:
 Servers MAY use additional status codes as defined in RFC 2616, and clients
 SHOULD interpret them accordingly, or fall back to interpret unknown codes as
 irrecoverable errors.
+
+### Request Headers
+
+`Content-Length`: Defines the amount of bytes included in the request body.
+
+`Content-Range`: When `Content-Length` is `0`, the `Content-Range` MUST be
+given as `bytes */[size]` where `[size]` is the total size of the file. For
+`Content-Length` values larger than `0`, the `Content-Range` MUST take the form
+`bytes [from]-[to]/[size]`, where [from] and [to] define the byte range
+transmitted in the body.
+
+### Response Headers
+
+`Range`: Defines the amount of bytes a server has received for the given file
+resource. Takes the form `bytes=[from]-[to]`. An empty file is indicated by the
+absence of a `Range` header. A completed file is indicated by a `Range` header
+where `[from]` is `0` and `[to]` is `[size - 1]` (e.g. `Range: bytes=0-99` for
+a 100 byte file).
 
 ### Error Handling
 
@@ -183,20 +205,11 @@ up to the client to decide to give up at some point.
 A server MUST define one or more fixed URLs for clients to create new file
 resources via `POST` requests (e.g `/files`).
 
-All file resource creation requests MUST include a `Content-Range` and
+All file resource creation requests MUST include a `Content-Range` and a
 `Content-Length` header.
 
-The `Content-Length` defines the amount of bytes included in the request body.
-For resumable uploads it SHOULD be set to `0`, but clients MAY choose to upload
-some or all bytes of a file when creating it.
-
-The `Content-Range` defines the total size of the file, and optionally the data
-range included in the body of the request. When `Content-Length` is `0`, the
-`Content-Range` MUST be given as `bytes */[size]` where `[size]` is the total
-size of the file. For `Content-Length` values larger than `0`, the
-`Content-Range` MUST take the form `bytes [from]-[to]/[size]`. Servers MAY
-respond to `[from]` values other than `0` with `501 Not Implemented` when
-creating a new file resource.
+The `Content-Length` SHOULD be set to `0`, but clients MAY choose to upload some
+or all bytes of a file when creating it.
 
 A valid request MUST be acknowledged with a `201 Created` status by the server.
 The response MUST also include a `Location` header that holds the absolute URL
@@ -206,22 +219,23 @@ Clients SHOULD also include meta headers , such as `Content-Type`,
 `Content-Disposition`, and MAY also include headers to trigger server specific
 behavior.
 
-Servers MUST respond with a `Range` header when creating a new file resource.
-The header value takes the form `bytes=[from]-[to]`. 
-
-A completed upload will be indicated by a single range covering the entire file
-size (e.g. `Range: bytes=0-99` for a 100 byte file).
-
 ### Uploading File Data (PUT)
 
-... to be written ...
+Clients MUST use `PUT` requests in order to upload data to an existing file
+resource (e.g. `/files/24e533e02ec3bc40c387f1a0e460e216`).
+
+`PUT` requests MUST include a `Content-Length` header larger than `0`, as well
+as a corresponding `Content-Range` header.
+
+Servers MUST handle overlapping `PUT` requests in an idempotent fashion given
+that the overlapping data is identical. Otherwise the behavior is undefined.
+
+The `Range` response header indicates if a file has been received completely.
 
 ### Checking File Resources (HEAD)
 
-... to be written ...
-
-**Note** If the server has not received anything so far, there will be no `Range`
-header present.
+Clients MUST use `HEAD` requests to inquire about the `Range` of data received
+by an existing file resource.
 
 ## Appendix A - Discussion of Prior Art
 
