@@ -1,6 +1,7 @@
 # tus resumable upload protocol
 
 **Version:** 0.1 ([SemVer](http://semver))<br>
+**Date:** 2013-04-15<br>
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos)
 
@@ -55,7 +56,7 @@ Host: tus.example.org
 Content-Length: 0
 Content-Range: bytes */100
 Content-Type: image/jpeg
-Content-Disposition: attachment; filename="cat.jpg"'
+Content-Disposition: attachment; filename="cat.jpg"
 ```
 ```
 [empty body]
@@ -168,24 +169,6 @@ Servers MAY use additional status codes as defined in RFC 2616, and clients
 SHOULD interpret them accordingly, or fall back to interpret unknown codes as
 irrecoverable errors.
 
-### Request Headers
-
-`Content-Length`: Defines the amount of bytes included in the request body.
-
-`Content-Range`: When `Content-Length` is `0`, the `Content-Range` MUST be
-given as `bytes */[size]` where `[size]` is the total size of the file. For
-`Content-Length` values larger than `0`, the `Content-Range` MUST take the form
-`bytes [from]-[to]/[size]`, where [from] and [to] define the byte range
-transmitted in the body.
-
-### Response Headers
-
-`Range`: Defines the amount of bytes a server has received for the given file
-resource. Takes the form `bytes=[from]-[to]`. An empty file is indicated by the
-absence of a `Range` header. A completed file is indicated by a `Range` header
-where `[from]` is `0` and `[to]` is `[size - 1]` (e.g. `Range: bytes=0-99` for
-a 100 byte file).
-
 ### Error Handling
 
 Both clients and servers SHOULD attempt to detect and handle network errors
@@ -199,6 +182,24 @@ store as much of the received data as possible.
 Clients SHOULD use a randomized exponential back off strategy after
 encountering a network error or receiving a `500 Internal Server Error`. It is
 up to the client to decide to give up at some point.
+
+### Request Headers
+
+`Content-Length`: Defines the amount of bytes included in the request body.
+
+`Content-Range`: When `Content-Length` is `0`, the `Content-Range` MUST be
+given as `bytes */[size]` where `[size]` is the total size of the file. For
+`Content-Length` values larger than `0`, the `Content-Range` MUST take the form
+`bytes [from]-[to]/[size]`, where `[from]` and `[to]` define the byte range
+transmitted in the body according to RFC 2616.
+
+### Response Headers
+
+`Range`: Defines the range of bytes a server has received for the given file
+resource. Takes the form `bytes=[from]-[to]`. An empty file is indicated by the
+absence of a `Range` header. A completed file is indicated by a `Range` header
+where `[from]` is `0` and `[to]` is `[size - 1]` (e.g. `Range: bytes=0-99` for
+a 100 byte file).
 
 ### Creating File Resources (POST)
 
