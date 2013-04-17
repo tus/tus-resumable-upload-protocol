@@ -163,6 +163,7 @@ Servers MUST implement the following http status codes:
 * `201 Created` after creating new resources
 * `400 Bad Request` for invalid request
 * `404 Not Found` for unknown resources
+* `413 Request Entity Too Large` to enforce file size limits
 * `500 Internal Server Error` for transient problems
 
 Servers MAY use additional status codes as defined in RFC 2616, and clients
@@ -185,7 +186,12 @@ up to the client to decide to give up at some point.
 
 ### Request Headers
 
-`Content-Length`: Defines the amount of bytes included in the request body.
+`Content-Length`: Defines the amount of bytes included in the request body. For
+[historical reasons](http://www.motobit.com/help/scptutl/pa98.htm), some
+clients and servers may be unable to process `Content-Length` values larger
+than 2147483648 (2 GB). Clients therefore SHOULD expose a maximum chunk size
+option which defaults to 2147483647 (2 GB - 1) for breaking up large files into
+multiple PUT requests.
 
 `Content-Range`: When `Content-Length` is `0`, the `Content-Range` MUST be
 given as `bytes */[size]` where `[size]` is the total size of the file. For
@@ -219,6 +225,9 @@ of the created file resource.
 Clients SHOULD also include meta headers , such as `Content-Type`,
 `Content-Disposition`, and MAY also include headers to trigger server specific
 behavior.
+
+Servers MAY also define custom file size / request size limits and MUST respond
+with `413 Request Entity Too Large` if the limits are exceeded.
 
 ### Uploading File Data (PUT)
 
