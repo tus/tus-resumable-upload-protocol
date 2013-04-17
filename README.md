@@ -257,6 +257,7 @@ by an existing file resource.
 * [Google Drive - Upload Files](https://developers.google.com/drive/manage-uploads)
 * [Amazon S3 Multipart API](http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html)
 * [Resumable.js](https://github.com/23/resumable.js)
+* [NGINX Upload Module](http://www.grid.net.ru/nginx/resumable_uploads.en.html)
 * [Resumable Media Uploads in the Google Data Protocol](https://developers.google.com/gdata/docs/resumable_upload) (deprecated)
 * [ResumableHttpRequestsProposal from Gears](http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal) (deprecated)
 
