@@ -1,6 +1,6 @@
 # tus resumable upload protocol
 
-**Version:** 0.1 ([SemVer](http://semver))<br>
+**Version:** 0.1 ([SemVer](http://semver.org))<br>
 **Date:** 2013-04-15<br>
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos)
