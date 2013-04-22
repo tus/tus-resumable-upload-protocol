@@ -1,0 +1,8 @@
+ol{
+  list-style-type: none;
+}
+
+#container{
+  width: 960px;
+  margin: 0 auto;
+}
