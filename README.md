@@ -31,10 +31,8 @@ if you'd like to be listed on the
 
 ## Abstract
 
-The protocol describes the use of [RFC
-2616](http://tools.ietf.org/html/rfc2616) (HTTP 1.1) in order to achieve a
-[RESTful](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
-mechanism for resumable file uploads.
+The protocol provides a mechanism for resumable file uploads via HTTP 1.1 ([RFC
+2616](http://tools.ietf.org/html/rfc2616))
 
 ## Notation
 
@@ -54,9 +52,6 @@ the server:
 POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
-Content-Range: bytes */100
-Content-Type: image/jpeg
-Content-Disposition: attachment; filename="cat.jpg"
 ```
 ```
 [empty body]
@@ -79,20 +74,19 @@ upload:
 **Request:**
 
 ```
-PUT /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
 Content-Length: 100
-Content-Range: bytes 0-99/100
+Offset: 0
 ```
 ```
-[bytes 0-99]
+[file data]
 ```
 
 **Response:**
 
 ```
 HTTP/1.1 200 Ok
-Range: bytes=0-99
 Content-Length: 0
 ```
 ```
@@ -100,13 +94,14 @@ Content-Length: 0
 ```
 
 In this case, the upload succeeded. However, if there had been a network error
-during the `PUT` request, the client could have also resumed this upload:
+, the client could have also resumed this upload:
 
 **Request:**
 
 ```
 HEAD /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
+Content-Length: 0
 ```
 ```
 [empty body]
@@ -117,32 +112,29 @@ Host: tus.example.org
 ```
 HTTP/1.1 200 Ok
 Content-Length: 100
-Content-Type: image/jpg
-Content-Disposition: attachment; filename="cat.jpg"'
-Range: bytes=0-69
+Tus-Offset: 70
 ```
 ```
 [empty body]
 ```
 
-The `Range` tells the client how much data made it to the server, so he
-can continue from there:
+The `Tus-Offset` tells the client how much data made it to the server and where
+to continue.
 
 ```
-PUT /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+POST /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
 Content-Length: 30
-Content-Range: bytes 70-99/100
+Tus-Offset: 70
 ```
 ```
-[bytes 70-99]
+[file data]
 ```
 
 **Response:**
 
 ```
 HTTP/1.1 200 Ok
-Range: bytes=0-99
 Content-Length: 0
 ```
 ```
@@ -264,6 +256,10 @@ by an existing file resource.
 ## Appendix B - Cross Domain Uploads
 
 *to be written ...*
+
+### Sub level
+
+Test
 
 ## Appendix C - Support for legacy / multipart clients
 
