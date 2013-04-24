@@ -6,8 +6,15 @@ var robotskirt = require('robotskirt');
 var fs = require('fs');
   
 var toc = [];
+var port = process.env.PORT || 8080;
 
 http.createServer(function(req, res) {
+  if (req.url != '/') {
+    res.writeHead(404);
+    res.end('404 - not found');
+    return;
+  }
+
   renderProtocol(function(err, html) {
     if (err) {
       res.writeHead(500);
@@ -18,7 +25,9 @@ http.createServer(function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html; charset=utf8'});
     res.end(html);
   });
-}).listen(8080);
+}).listen(port, function() {
+  console.log('listening on http://localhost:'+port);
+});
 
 function renderProtocol(cb) {
   var renderer = new robotskirt.HtmlRenderer();
@@ -36,13 +45,15 @@ function renderProtocol(cb) {
 
     counters[level-1] = (counters[level-1] || 0) + 1;
     if (level < prevLevel) {
-      counters.pop();
+      for (var i = 0; i < prevLevel - level; i++) {
+        counters.pop();
+      }
     }
     var prefix = counters.join('.')+'. ';
     if (level > prevLevel) {
       toc += '<ol>';
     } else if (level < prevLevel) {
-      toc += '</ol>';
+      toc += Array(prevLevel - level + 1).join('</ol>');
     }
     var id = counters.join('-');
     toc += '<li><a href="#'+id+'">'+prefix+title+'</a></li>';
