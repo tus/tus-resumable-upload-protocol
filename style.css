@@ -1,5 +1,19 @@
+body{
+  font-family: Courier New, monospace;
+}
+
+h1{font-size: 30px}
+h2{font-size: 24px}
+h3{font-size: 18px}
+
 ol{
   list-style-type: none;
+}
+
+pre{
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  padding: 10px 6px;
 }
 
 #container{

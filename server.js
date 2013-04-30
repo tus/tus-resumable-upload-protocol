@@ -59,10 +59,10 @@ function renderProtocol(cb) {
     toc += '<li><a href="#'+id+'">'+prefix+title+'</a></li>';
     prevLevel = level;
 
-    return '<h'+level+' id="'+id+'">'+prefix+title+'</h'+level+'>';
+    return '<h'+(level+1)+' id="'+id+'">'+prefix+title+'</h'+(level+1)+'>';
   };
 
-  var md = new robotskirt.Markdown(renderer);
+  var md = new robotskirt.Markdown(renderer, [robotskirt.EXT_FENCED_CODE]);
   fs.readFile(__dirname + '/protocol.md', 'utf-8', function(err, markdown) {
     if (err) return cb(err);
 
