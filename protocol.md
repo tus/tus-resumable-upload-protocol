@@ -42,7 +42,7 @@ Characters enclosed by square brackets indicate a placeholder (e.g. `[size]`).
 
 The core protocol describes how to resume an interrupted upload. It assumes that
 you already have a URL for the upload, usually created via the [File
-Creation](#6-1) extension.
+Creation](#file-creation) extension.
 
 All clients and servers MUST implement the core protocol.
 
@@ -111,16 +111,15 @@ The `Offset` value SHOULD be equal, but MAY also be smaller than the current
 offset of the resource, and servers MUST handle `PATCH` operations containing
 the same data at the same absolute offsets idempotently. The behavior of using
 `Offset` values larger than the current upload offset is undefined, see the
-[Parallel Chunks Extension](#6-3).
+[Parallel Chunks](#parallel-chunks) extension.
 
-Clients SHOULD usually send all remaining bytes of a resource in a single
-`PATCH` request, but MAY also use multiple small requests for scenarios where
-this is desirable (e.g. NGINX buffering requests before they reach their
-backend).
+Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
+request, but MAY also use multiple small requests for scenarios where this is
+desirable (e.g. NGINX buffering requests before they reach their backend).
 
 Servers MUST acknowledge successful `PATCH` operations using a `200 Ok` status,
 which implicitly means that clients can assume that the new `Offset` = `Offset`
-+ `Content-Length`.
+\+ `Content-Length`.
 
 Both clients and servers SHOULD attempt to detect and handle network errors
 predictably. They may do so by checking for read/write socket errors, as well
@@ -248,7 +247,6 @@ defining a compatibility protocol extension.
 ### How are pause/resume handled? When should I delete partial uploads?
 
 Needs to be written ...
-
 
 ## License
 
