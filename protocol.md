@@ -1,6 +1,6 @@
 # tus resumable upload protocol
 
-**Version:** 0.1 ([SemVer](http://semver))<br>
+**Version:** 0.2 ([SemVer](http://semver))<br>
 **Date:** 2013-04-15<br>
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos)
@@ -32,142 +32,100 @@ if you'd like to be listed on the
 ## Abstract
 
 The protocol provides a mechanism for resumable file uploads via HTTP 1.1 ([RFC
-2616](http://tools.ietf.org/html/rfc2616))
+2616](http://tools.ietf.org/html/rfc2616)).
 
 ## Notation
 
 Characters enclosed by square brackets indicate a placeholder (e.g. `[size]`).
 
-## Example: Resumable Upload
+## Core Protocol
 
-The example below is meant to give you a quick overview over the protocol, but
-is not part of the protocol definition.
+The core protocol describes how to resume an interrupted upload. It assumes that
+you already have a URL for the upload, usually created via the [File
+Creation](#6-1) extension.
 
-A new file resource is created by sending a POST request to an URL defined by
-the server:
+All clients and servers MUST implement the core protocol.
 
-**Request:**
+### Example
 
-```
-POST /files HTTP/1.1
-Host: tus.example.org
-Content-Length: 0
-```
-```
-[empty body]
-```
+A HEAD request is used to determine the offset at which the upload should be
+continued.
 
-**Response:**
-
-```
-HTTP/1.1 201 Created
-Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
-Content-Length: 0
-```
-```
-[empty body]
-```
-
-After being assigned a resource `Location`, the client starts the actual
-upload:
-
-**Request:**
-
-```
-PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
-Host: tus.example.org
-Content-Length: 100
-Offset: 0
-```
-```
-[file data]
-```
-
-**Response:**
-
-```
-HTTP/1.1 200 Ok
-Content-Length: 0
-```
-```
-[empty body]
-```
-
-In this case, the upload succeeded. However, if there had been a network error
-, the client could have also resumed this upload:
+The example below shows the continuation of a 100 byte upload that was
+interrupted after 70 bytes were transfered.
 
 **Request:**
 
 ```
 HEAD /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
-Content-Length: 0
-```
-```
-[empty body]
 ```
 
 **Response:**
 
 ```
 HTTP/1.1 200 Ok
-Content-Length: 100
-Tus-Offset: 70
-```
-```
-[empty body]
+Offset: 70
 ```
 
-The `Tus-Offset` tells the client how much data made it to the server and where
-to continue.
+Given the offset, the client uses the PATCH method to resume the upload:
+
+
+**Request:**
 
 ```
-POST /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
 Content-Length: 30
-Tus-Offset: 70
-```
-```
-[file data]
+Offset: 70
+
+[remaining 30 bytes]
 ```
 
 **Response:**
 
 ```
 HTTP/1.1 200 Ok
-Content-Length: 0
-```
-```
-[empty body]
 ```
 
-## Protocol
+### Headers
 
-Unless declared otherwise, all rules defined in [RFC
-2616](http://tools.ietf.org/html/rfc2616) apply when implementing this
-protocol.
+#### Offset
 
-### Response Codes
+The `Offset` header is a request and response header that indicates a byte
+offset within a resource. The value MUST be an integer that is `0` or larger.
 
-Servers MUST implement the following http status codes:
+### Requests
 
-* `200 Ok` per default
-* `201 Created` after creating new resources
-* `400 Bad Request` for invalid request
-* `404 Not Found` for unknown resources
-* `413 Request Entity Too Large` to enforce file size limits
-* `500 Internal Server Error` for transient problems
+#### HEAD
 
-Servers MAY use additional status codes as defined in RFC 2616, and clients
-SHOULD interpret them accordingly, or fall back to interpret unknown codes as
-irrecoverable errors.
+Servers MUST always return an `Offset` header for `HEAD` requests against a tus
+resource, even if it is `0`, or the upload is already considered completed.
 
-### Error Handling
+#### PATCH
+
+Servers MUST accept `PATCH` requests against any tus resource and apply the
+bytes contained in the message at the given `Offset`.
+
+The `Offset` value SHOULD be equal, but MAY also be smaller than the current
+offset of the resource, and servers MUST handle `PATCH` operations containing
+the same data at the same absolute offsets idempotently. The behavior of using
+`Offset` values larger than the current upload offset is undefined, see the
+[Parallel Chunks Extension](#6-3).
+
+Clients SHOULD usually send all remaining bytes of a resource in a single
+`PATCH` request, but MAY also use multiple small requests for scenarios where
+this is desirable (e.g. NGINX buffering requests before they reach their
+backend).
+
+Servers MUST acknowledge successful `PATCH` operations using a `200 Ok` status,
+which implicitly means that clients can assume that the new `Offset` = `Offset`
++ `Content-Length`.
 
 Both clients and servers SHOULD attempt to detect and handle network errors
 predictably. They may do so by checking for read/write socket errors, as well
 as setting read/write timeouts. Both clients and servers SHOULD use a 30 second
-timeout. A timeout SHOULD be handled by closing the underlaying socket.
+timeout. A timeout SHOULD be handled by closing the underlaying connection.
 
 Servers SHOULD always attempt to process partial message bodies in order to
 store as much of the received data as possible.
@@ -176,94 +134,121 @@ Clients SHOULD use a randomized exponential back off strategy after
 encountering a network error or receiving a `500 Internal Server Error`. It is
 up to the client to decide to give up at some point.
 
-### Request Headers
+## Protocol Extensions
 
-`Content-Length`: Defines the amount of bytes included in the request body. For
-[historical reasons](http://www.motobit.com/help/scptutl/pa98.htm), some
-clients and servers may be unable to process `Content-Length` values larger
-than 2147483648 (2 GB). Clients therefore SHOULD expose a maximum chunk size
-option which defaults to 2147483647 (2 GB - 1) for breaking up large files into
-multiple PUT requests.
+Clients and servers are encouraged to implement as many of the extensions
+described below as possible. There is no feature detection for clients, instead
+they should allow individual extensions to be enabled/disabled in order to
+match the available server features.
 
-`Content-Range`: When `Content-Length` is `0`, the `Content-Range` MUST be
-given as `bytes */[size]` where `[size]` is the total size of the file. For
-`Content-Length` values larger than `0`, the `Content-Range` MUST take the form
-`bytes [from]-[to]/[size]`, where `[from]` and `[to]` define the byte range
-transmitted in the body according to RFC 2616.
+### File Creation
 
-### Response Headers
+All clients and servers SHOULD implement the file creation API. In cases where
+that does not make sense, a custom mechanism may be used instead.
 
-`Range`: Defines the range of bytes a server has received for the given file
-resource. Takes the form `bytes=[from]-[to]`. An empty file is indicated by the
-absence of a `Range` header. A completed file is indicated by a `Range` header
-where `[from]` is `0` and `[to]` is `[size - 1]` (e.g. `Range: bytes=0-99` for
-a 100 byte file).
+#### Example
 
-### Creating File Resources (POST)
+An empty POST request is used to create a new upload resource. The
+`Final-Length` header indicates the final size of the file.
 
-A server MUST define one or more fixed URLs for clients to create new file
-resources via `POST` requests (e.g `/files`).
+**Request:**
 
-All file resource creation requests MUST include a `Content-Range` and a
-`Content-Length` header.
+```
+POST /files HTTP/1.1
+Host: tus.example.org
+Content-Length: 0
+Final-Length: 100
+```
 
-The `Content-Length` SHOULD be set to `0`, but clients MAY choose to upload some
-or all bytes of a file when creating it.
+**Response:**
 
-A valid request MUST be acknowledged with a `201 Created` status by the server.
-The response MUST also include a `Location` header that holds the absolute URL
-of the created file resource.
+```
+HTTP/1.1 201 Created
+Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
+```
 
-Clients SHOULD also include meta headers , such as `Content-Type`,
-`Content-Disposition`, and MAY also include headers to trigger server specific
-behavior.
+The new resource has an implicit offset of `0` allowing the client to use the
+core protocol for performing the actual upload.
 
-Servers MAY also define custom file size / request size limits and MUST respond
-with `413 Request Entity Too Large` if the limits are exceeded.
+#### Headers
 
-### Uploading File Data (PUT)
+##### Final-Length
 
-Clients MUST use `PUT` requests in order to upload data to an existing file
-resource (e.g. `/files/24e533e02ec3bc40c387f1a0e460e216`).
+The `Final-Length` header indicates the final size of a new resource in bytes.
+This way a server will implicitly know when a file has completed uploading.
 
-`PUT` requests MUST include a `Content-Length` header larger than `0`, as well
-as a corresponding `Content-Range` header.
+#### Requests
 
-Servers MUST handle overlapping `PUT` requests in an idempotent fashion given
-that the overlapping data is identical. Otherwise the behavior is undefined.
+##### POST
 
-The `Range` response header indicates if a file has been received completely.
+Clients MUST use a `POST` against a well known file creation url to request the
+creation of a new file resource. The request MUST include a `Final-Size`
+header.
 
-### Checking File Resources (HEAD)
+Servers MUST acknowledge a successful file creation request with a `201
+Created` response code and include an absolute url for the created resource in
+the `Location` header.
 
-Clients MUST use `HEAD` requests to inquire about the `Range` of data received
-by an existing file resource.
+Clients then continue to perform the actual upload of the file using the core
+protocol.
 
-## Appendix A - Discussion of Prior Art
+### Checksums
 
-*to be written ...*
+This extension will define how to provide per file or per chunk checksums for
+uploaded files.
 
-**Prior art:**
+### Parallel Chunks
 
-* [YouTube Data API - Resumable Upload](https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol)
-* [Google Drive - Upload Files](https://developers.google.com/drive/manage-uploads)
-* [Amazon S3 Multipart API](http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html)
-* [Resumable.js](https://github.com/23/resumable.js)
-* [NGINX Upload Module](http://www.grid.net.ru/nginx/resumable_uploads.en.html)
-* [Resumable Media Uploads in the Google Data Protocol](https://developers.google.com/gdata/docs/resumable_upload) (deprecated)
-* [ResumableHttpRequestsProposal from Gears](http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal) (deprecated)
+This extension will define how to upload several chunks of a file in parallel in
+order to overcome the throughput limitations of individual tcp connections.
 
-## Appendix B - Cross Domain Uploads
+### Metadata
 
-*to be written ...*
+This extension will define how to provide meta information when uploading files.
 
-### Sub level
+### Streams
 
-Test
+This extension will define how to upload finite streams of data that have an
+unknown length at the beginning of the upload.
 
-## Appendix C - Support for legacy / multipart clients
+## FAQ
 
-*to be written ...*
+### Why is the protocol using custom headers?
+
+We have carefully investigated the use of existing headers such as `Range` and
+`Content-Range`, but unfortunately they are defined in a way that makes them
+unsuitable for resumable file uploads.
+
+We also considered using existing `PATCH` payload formats such as
+[multipart/byteranges](http://greenbytes.de/tech/webdav/draft-ietf-httpbis-p5-range-latest.html#internet.media.type.multipart.byteranges),
+but unfortunately the XHR2 [FormData
+interface](http://www.w3.org/TR/XMLHttpRequest/#interface-formdata) does not
+support custom headers for multipart parts, and the [send()
+method](http://www.w3.org/TR/XMLHttpRequest/#the-send-method) does not allow
+streaming arbitrary data without loading all of it into memory.
+
+That being said, custom headers also allowed us to greatly simplify the
+implementation requirements for clients and servers, so we're quite happy with
+them.
+
+### Why are you not using the "X-" prefix for your headers?
+
+The "X-" prefix for headers has been deprecated, see [RFC
+6648](http://tools.ietf.org/html/rfc6648).
+
+### How can I deal with bad http proxies?
+
+If you are dealing with http proxies that strip/modify http headers or can't
+handle `PATCH` requests properly, you should consider using https which will
+make it impossible for proxies to modify your requests.
+
+If that is not an option for you, please reach out to us, we are open to
+defining a compatibility protocol extension.
+
+### How are pause/resume handled? When should I delete partial uploads?
+
+Needs to be written ...
+
 
 ## License
 
