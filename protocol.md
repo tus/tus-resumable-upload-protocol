@@ -3,7 +3,8 @@
 **Version:** 0.2 ([SemVer](http://semver.org))<br>
 **Date:** 2013-04-15<br>
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
-Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos)
+Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos),
+[Naren Venkataraman](https://github.com/vayam)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
