@@ -181,7 +181,7 @@ This way a server will implicitly know when a file has completed uploading.
 ##### POST
 
 Clients MUST use a `POST` against a well known file creation url to request the
-creation of a new file resource. The request MUST include a `Final-Size`
+creation of a new file resource. The request MUST include a `Final-Length`
 header.
 
 Servers MUST acknowledge a successful file creation request with a `201
