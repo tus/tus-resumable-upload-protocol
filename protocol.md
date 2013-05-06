@@ -76,6 +76,7 @@ Given the offset, the client uses the PATCH method to resume the upload:
 ```
 PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
+Content-Type: video/mp4
 Content-Length: 30
 Offset: 70
 
@@ -120,6 +121,8 @@ desirable (e.g. NGINX buffering requests before they reach their backend).
 Servers MUST acknowledge successful `PATCH` operations using a `200 Ok` status,
 which implicitly means that clients can assume that the new `Offset` = `Offset`
 \+ `Content-Length`.
+
+Clients SHOULD send Content-Type of the file with every 'PATCH' request.
 
 Both clients and servers SHOULD attempt to detect and handle network errors
 predictably. They may do so by checking for read/write socket errors, as well
