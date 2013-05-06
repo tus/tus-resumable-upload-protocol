@@ -122,7 +122,7 @@ Servers MUST acknowledge successful `PATCH` operations using a `200 Ok` status,
 which implicitly means that clients can assume that the new `Offset` = `Offset`
 \+ `Content-Length`.
 
-Clients SHOULD send Content-Type of the file with every 'PATCH' request.
+Clients SHOULD send Content-Type of the file in every `PATCH` request.
 
 Both clients and servers SHOULD attempt to detect and handle network errors
 predictably. They may do so by checking for read/write socket errors, as well
