@@ -175,7 +175,8 @@ core protocol for performing the actual upload.
 ##### Final-Length
 
 The `Final-Length` header indicates the final size of a new resource in bytes.
-This way a server will implicitly know when a file has completed uploading.
+This way a server will implicitly know when a file has completed uploading. The
+value MUST be a non-negative integer.
 
 #### Requests
 
