@@ -106,7 +106,8 @@ resource, even if it is `0`, or the upload is already considered completed.
 #### PATCH
 
 Servers MUST accept `PATCH` requests against any tus resource and apply the
-bytes contained in the message at the given `Offset`.
+bytes contained in the message at the given `Offset`. All `PATCH` requests
+MUST use `Content-Type: application/offset+octet-stream`.
 
 The `Offset` value SHOULD be equal, but MAY also be smaller than the current
 offset of the resource, and servers MUST handle `PATCH` operations containing
