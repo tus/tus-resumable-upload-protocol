@@ -151,7 +151,7 @@ that does not make sense, a custom mechanism may be used instead.
 #### Example
 
 An empty POST request is used to create a new upload resource. The
-`Final-Length` header indicates the final size of the file.
+`Entity-Length` header indicates the size of the file that will be uploaded.
 
 **Request:**
 
@@ -159,7 +159,7 @@ An empty POST request is used to create a new upload resource. The
 POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
-Final-Length: 100
+Entity-Length: 100
 ```
 
 **Response:**
@@ -174,9 +174,9 @@ core protocol for performing the actual upload.
 
 #### Headers
 
-##### Final-Length
+##### Entity-Length
 
-The `Final-Length` header indicates the final size of a new resource in bytes.
+The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer.
 
@@ -185,7 +185,7 @@ value MUST be a non-negative integer.
 ##### POST
 
 Clients MUST use a `POST` against a well known file creation url to request the
-creation of a new file resource. The request MUST include a `Final-Length`
+creation of a new file resource. The request MUST include a `Entity-Length`
 header.
 
 Servers MUST acknowledge a successful file creation request with a `201
