@@ -77,6 +77,7 @@ Given the offset, the client uses the PATCH method to resume the upload:
 ```
 PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
+Content-Type: application/offset+octet-stream
 Content-Length: 30
 Offset: 70
 
