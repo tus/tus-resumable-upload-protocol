@@ -1,7 +1,7 @@
 # tus resumable upload protocol
 
-**Version:** 0.2.1 ([SemVer](http://semver.org))<br>
-**Date:** 2013-04-15<br>
+**Version:** 0.2.2 ([SemVer](http://semver.org))<br>
+**Date:** 2014-01-26<br>
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos),
 [Naren Venkataraman](https://github.com/vayam)
@@ -103,6 +103,8 @@ offset within a resource. The value MUST be an integer that is `0` or larger.
 
 Servers MUST always return an `Offset` header for `HEAD` requests against a tus
 resource, even if it is `0`, or the upload is already considered completed.
+If the tus resource is not found Servers MUST return either `404` or `403` 
+without `Offset` Header.
 
 #### PATCH
 
