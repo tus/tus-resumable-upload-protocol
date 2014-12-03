@@ -199,8 +199,8 @@ protocol.
 
 ### Upload Expiration
 
-The server may want to remove unfinished uploads. In order to indicate to the
-client this extension should be implemented.
+The server may want to remove unfinished uploads. In order to indicate this
+behavior to the client this extension SHOULD be implemented.
 
 #### Example
 
@@ -231,8 +231,8 @@ Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
 ##### Upload-Expires
 
 The `Upload-Expires` header indicates how much time an upload has to complete
-before it expires. A server may wish to remove incomplete uploads after a given
-period to prevent abandoned uploads from taking up space. The client should
+before it expires. A server MAY wish to remove incomplete uploads after a given
+period to prevent abandoned uploads from taking up space. The client SHOULD
 use this header to determine if an upload is still valid before attempting to
 upload another chunk and otherwise begin the upload process from scratch.
 
@@ -240,9 +240,9 @@ This header MUST be included in the reponse to every PATCH request if the upload
 is going to expire. Its value MAY change over time.
 
 If a client does attempt to resume an upload which has since been removed by the
-server, the server should respond with 404 Not Found or 410 Gone. The latter
-one should be used if the server is keeping track of expired uploads. In both
-cases the client needs to start a new upload.
+server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
+one SHOULD be used if the server is keeping track of expired uploads. In both
+cases the client MUST start a new upload.
 
 The value of the  `Upload-Expires` header MUST be in
 [RFC 2616](http://tools.ietf.org/html/rfc2616) datetime format.
