@@ -197,6 +197,56 @@ the `Location` header.
 Clients then continue to perform the actual upload of the file using the core
 protocol.
 
+### Upload Expiration
+
+The server may want to remove unfinished uploads. In order to indicate to the
+client this extension should be implemented.
+
+#### Example
+
+The upload will be available until the time specified in `Upload-Expires`.
+After this date the upload isn't available and can't be continued.
+
+**Request:**
+
+```
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Host: tus.example.org
+Content-Type: application/offset+octet-stream
+Content-Length: 30
+Offset: 70
+
+[remaining 30 bytes]
+```
+
+**Response:**
+
+```
+HTTP/1.1 200 Ok
+Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
+```
+
+#### Headers
+
+##### Upload-Expires
+
+The `Upload-Expires` header indicates how much time an upload has to complete
+before it expires. A server may wish to remove incomplete uploads after a given
+period to prevent abandoned uploads from taking up space. The client should
+use this header to determine if an upload is still valid before attempting to
+upload another chunk and otherwise begin the upload process from scratch.
+
+This header MUST be included in the reponse to every PATCH request if the upload
+is going to expire. Its value MAY change over time.
+
+If a client does attempt to resume an upload which has since been removed by the
+server, the server should respond with 404 Not Found or 410 Gone. The latter
+one should be used if the server is keeping track of expired uploads. In both
+cases the client needs to start a new upload.
+
+The value of the  `Upload-Expires` header MUST be in
+[RFC 2616](http://tools.ietf.org/html/rfc2616) datetime format.
+
 ### Checksums
 
 This extension will define how to provide per file or per chunk checksums for
