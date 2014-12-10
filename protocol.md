@@ -65,7 +65,7 @@ Host: tus.example.org
 **Response:**
 
 ```
-HTTP/1.1 200 Ok
+HTTP/1.1 204 No Content
 Offset: 70
 ```
 
@@ -87,7 +87,7 @@ Offset: 70
 **Response:**
 
 ```
-HTTP/1.1 200 Ok
+HTTP/1.1 204 No Content
 ```
 
 ### Headers
@@ -122,9 +122,9 @@ Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
-Servers MUST acknowledge successful `PATCH` operations using a `200 Ok` status,
-which implicitly means that clients can assume that the new `Offset` = `Offset`
-\+ `Content-Length`.
+Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
+status, which implicitly means that clients can assume that the new `Offset` =
+`Offset` \+ `Content-Length`.
 
 Both clients and servers SHOULD attempt to detect and handle network errors
 predictably. They may do so by checking for read/write socket errors, as well
@@ -196,6 +196,56 @@ the `Location` header.
 
 Clients then continue to perform the actual upload of the file using the core
 protocol.
+
+### Upload Expiration
+
+The server may want to remove unfinished uploads. In order to indicate this
+behavior to the client this extension SHOULD be implemented.
+
+#### Example
+
+The upload will be available until the time specified in `Upload-Expires`.
+After this date the upload isn't available and can't be continued.
+
+**Request:**
+
+```
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Host: tus.example.org
+Content-Type: application/offset+octet-stream
+Content-Length: 30
+Offset: 70
+
+[remaining 30 bytes]
+```
+
+**Response:**
+
+```
+HTTP/1.1 204 No Content
+Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
+```
+
+#### Headers
+
+##### Upload-Expires
+
+The `Upload-Expires` header indicates how much time an upload has to complete
+before it expires. A server MAY wish to remove incomplete uploads after a given
+period to prevent abandoned uploads from taking up space. The client SHOULD
+use this header to determine if an upload is still valid before attempting to
+upload another chunk and otherwise begin the upload process from scratch.
+
+This header MUST be included in the reponse to every PATCH request if the upload
+is going to expire. Its value MAY change over time.
+
+If a client does attempt to resume an upload which has since been removed by the
+server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
+one SHOULD be used if the server is keeping track of expired uploads. In both
+cases the client MUST start a new upload.
+
+The value of the  `Upload-Expires` header MUST be in
+[RFC 2616](http://tools.ietf.org/html/rfc2616) datetime format.
 
 ### Checksums
 
