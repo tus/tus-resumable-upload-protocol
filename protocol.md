@@ -47,6 +47,13 @@ Creation](#file-creation) extension.
 
 All clients and servers MUST implement the core protocol.
 
+This specification does not describe the struture of URLs, as that is left for
+the specific implementation to decide.  All URLs shown in this document are
+meant for example purposes only.
+
+In addition, the implementation of authentication is left for the server to
+decide.
+
 ### Example
 
 A HEAD request is used to determine the offset at which the upload should be
