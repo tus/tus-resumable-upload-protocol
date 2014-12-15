@@ -222,7 +222,7 @@ Offset: 70
 **Response:**
 
 ```
-HTTP/1.1 200 Ok
+HTTP/1.1 204 No Content
 Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
 ```
 
