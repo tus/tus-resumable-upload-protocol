@@ -47,11 +47,12 @@ Creation](#file-creation) extension.
 
 All clients and servers MUST implement the core protocol.
 
-The specification does not describe which URLs to use and it is up to the
-implementation to decide about them. Every URL in this document is just there
-for the purpose of showing an example.
+This specification does not describe the struture of URLs, as that is left for
+the specific implementation to decide.  All URLs shown in this document are
+meant for example purposes only.
 
-In addition the server is allowed to implement authentication as he wishes.
+In addition, the implementation of authentication is left for the server to
+decide.
 
 ### Example
 
