@@ -216,6 +216,13 @@ This extension will define how to provide meta information when uploading files.
 This extension will define how to upload finite streams of data that have an
 unknown length at the beginning of the upload.
 
+### Retries
+
+In the case of the server not being able to accept the current request it MAY
+return `503 Service Unavailable`. The client SHOULD retry the request after
+waiting an appropriated duration. It MAY retry for other status codes including
+`4xx` and `5xx`.
+
 ## FAQ
 
 ### Why is the protocol using custom headers?
