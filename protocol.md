@@ -72,7 +72,7 @@ Host: tus.example.org
 **Response:**
 
 ```
-HTTP/1.1 200 Ok
+HTTP/1.1 204 No Content
 Offset: 70
 ```
 
@@ -94,7 +94,7 @@ Offset: 70
 **Response:**
 
 ```
-HTTP/1.1 200 Ok
+HTTP/1.1 204 No Content
 ```
 
 ### Headers
@@ -129,9 +129,9 @@ Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
-Servers MUST acknowledge successful `PATCH` operations using a `200 Ok` status,
-which implicitly means that clients can assume that the new `Offset` = `Offset`
-\+ `Content-Length`.
+Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
+or `200 Ok` status, which implicitly means that clients can assume that the new
+`Offset` = `Offset` \+ `Content-Length`.
 
 Both clients and servers SHOULD attempt to detect and handle network errors
 predictably. They may do so by checking for read/write socket errors, as well
