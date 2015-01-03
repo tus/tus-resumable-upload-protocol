@@ -159,8 +159,8 @@ that does not make sense, a custom mechanism may be used instead.
 
 #### Example
 
-An empty POST request is used to create a new upload resource. The
-`Entity-Length` header indicates the size of the file that will be uploaded.
+A POST request is used to create a new upload resource. The`Entity-Length`
+header indicates the size of the file that will be uploaded.
 
 **Request:**
 
@@ -180,6 +180,12 @@ Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 
 The new resource has an implicit offset of `0` allowing the client to use the
 core protocol for performing the actual upload.
+
+The client MAY supply a [JSON](http://json.org/) formated non-empty body to add
+additional metadata. In this case the request MUST contain the `Content-Type`
+header set to `application/json` indicating the used format. The server MAY
+decide to ignore or use this information to further process the request or to
+refuse it.
 
 #### Headers
 
@@ -263,10 +269,6 @@ uploaded files.
 
 This extension will define how to upload several chunks of a file in parallel in
 order to overcome the throughput limitations of individual tcp connections.
-
-### Metadata
-
-This extension will define how to provide meta information when uploading files.
 
 ### Streams
 
