@@ -67,7 +67,7 @@ interrupted after 70 bytes were transfered.
 ```
 HEAD /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 ```
 
 **Response:**
@@ -75,7 +75,7 @@ TUS-Resumable: 1.0
 ```
 HTTP/1.1 204 No Content
 Offset: 70
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 ```
 
 Given the offset, the client uses the PATCH method to resume the upload:
@@ -89,7 +89,7 @@ Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
 Offset: 70
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 
 [remaining 30 bytes]
 ```
@@ -98,7 +98,7 @@ TUS-Resumable: 1.0
 
 ```
 HTTP/1.1 204 No Content
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 ```
 
 ### Headers
@@ -197,7 +197,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
 Entity-Length: 100
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 ```
 
 **Response:**
@@ -205,7 +205,7 @@ TUS-Resumable: 1.0
 ```
 HTTP/1.1 201 Created
 Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 ```
 
 The new resource has an implicit offset of `0` allowing the client to use the
@@ -252,7 +252,7 @@ Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
 Offset: 70
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 
 [remaining 30 bytes]
 ```
@@ -262,7 +262,7 @@ TUS-Resumable: 1.0
 ```
 HTTP/1.1 204 No Content
 Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
-TUS-Resumable: 1.0
+TUS-Resumable: 1.0.0
 ```
 
 #### Headers
