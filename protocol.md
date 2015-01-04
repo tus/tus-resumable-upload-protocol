@@ -181,11 +181,11 @@ Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 The new resource has an implicit offset of `0` allowing the client to use the
 core protocol for performing the actual upload.
 
-The client MAY supply a [JSON](http://json.org/) formated non-empty body to add
+The client MAY supply a [JSON](http://json.org/) formatted non-empty body to add
 additional metadata. In this case the request MUST contain the `Content-Type`
 header set to `application/json` indicating the used format. The server MAY
 decide to ignore or use this information to further process the request or to
-refuse it.
+reject it.
 
 #### Headers
 
