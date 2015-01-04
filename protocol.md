@@ -176,9 +176,8 @@ configuration of the server. The response MUST contain the `TUS-Extension`,
 ## Protocol Extensions
 
 Clients and servers are encouraged to implement as many of the extensions
-described below as possible. There is no feature detection for clients, instead
-they should allow individual extensions to be enabled/disabled in order to
-match the available server features.
+described below as possible. Feature detection SHOULD be achieved using the
+`TUS-Extension` header in the response to an `OPTIONS` request.
 
 ### File Creation
 
