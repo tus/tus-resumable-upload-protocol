@@ -133,6 +133,10 @@ Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
 or `200 Ok` status, which implicitly means that clients can assume that the new
 `Offset` = `Offset` \+ `Content-Length`.
 
+If the clients sends an `Expect` request-header field with the `100-continue`
+expectation the server SHOULD return the `100 Continue` status code before
+reading the request's body and sending the final response.
+
 Both clients and servers SHOULD attempt to detect and handle network errors
 predictably. They may do so by checking for read/write socket errors, as well
 as setting read/write timeouts. Both clients and servers SHOULD use a 30 second
