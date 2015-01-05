@@ -173,6 +173,28 @@ An `OPTIONS` request MAY be used to gather information about the current
 configuration of the server. The response MUST contain the `TUS-Extension`,
 `TUS-Version` and `TUS-Max-Size` if available.
 
+##### Example
+
+This example clarifies the response for an `OPTIONS` request. The version used in both, request and response, is `1.0.0` while the server is also capable of handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are supported and the extensions for file creation, upload expiration and retries are enabled.
+
+**Request:**
+
+```
+OPTIONS /files HTTP/1.1
+Host: tus.example.org
+TUS-Resumable: 1.0.0
+```
+
+**Response:**
+
+```
+HTTP/1.1 204 No Content
+TUS-Resumable: 1.0.0
+TUS-Version: 1.0.0,0.2.2,0.2.1
+TUS-Max-Size: 1073741824
+TUS-Extension: file-creation,upload-expiration,retries
+```
+
 ## Protocol Extensions
 
 Clients and servers are encouraged to implement as many of the extensions
