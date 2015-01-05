@@ -113,6 +113,10 @@ The `TUS-Resumable` header MUST be sent in every response and resquest. Its
 value is a string set to the current version of the used tus resumable upload
 protocol by the client or server.
 
+If the client requests the use of a version which is not supported by the server
+latter one MUST return `412 Precondition Failed` without processing the request
+further.
+
 #### TUS-Extension
 This header MUST be a comma-separated list of the extensions supported by the
 server. If no extensions are supported `TUS-Extension` MAY be omitted.
