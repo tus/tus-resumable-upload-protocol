@@ -67,6 +67,7 @@ interrupted after 70 bytes were transfered.
 ```
 HEAD /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
+TUS-Resumable: 1.0.0
 ```
 
 **Response:**
@@ -74,6 +75,7 @@ Host: tus.example.org
 ```
 HTTP/1.1 204 No Content
 Offset: 70
+TUS-Resumable: 1.0.0
 ```
 
 Given the offset, the client uses the PATCH method to resume the upload:
@@ -87,6 +89,7 @@ Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
 Offset: 70
+TUS-Resumable: 1.0.0
 
 [remaining 30 bytes]
 ```
@@ -95,6 +98,7 @@ Offset: 70
 
 ```
 HTTP/1.1 204 No Content
+TUS-Resumable: 1.0.0
 ```
 
 ### Headers
@@ -103,6 +107,29 @@ HTTP/1.1 204 No Content
 
 The `Offset` header is a request and response header that indicates a byte
 offset within a resource. The value MUST be an integer that is `0` or larger.
+
+#### TUS-Resumable
+The `TUS-Resumable` header MUST be sent in every response and resquest. Its
+value is a string set to the current version of the used tus resumable upload
+protocol by the client or server.
+
+If the client requests the use of a version which is not supported by the server
+latter one MUST return `412 Precondition Failed` without processing the request
+further.
+
+#### TUS-Extension
+This header MUST be a comma-separated list of the extensions supported by the
+server. If no extensions are supported `TUS-Extension` MAY be omitted.
+
+#### TUS-Max-Size
+The `TUS-Max-Size` header MUST be an integer indicating the maximum allowed size
+of a single fully uploaded file in bytes. If no hard-limit is presented or the
+server is not able to calculate it this header MUST be omitted.
+
+#### TUS-Version
+This header MUST be a comma-separated list of the supported versions of the tus
+resumable upload protocol by the server. The lists elements are sorted by the
+server's preference whereas the first element is the most preferred one.
 
 ### Requests
 
@@ -145,12 +172,38 @@ Clients SHOULD use a randomized exponential back off strategy after
 encountering a network error or receiving a `500 Internal Server Error`. It is
 up to the client to decide to give up at some point.
 
+#### OPTIONS
+An `OPTIONS` request MAY be used to gather information about the current
+configuration of the server. The response MUST contain the `TUS-Extension`,
+`TUS-Version` and `TUS-Max-Size` if available.
+
+##### Example
+
+This example clarifies the response for an `OPTIONS` request. The version used in both, request and response, is `1.0.0` while the server is also capable of handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are supported and the extensions for file creation, upload expiration and retries are enabled.
+
+**Request:**
+
+```
+OPTIONS /files HTTP/1.1
+Host: tus.example.org
+TUS-Resumable: 1.0.0
+```
+
+**Response:**
+
+```
+HTTP/1.1 204 No Content
+TUS-Resumable: 1.0.0
+TUS-Version: 1.0.0,0.2.2,0.2.1
+TUS-Max-Size: 1073741824
+TUS-Extension: file-creation,upload-expiration,retries
+```
+
 ## Protocol Extensions
 
 Clients and servers are encouraged to implement as many of the extensions
-described below as possible. There is no feature detection for clients, instead
-they should allow individual extensions to be enabled/disabled in order to
-match the available server features.
+described below as possible. Feature detection SHOULD be achieved using the
+`TUS-Extension` header in the response to an `OPTIONS` request.
 
 ### File Creation
 
@@ -169,6 +222,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
 Entity-Length: 100
+TUS-Resumable: 1.0.0
 ```
 
 **Response:**
@@ -176,6 +230,7 @@ Entity-Length: 100
 ```
 HTTP/1.1 201 Created
 Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
+TUS-Resumable: 1.0.0
 ```
 
 The new resource has an implicit offset of `0` allowing the client to use the
@@ -222,6 +277,7 @@ Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
 Offset: 70
+TUS-Resumable: 1.0.0
 
 [remaining 30 bytes]
 ```
@@ -231,6 +287,7 @@ Offset: 70
 ```
 HTTP/1.1 204 No Content
 Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
+TUS-Resumable: 1.0.0
 ```
 
 #### Headers
