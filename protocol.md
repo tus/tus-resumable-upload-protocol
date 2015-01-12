@@ -122,9 +122,9 @@ This header MUST be a comma-separated list of the extensions supported by the
 server. If no extensions are supported `TUS-Extension` MAY be omitted.
 
 #### TUS-Max-Size
-The `TUS-Max-Size` header MUST be an integer indicating the maximum allowed size
-of a single fully uploaded file in bytes. If no hard-limit is presented or the
-server is not able to calculate it this header MUST be omitted.
+The `TUS-Max-Size` header MUST be a non-negative integer indicating the maximum
+allowed size of a single fully uploaded file in bytes. If no hard-limit is
+presented or the server is not able to calculate it this header MUST be omitted.
 
 #### TUS-Version
 This header MUST be a comma-separated list of the supported versions of the tus
