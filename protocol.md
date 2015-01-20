@@ -196,8 +196,8 @@ value MUST be a non-negative integer.
 
 ##### Metadata
 
-The `Metadata` header adds one key-value-pairto the file creation request. Its
-value MUST consists of the key and the Base64 encoded value concatenated by a
+The `Metadata` header adds one key-value-pair to the file creation request. Its
+value MUST consists of the key and the Base64 encoded value seperated by a
 space. Both enities, the key and value, MUST be non-empty strings.
 
 #### Requests
