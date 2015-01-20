@@ -159,8 +159,8 @@ that does not make sense, a custom mechanism may be used instead.
 
 #### Example
 
-A POST request is used to create a new upload resource. The`Entity-Length`
-header indicates the size of the file that will be uploaded.
+An empty POST request is used to create a new upload resource. The
+`Entity-Length` header indicates the size of the file that will be uploaded.
 
 **Request:**
 
@@ -169,6 +169,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
 Entity-Length: 100
+Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
 ```
 
 **Response:**
@@ -181,11 +182,9 @@ Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 The new resource has an implicit offset of `0` allowing the client to use the
 core protocol for performing the actual upload.
 
-The client MAY supply a [JSON](http://json.org/) formatted non-empty body to add
-additional metadata. In this case the request MUST contain the `Content-Type`
-header set to `application/json` indicating the used format. The server MAY
-decide to ignore or use this information to further process the request or to
-reject it.
+The client MAY supply one or multiple `Metadata` headers to add additional
+metadata to the file creation request. The server MAY decide to ignore or use
+this information to further process the request or to reject it.
 
 #### Headers
 
@@ -194,6 +193,12 @@ reject it.
 The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer.
+
+##### Metadata
+
+The `Metadata` header adds one key-value-pairto the file creation request. Its
+value MUST consists of the key and the Base64 encoded value concatenated by a
+space. Both enities, the key and value, MUST be non-empty strings.
 
 #### Requests
 
