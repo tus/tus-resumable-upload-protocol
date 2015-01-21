@@ -275,7 +275,7 @@ This extension defines how to upload finite streams of data that have an
 unknown length at the beginning of the upload.
 
 If the file creation extension is used to initiate a new upload the
-`Entity-Length` header MUST be set to `streaming`. Once the total size of the
+`Entity-Length` header MUST be set to the string `streaming`. Once the total size of the
 entire upload is known it MUST be included as the `Entity-Length` header's value
 in the next `PATCH` request. Once the entity's length has been set it MUST NOT
 be changed.
