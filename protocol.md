@@ -188,7 +188,7 @@ core protocol for performing the actual upload.
 The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer or the string `streaming` indicating that
-the streams extension is used to send the entitie's length later.
+the streams extension is used to send the entity's length later.
 
 #### Requests
 
