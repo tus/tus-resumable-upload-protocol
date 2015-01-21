@@ -187,7 +187,8 @@ core protocol for performing the actual upload.
 
 The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a server will implicitly know when a file has completed uploading. The
-value MUST be a non-negative integer.
+value MUST be a non-negative integer or the string `streaming` indicating that
+the streams extension is used to send the entitie's length later.
 
 #### Requests
 
@@ -274,9 +275,13 @@ This extension defines how to upload finite streams of data that have an
 unknown length at the beginning of the upload.
 
 If the file creation extension is used to initiate a new upload the
-`Entity-Length` header MUST be omitted. Once the total size of the entire upload
-is known it MUST be included as the `Entity-Length` header's value in the next
-`PATCH` request.
+`Entity-Length` header MUST be set to `streaming`. Once the total size of the
+entire upload is known it MUST be included as the `Entity-Length` header's value
+in the next `PATCH` request. Once the entity's length has been set it MUST NOT
+be changed.
+
+In order to indicate that this extension is supported by the server it MUST
+include the `streams` element in the `TUS-Extension` header.
 
 #### Example
 
