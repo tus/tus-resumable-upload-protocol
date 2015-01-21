@@ -182,9 +182,9 @@ Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 The new resource has an implicit offset of `0` allowing the client to use the
 core protocol for performing the actual upload.
 
-The client MAY supply one or multiple `Metadata` headers to add additional
-metadata to the file creation request. The server MAY decide to ignore or use
-this information to further process the request or to reject it.
+The client MAY supply the `Metadata` header to add additional metadata to the
+file creation request. The server MAY decide to ignore or use this information
+to further process the request or to reject it.
 
 #### Headers
 
@@ -196,9 +196,11 @@ value MUST be a non-negative integer.
 
 ##### Metadata
 
-The `Metadata` header adds one key-value-pair to the file creation request. Its
-value MUST consists of the key and the Base64 encoded value seperated by a
-space. Both enities, the key and value, MUST be non-empty strings.
+The `Metadata` header MUST be a comma-separated list adding one or multiple
+key-value-pairs to the file creation request. Its elements MUST consist of the
+key and the according Base64 encoded value seperated by a space. Both entities,
+the key and value, MUST be non-empty strings. The key MUST NOT contain a space
+or a comma.
 
 #### Requests
 
