@@ -195,7 +195,7 @@ the streams extension is used to send the entity's length later.
 ##### POST
 
 Clients MUST use a `POST` against a well known file creation URL to request the
-creation of a new file resource. The request MUST include a `Entity-Length`
+creation of a new file resource. The request MUST include an `Entity-Length`
 header unless the streams extension is used to upload a file of unknown size.
 
 Servers MUST acknowledge a successful file creation request with a `201
