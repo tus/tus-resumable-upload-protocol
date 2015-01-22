@@ -322,12 +322,15 @@ integrity per chunk. In this case the server MUST add the `checksum` element to
 the `TUS-Extension` header.
 
 A client MAY include the `Content-MD5` header and its appropriate value in a
-`PATCH` request. Once all the data of the current uploading chunk has been
-received by the server it MUST verify the uploaded chunk against the provided
-checksum. If the verification succeeds the server continues with processing the
-data. In the case of mismatching checksums the server MUST abort handling the
-request and MUST send the tus-specific `460 Checksum Mismatch` status code. In
-addition the file and its offsets MUST not be updated.
+`PATCH` request. The value MUST be the Base64 encoded string of the MD5 digest
+of the entire chunk which is currently uploading as defined in
+[RFC2616 Section 14.15 Content-MD5](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.15).
+Once all the data of the current uploading chunk has been received by the server
+it MUST verify the uploaded chunk against the provided checksum. If the
+verification succeeds the server continues with processing the data. In the
+case of mismatching checksums the server MUST abort handling the request and
+MUST send the tus-specific `460 Checksum Mismatch` status code. In addition the
+file and its offsets MUST not be updated.
 
 If the hash cannot be calculated at the beginning of the upload it MAY be
 included as a trailer. If the server can handle trailers, this behavior MUST be
