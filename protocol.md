@@ -341,21 +341,22 @@ return `503 Service Unavailable`. The client SHOULD retry the request after
 waiting an appropriated duration. It MAY retry for other status codes including
 `4xx` and `5xx`.
 
-### Abortion
+### Termination
 
-This extensions defines a way for clients to abort unfinished uploads which
+This extensions defines a way for clients to terminate unfinished uploads which
 won't be continued allowing servers to free up used resources. All clients are
 encouraged to implement this.
 
-Clients MAY abort an upload by sending a `DELETE` request to the upload's url.
+Clients MAY terminate an upload by sending a `DELETE` request to the upload's
+url.
 
 When recieving a `DELETE` request for an existing upload the server SHOULD free
 associated resources and MUST return the `204 No Content` status code,
-confirming that the upload was aborted. For all future requests to this URL the
-server MUST return `404 No Found` or `410 Gone`.
+confirming that the upload was terminated. For all future requests to this URL
+the server MUST return `404 No Found` or `410 Gone`.
 
 If this extension is supported by the server it MUST be announced by adding the
-`abortion` element to the `TUS-Extension` header.
+`termination` element to the `TUS-Extension` header.
 
 #### Example 
 
