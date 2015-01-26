@@ -318,8 +318,50 @@ The value of the  `Upload-Expires` header MUST be in
 
 ### Checksums
 
-This extension will define how to provide per file or per chunk checksums for
-uploaded files.
+Clients and servers MAY implement and use this extension to verify data
+integrity per chunk. In this case the server MUST add the `checksum` element to
+the `TUS-Extension` header.
+
+A client MAY include the `Content-MD5` header and its appropriate value in a
+`PATCH` request. The value MUST be the Base64 encoded string of the MD5 digest
+of the entire chunk which is currently uploading as defined in
+[RFC2616 Section 14.15 Content-MD5](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.15).
+Once all the data of the current uploading chunk has been received by the server
+it MUST verify the uploaded chunk against the provided checksum. If the
+verification succeeds the server continues with processing the data. In the
+case of mismatching checksums the server MUST abort handling the request and
+MUST send the tus-specific `460 Checksum Mismatch` status code. In addition the
+file and its offsets MUST not be updated.
+
+If the hash cannot be calculated at the beginning of the upload it MAY be
+included as a trailer. If the server can handle trailers, this behavior MUST be
+promoted by adding the `checksum-trailer` element to the `TUS-Extension` header.
+Trailers, also known as trailing headers, are headers which are sent after the
+request's body has been transmitted already. Following
+[RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1) they
+must be announced using the `Trailer` header and are only allowed in chunked
+transfers.
+
+#### Example
+
+**Request**:
+
+```
+PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83
+Content-Length: 40
+Offset: 0
+TUS-Resumable: 1.0.0
+Content-MD5: vVgjt92XwLTGjdkIiNdlSw==
+
+Die Würde des Menschen ist unantastbar.
+```
+
+**Response**:
+
+```
+204 No Content
+TUS-Resumable: 1.0.0
+```
 
 ### Parallel Chunks
 
