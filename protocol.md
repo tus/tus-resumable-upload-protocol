@@ -412,6 +412,7 @@ a size of 300 bytes but only the first 200 are transferred.
 ```
 POST /files HTTP/1.1
 Host: tus.example.org
+TUS-Resumable: 1.0.0
 Content-Length: 0
 ```
 
@@ -419,6 +420,7 @@ Content-Length: 0
 
 ```
 HTTP/1.1 201 Created
+TUS-Resumable: 1.0.0
 Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 ```
 
@@ -427,6 +429,7 @@ Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 ```
 PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
+TUS-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 Content-Length: 100
 Offset: 0
@@ -438,6 +441,7 @@ Offset: 0
 
 ```
 HTTP/1.1 204 No Content
+TUS-Resumable: 1.0.0
 ```
 
 **Request:**
@@ -445,6 +449,7 @@ HTTP/1.1 204 No Content
 ```
 PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
+TUS-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 Content-Length: 100
 Offset: 100
@@ -457,6 +462,7 @@ Entity-Length: 300
 
 ```
 HTTP/1.1 204 No Content
+TUS-Resumable: 1.0.0
 ```
 
 ### Retries
