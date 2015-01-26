@@ -246,18 +246,19 @@ core protocol for performing the actual upload.
 
 The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a server will implicitly know when a file has completed uploading. The
-value MUST be a non-negative integer.
+value MUST be a non-negative integer or the string `streaming` indicating that
+the streams extension is used to send the entity's length later.
 
 #### Requests
 
 ##### POST
 
-Clients MUST use a `POST` against a well known file creation url to request the
-creation of a new file resource. The request MUST include a `Entity-Length`
-header.
+Clients MUST use a `POST` against a well known file creation URL to request the
+creation of a new file resource. The request MUST include an `Entity-Length`
+header unless the streams extension is used to upload a file of unknown size.
 
 Servers MUST acknowledge a successful file creation request with a `201
-Created` response code and include an absolute url for the created resource in
+Created` response code and include an absolute URL for the created resource in
 the `Location` header.
 
 Clients then continue to perform the actual upload of the file using the core
@@ -331,8 +332,76 @@ This extension will define how to provide meta information when uploading files.
 
 ### Streams
 
-This extension will define how to upload finite streams of data that have an
+This extension defines how to upload finite streams of data that have an
 unknown length at the beginning of the upload.
+
+If the file creation extension is used to initiate a new upload the
+`Entity-Length` header MUST be set to the string `streaming`. Once the total size of the
+entire upload is known it MUST be included as the `Entity-Length` header's value
+in the next `PATCH` request. Once the entity's length has been set it MUST NOT
+be changed.
+
+In order to indicate that this extension is supported by the server it MUST
+include the `streams` element in the `TUS-Extension` header.
+
+#### Example
+
+After creating a new upload using the file creation extension, 100 bytes are
+uploaded. The next request transfers additional 100 bytes and the total entity
+length. In the end of this example the server knows that the resource will have
+a size of 300 bytes but only the first 200 are transferred.
+
+**Request:**
+
+```
+POST /files HTTP/1.1
+Host: tus.example.org
+Content-Length: 0
+```
+
+**Response:**
+
+```
+HTTP/1.1 201 Created
+Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
+```
+
+**Request:**
+
+```
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Host: tus.example.org
+Content-Type: application/offset+octet-stream
+Content-Length: 100
+Offset: 0
+
+[100 bytes]
+```
+
+**Response:**
+
+```
+HTTP/1.1 204 No Content
+```
+
+**Request:**
+
+```
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Host: tus.example.org
+Content-Type: application/offset+octet-stream
+Content-Length: 100
+Offset: 100
+Entity-Length: 300
+
+[100 bytes]
+```
+
+**Response:**
+
+```
+HTTP/1.1 204 No Content
+```
 
 ### Retries
 
