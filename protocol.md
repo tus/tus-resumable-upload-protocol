@@ -548,7 +548,20 @@ defining a compatibility protocol extension.
 
 ### How are pause/resume handled? When should I delete partial uploads?
 
-Needs to be written ...
+The tus protocol is built upon the principles of simple pausing and resuming. In
+order to pause an upload you are allowed to end the current open request. The
+server will store the uploaded data as long as no violations against other
+constraints (e.g. checksums) or internal errors occur. Once you are ready to
+resume an upload, send a `HEAD` request to the according file URL in order to
+obtain the available offsets. After receiving a valid response you can upload
+more data using `PATCH` request. You should keep in mind that the server may
+delete an unfinished upload if it is not continued for a longer time period (see
+Upload Expires extension).
+
+Before deleting an outstanding upload the server should give the client enough
+time to resolve potential networking issues. Since this duration depends heavily
+on the underlining application model the protocol does not contain a specific
+number but we recommend a few days for a general usecase.
 
 ## License
 
