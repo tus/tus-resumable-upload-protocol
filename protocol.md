@@ -110,6 +110,7 @@ The `Offset` header is a request and response header that indicates a byte
 offset within a resource. The value MUST be an integer that is `0` or larger.
 
 #### TUS-Resumable
+
 The `TUS-Resumable` header MUST be sent in every response and resquest. Its
 value is a string set to the current version of the used tus resumable upload
 protocol by the client or server.
@@ -119,15 +120,18 @@ latter one MUST return `412 Precondition Failed` without processing the request
 further.
 
 #### TUS-Extension
+
 This header MUST be a comma-separated list of the extensions supported by the
 server. If no extensions are supported `TUS-Extension` MAY be omitted.
 
 #### TUS-Max-Size
+
 The `TUS-Max-Size` header MUST be a non-negative integer indicating the maximum
 allowed size of a single fully uploaded file in bytes. If no hard-limit is
 presented or the server is not able to calculate it this header MUST be omitted.
 
 #### TUS-Version
+
 This header MUST be a comma-separated list of the supported versions of the tus
 resumable upload protocol by the server. The lists elements are sorted by the
 server's preference whereas the first element is the most preferred one.
@@ -178,6 +182,7 @@ encountering a network error or receiving a `500 Internal Server Error`. It is
 up to the client to decide to give up at some point.
 
 #### OPTIONS
+
 An `OPTIONS` request MAY be used to gather information about the current
 configuration of the server. The response MUST contain the `TUS-Extension`,
 `TUS-Version` and `TUS-Max-Size` if available.
