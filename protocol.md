@@ -227,6 +227,7 @@ Host: tus.example.org
 Content-Length: 0
 Entity-Length: 100
 TUS-Resumable: 1.0.0
+Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
 ```
 
 **Response:**
@@ -240,6 +241,10 @@ TUS-Resumable: 1.0.0
 The new resource has an implicit offset of `0` allowing the client to use the
 core protocol for performing the actual upload.
 
+The client MAY supply the `Metadata` header to add additional metadata to the
+file creation request. The server MAY decide to ignore or use this information
+to further process the request or to reject it.
+
 #### Headers
 
 ##### Entity-Length
@@ -247,6 +252,14 @@ core protocol for performing the actual upload.
 The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer.
+
+##### Metadata
+
+The `Metadata` header MUST be a comma-separated list adding one or multiple
+key-value-pairs to the file creation request. Its elements MUST consist of the
+key and the according Base64 encoded value seperated by a space. Both entities,
+the key and value, MUST be non-empty strings. The key MUST NOT contain a space
+or a comma.
 
 #### Requests
 
@@ -324,10 +337,6 @@ uploaded files.
 
 This extension will define how to upload several chunks of a file in parallel in
 order to overcome the throughput limitations of individual tcp connections.
-
-### Metadata
-
-This extension will define how to provide meta information when uploading files.
 
 ### Streams
 
