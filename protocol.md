@@ -183,7 +183,11 @@ configuration of the server. The response MUST contain the `TUS-Extension`,
 
 ##### Example
 
-This example clarifies the response for an `OPTIONS` request. The version used in both, request and response, is `1.0.0` while the server is also capable of handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are supported and the extensions for file creation, upload expiration and retries are enabled.
+This example clarifies the response for an `OPTIONS` request. The version used
+in both, request and response, is `1.0.0` while the server is also capable of
+handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are
+supported and the extensions for file creation, upload expiration and retries
+are enabled.
 
 **Request:**
 
