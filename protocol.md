@@ -152,7 +152,9 @@ bytes contained in the message at the given `Offset`. All `PATCH` requests
 MUST use `Content-Type: application/offset+octet-stream`.
 
 The `Offset` value MUST be equal to the current offset of the resource. In order
-to achieve parallel upload the Merge extension MAY be used.
+to achieve parallel upload the Merge extension MAY be used. If the offsets
+do not match the server MUST return the `409 Conflict` status code without
+modifying the upload resource.
 
 Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
