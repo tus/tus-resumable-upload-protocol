@@ -13,12 +13,10 @@ interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
 ## Status
 
-This protocol is under development and is not ready for general adoption yet.
-
-The goal is to have a 1.0 release candidate in a few weeks, at which point only
-minor revisions will be made to the protocol. After a few months 1.0 will be
-frozen, and changes will be considered very carefully. Ideally there will be no
-need for a version 2.0.
+Following [SemVer](http://semver.org), as of 1.0.0 tus is ready for general
+adoption. We don't expect to make breaking changes, but if we do, those will
+have to be in a 2.0.0. Introducing a new extension or any backwards-compatible
+change adding new functionality will result in a bumped MINOR version.
 
 ## Contributing
 
