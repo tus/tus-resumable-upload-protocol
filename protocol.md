@@ -517,9 +517,9 @@ A partial upload is an upload which represents a chunk of a file. It is
 constructed by including the `Merge: partial` header when creating a new
 resource using the file creation extension. Multiple partial uploads are merged
 into a final upload in a specific order. The server SHOULD NOT process these
-uploads once they are finished. The length of the final resource MUST be the sum
-of the length of all partial resources. A final upload is considered finished if
-all of its partial uploads are finished.
+partial uploads until they are merged to form a final upload. The length of the
+final resource MUST be the sum of the length of all partial resources. A final
+upload is considered finished if all of its partial uploads are finished.
 
 In order to create a new final upload the client MUST omit the `Entity-Length`
 header and add the `Merge` header to the file creation request. The headers
@@ -534,20 +534,21 @@ multiple times for forming a final resource.
 
 Any `PATCH` request against a final upload MUST be denied and MUST neither
 modify the final nor any of its partial resources. The response of a `HEAD`
-request MUST NOT contain the `Offset`. The `Entity-Length` MUST be included if
-the length of the final resource can be calculated at the time.
+request MUST NOT contain the `Offset` header. The `Entity-Length` header MUST be
+included if the length of the final resource can be calculated at the time.
 
 #### Headers
 
 ##### Merge
 
-The `Merge` header indicates where the upload created by the request is either a
-partial or final upload. To build first one its value MUST be `partial`. In the
-case of creating a final resource its value is the string `final` followed by a
-semicolon and a space-separated list of the URLs of the partial uploads which
-will be merged and form the file. All of the URLs MUST NOT contain a space. The
-host and protocol scheme of the URLs MAY be omitted. In this case the value of
-the `Host` header MUST be used as the host and the scheme of the current request.
+The `Merge` header indicates whether the upload created by the request is either
+a partial or final upload. If a partial upload is to be built, the header value
+MUST be `partial`. In the case of creating a final resource its value is the
+string `final` followed by a semicolon and a space-separated list of the URLs of
+the partial uploads which will be merged and form the file. All of the URLs MUST
+NOT contain a space. The host and protocol scheme of the URLs MAY be omitted. In
+this case the value of the `Host` header MUST be used as the host and the scheme
+of the current request.
 
 #### Example
 
