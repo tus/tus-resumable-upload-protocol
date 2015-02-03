@@ -525,9 +525,9 @@ In order to create a new final upload the client MUST omit the `Entity-Length`
 header and add the `Merge` header to the file creation request. The headers
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be merged. The order of this list
-MUST represent the order using which the partial uploads are concatenated. This
-merge request MAY even happen if all or some of the corresponding partial
-uploads are not finished.
+MUST represent the order using which the partial uploads are concatenated
+without adding, modifying or removing any bytes. This merge request MAY even
+happen if all or some of the corresponding partial uploads are not finished.
 
 The server MAY delete partial uploads once they are merged but they MAY be used
 multiple times for forming a final resource.
@@ -556,12 +556,12 @@ of the current request.
 
 In the following example the `Host` and `TUS-Resumable` headers are omitted for
 readability although they are required by the specification.
-In the beginning three partial uploads are created:
+In the beginning two partial uploads are created:
 
 ```
 POST /files HTTP/1.1
 Merge: partial
-Entity-Length: 100
+Entity-Length: 5
 
 HTTP/1.1 204 No Content
 Location: http://tus.example.org/files/a
@@ -569,33 +569,59 @@ Location: http://tus.example.org/files/a
 ```
 POST /files HTTP/1.1
 Merge: partial
-Entity-Length: 200
+Entity-Length: 6
 
 HTTP/1.1 204 No Content
 Location: http://tus.example.org/files/b
 ```
-```
-POST /files HTTP/1.1
-Merge: partial
-Entity-Length: 300
 
-HTTP/1.1 204 No Content
-Location: http://tus.example.org/files/c
-```
-
-The next step is to create the final upload. In following request no
-`Entity-Length` header is presented.
+The next step is to create the final upload consisting of the two earlier
+generated partial uploads. In following request no `Entity-Length` header is
+presented.
 
 ```
 POST /files HTTP/1.1
-Merge: final; /files/a /files/b, http://tus.example.org/files/c
+Merge: final; /files/a http://tus.example.org/files/b
 
 HTTP/1.1 204 No Content
-Location: http://tus.example.org/files/abc
+Location: http://tus.example.org/files/ab
 ```
 
-You are now able to upload data to the three partial resources using `PATCH`
-requests. The length of the final resource is now 600 bytes.
+The length of the final resource is now 11 bytes:
+
+```
+HEAD /files/ab HTTP/1.1
+
+HTTP/1.1 204 No Content
+Entity-Length: 11
+Merge: final; /files/a /files/b
+```
+
+You are now able to upload data to the two partial resources using `PATCH`
+requests:
+
+```
+PATCH /files/a HTTP/1.1
+Offset: 0
+Content-Length: 5
+
+hello
+
+HTTP/1.1 204 No Content
+```
+```
+PATCH /files/b HTTP/1.1
+Offset: 0
+Content-Length: 6
+
+ world
+
+HTTP/1.1 204 No Content
+```
+
+In the first request the string `hello` was uploaded while the second file now
+contains ` world` with a leading space. The data stored for the final upload
+`/files/ab` is `hello world`.
 
 ## FAQ
 
