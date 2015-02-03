@@ -536,6 +536,8 @@ Any `PATCH` request against a final upload MUST be denied and MUST neither
 modify the final nor any of its partial resources. The response of a `HEAD`
 request MUST NOT contain the `Offset` header. The `Entity-Length` header MUST be
 included if the length of the final resource can be calculated at the time.
+Responses to `HEAD` requests against partial or final uploads MUST include the
+`Merge` header and its value as sent in the file creation request.
 
 #### Headers
 
