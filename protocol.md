@@ -411,6 +411,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 TUS-Resumable: 1.0.0
 Content-Length: 0
+Entity-Length: streaming
 ```
 
 **Response:**
