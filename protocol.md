@@ -150,7 +150,7 @@ bytes contained in the message at the given `Offset`. All `PATCH` requests
 MUST use `Content-Type: application/offset+octet-stream`.
 
 The `Offset` value MUST be equal to the current offset of the resource. In order
-to achieve parallel upload the Merge extension MAY be used. If the offsets
+to achieve parallel upload the Concatenation extension MAY be used. If the offsets
 do not match the server MUST return the `409 Conflict` status code without
 modifying the upload resource.
 
@@ -505,15 +505,15 @@ HTTP/1.1 204 No Content
 TUS-Resumable: 1.0.0
 ```
 
-### Merge
+### Concatenation
 
 This extension can be used to merge multiple uploads into a single one enabling
 clients to perform parallel uploads and uploading non-contiguous chunks. If the
-server supports this extension it MUST be announced by adding the `merge`
+server supports this extension it MUST be announced by adding the `concatenation`
 element to the values of the `TUS-Extension` header.
 
 A partial upload is an upload which represents a chunk of a file. It is
-constructed by including the `Merge: partial` header when creating a new
+constructed by including the `Concat: partial` header when creating a new
 resource using the file creation extension. Multiple partial uploads are merged
 into a final upload in a specific order. The server SHOULD NOT process these
 partial uploads until they are merged to form a final upload. The length of the
@@ -521,32 +521,32 @@ final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
 In order to create a new final upload the client MUST omit the `Entity-Length`
-header and add the `Merge` header to the file creation request. The headers
+header and add the `Concat` header to the file creation request. The headers
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be merged. The order of this list
 MUST represent the order using which the partial uploads are concatenated
 without adding, modifying or removing any bytes. This merge request MAY even
 happen if all or some of the corresponding partial uploads are not finished.
 
-The server MAY delete partial uploads once they are merged but they MAY be used
-multiple times for forming a final resource.
+The server MAY delete partial uploads once they are concatenated but they MAY be
+used multiple times for forming a final resource.
 
 Any `PATCH` request against a final upload MUST be denied and MUST neither
 modify the final nor any of its partial resources. The response of a `HEAD`
 request MUST NOT contain the `Offset` header. The `Entity-Length` header MUST be
 included if the length of the final resource can be calculated at the time.
 Responses to `HEAD` requests against partial or final uploads MUST include the
-`Merge` header and its value as sent in the file creation request.
+`Concat` header and its value as sent in the file creation request.
 
 #### Headers
 
-##### Merge
+##### Concat
 
-The `Merge` header indicates whether the upload created by the request is either
+The `Concat` header indicates whether the upload created by the request is either
 a partial or final upload. If a partial upload is to be built, the header value
 MUST be `partial`. In the case of creating a final resource its value is the
 string `final` followed by a semicolon and a space-separated list of the URLs of
-the partial uploads which will be merged and form the file. All of the URLs MUST
+the partial uploads which will be concatenated and form the file. All of the URLs MUST
 NOT contain a space. The host and protocol scheme of the URLs MAY be omitted. In
 this case the value of the `Host` header MUST be used as the host and the scheme
 of the current request.
@@ -559,7 +559,7 @@ In the beginning two partial uploads are created:
 
 ```
 POST /files HTTP/1.1
-Merge: partial
+Concat: partial
 Entity-Length: 5
 
 HTTP/1.1 204 No Content
@@ -567,7 +567,7 @@ Location: http://tus.example.org/files/a
 ```
 ```
 POST /files HTTP/1.1
-Merge: partial
+Concat: partial
 Entity-Length: 6
 
 HTTP/1.1 204 No Content
@@ -580,7 +580,7 @@ presented.
 
 ```
 POST /files HTTP/1.1
-Merge: final; /files/a http://tus.example.org/files/b
+Concat: final; /files/a http://tus.example.org/files/b
 
 HTTP/1.1 204 No Content
 Location: http://tus.example.org/files/ab
@@ -593,7 +593,7 @@ HEAD /files/ab HTTP/1.1
 
 HTTP/1.1 204 No Content
 Entity-Length: 11
-Merge: final; /files/a /files/b
+Concat: final; /files/a /files/b
 ```
 
 You are now able to upload data to the two partial resources using `PATCH`
