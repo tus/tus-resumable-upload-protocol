@@ -525,8 +525,12 @@ header and add the `Concat` header to the file creation request. The headers
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be merged. The order of this list
 MUST represent the order using which the partial uploads are concatenated
-without adding, modifying or removing any bytes. This merge request MAY even
-happen if all or some of the corresponding partial uploads are not finished.
+without adding, modifying or removing any bytes. This merge request SHOULD
+happen if all of the corresponding partial uploads are finished.
+
+The merge request MAY even be sent before all partial uploads are finished. This
+feature MUST be explicitly announced by the server by including the
+`concatenation-unfinished` element in the `TUS-Extension` header.
 
 The server MAY delete partial uploads once they are concatenated but they MAY be
 used multiple times for forming a final resource.
@@ -574,28 +578,6 @@ HTTP/1.1 204 No Content
 Location: http://tus.example.org/files/b
 ```
 
-The next step is to create the final upload consisting of the two earlier
-generated partial uploads. In following request no `Entity-Length` header is
-presented.
-
-```
-POST /files HTTP/1.1
-Concat: final; /files/a http://tus.example.org/files/b
-
-HTTP/1.1 204 No Content
-Location: http://tus.example.org/files/ab
-```
-
-The length of the final resource is now 11 bytes:
-
-```
-HEAD /files/ab HTTP/1.1
-
-HTTP/1.1 204 No Content
-Entity-Length: 11
-Concat: final; /files/a /files/b
-```
-
 You are now able to upload data to the two partial resources using `PATCH`
 requests:
 
@@ -619,8 +601,30 @@ HTTP/1.1 204 No Content
 ```
 
 In the first request the string `hello` was uploaded while the second file now
-contains ` world` with a leading space. The data stored for the final upload
-`/files/ab` is `hello world`.
+contains ` world` with a leading space.
+
+The next step is to create the final upload consisting of the two earlier
+generated partial uploads. In following request no `Entity-Length` header is
+presented.
+
+```
+POST /files HTTP/1.1
+Concat: final; /files/a http://tus.example.org/files/b
+
+HTTP/1.1 204 No Content
+Location: http://tus.example.org/files/ab
+```
+
+The length of the final resource is now 11 bytes consisting of the string
+`hello world`.
+
+```
+HEAD /files/ab HTTP/1.1
+
+HTTP/1.1 204 No Content
+Entity-Length: 11
+Concat: final; /files/a /files/b
+```
 
 ## FAQ
 
