@@ -109,7 +109,7 @@ offset within a resource. The value MUST be an integer that is `0` or larger.
 
 #### TUS-Resumable
 
-The `TUS-Resumable` header MUST be sent in every response and resquest. Its
+The `TUS-Resumable` header MUST be sent in every response and request. Its
 value is a string set to the current version of the used tus resumable upload
 protocol by the client or server.
 
