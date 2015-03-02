@@ -252,6 +252,10 @@ The client MAY supply the `Metadata` header to add additional metadata to the
 file creation request. The server MAY decide to ignore or use this information
 to further process the request or to reject it.
 
+If an upload contains additional metadata responses to `HEAD` requests against
+these uploads MUST include the `Metadata` header and its value as sent in the
+file creation request.
+
 #### Headers
 
 ##### Entity-Length
