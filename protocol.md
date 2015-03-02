@@ -532,6 +532,9 @@ MUST represent the order using which the partial uploads are concatenated
 without adding, modifying or removing any bytes. This merge request SHOULD
 happen if all of the corresponding partial uploads are finished.
 
+When creating a new final upload the according partial uploads' metadata SHALL
+not be transfered to the new final upload.
+
 The merge request MAY even be sent before all partial uploads are finished. This
 feature MUST be explicitly announced by the server by including the
 `concatenation-unfinished` element in the `TUS-Extension` header.
