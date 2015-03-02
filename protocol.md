@@ -241,7 +241,7 @@ Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
 
 ```
 HTTP/1.1 201 Created
-Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
+Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 TUS-Resumable: 1.0.0
 ```
 
@@ -419,7 +419,7 @@ Entity-Length: streaming
 ```
 HTTP/1.1 201 Created
 TUS-Resumable: 1.0.0
-Location: http://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
+Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 ```
 
 **Request:**
@@ -567,7 +567,7 @@ Concat: partial
 Entity-Length: 5
 
 HTTP/1.1 204 No Content
-Location: http://tus.example.org/files/a
+Location: https://tus.example.org/files/a
 ```
 ```
 POST /files HTTP/1.1
@@ -575,7 +575,7 @@ Concat: partial
 Entity-Length: 6
 
 HTTP/1.1 204 No Content
-Location: http://tus.example.org/files/b
+Location: https://tus.example.org/files/b
 ```
 
 You are now able to upload data to the two partial resources using `PATCH`
@@ -609,10 +609,10 @@ presented.
 
 ```
 POST /files HTTP/1.1
-Concat: final; /files/a http://tus.example.org/files/b
+Concat: final; /files/a https://tus.example.org/files/b
 
 HTTP/1.1 204 No Content
-Location: http://tus.example.org/files/ab
+Location: https://tus.example.org/files/ab
 ```
 
 The length of the final resource is now 11 bytes consisting of the string
