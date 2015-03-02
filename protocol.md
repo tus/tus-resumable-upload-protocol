@@ -679,7 +679,7 @@ Upload Expires extension).
 Before deleting an outstanding upload the server should give the client enough
 time to resolve potential networking issues. Since this duration depends heavily
 on the underlining application model, the protocol does not contain a specific
-number, but we recommend a few days for a general usecase.
+number, but we recommend a few days for a general use case.
 
 ## License
 
