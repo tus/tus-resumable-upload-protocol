@@ -46,7 +46,7 @@ Creation](#file-creation) extension.
 
 All clients and servers MUST implement the core protocol.
 
-This specification does not describe the struture of URLs, as that is left for
+This specification does not describe the structure of URLs, as that is left for
 the specific implementation to decide.  All URLs shown in this document are
 meant for example purposes only.
 
@@ -269,7 +269,7 @@ the streams extension is used to send the entity's length later.
 
 The `Metadata` header MUST be a comma-separated list adding one or multiple
 key-value-pairs to the file creation request. Its elements MUST consist of the
-key and the according Base64 encoded value seperated by a space. Both entities,
+key and the according Base64 encoded value separated by a space. Both entities,
 the key and value, MUST be non-empty strings. The key MUST NOT contain a space
 or a comma.
 
@@ -329,7 +329,7 @@ period to prevent abandoned uploads from taking up space. The client SHOULD
 use this header to determine if an upload is still valid before attempting to
 upload another chunk and otherwise begin the upload process from scratch.
 
-This header MUST be included in the reponse to every PATCH request if the upload
+This header MUST be included in the response to every PATCH request if the upload
 is going to expire. Its value MAY change over time.
 
 If a client does attempt to resume an upload which has since been removed by the
@@ -481,9 +481,9 @@ won't be continued allowing servers to free up used resources. All clients are
 encouraged to implement this.
 
 Clients MAY terminate an upload by sending a `DELETE` request to the upload's
-url.
+URL.
 
-When recieving a `DELETE` request for an existing upload the server SHOULD free
+When receiving a `DELETE` request for an existing upload the server SHOULD free
 associated resources and MUST return the `204 No Content` status code,
 confirming that the upload was terminated. For all future requests to this URL
 the server MUST return `404 No Found` or `410 Gone`.
@@ -655,10 +655,10 @@ them.
 The "X-" prefix for headers has been deprecated, see [RFC
 6648](http://tools.ietf.org/html/rfc6648).
 
-### How can I deal with bad http proxies?
+### How can I deal with bad HTTP proxies?
 
-If you are dealing with http proxies that strip/modify http headers or can't
-handle `PATCH` requests properly, you should consider using https which will
+If you are dealing with HTTP proxies that strip/modify HTTP headers or can't
+handle `PATCH` requests properly, you should consider using HTTPS which will
 make it impossible for proxies to modify your requests.
 
 If that is not an option for you, please reach out to us, we are open to
