@@ -128,6 +128,9 @@ The `TUS-Max-Size` header MUST be a non-negative integer indicating the maximum
 allowed size of a single fully uploaded file in bytes. If no hard-limit is
 presented or the server is not able to calculate it this header MUST be omitted.
 
+Requests violating this constraint MUST be responded with the status code
+`413 Request Entity Too Large`.
+
 #### TUS-Version
 
 This header MUST be a comma-separated list of the supported versions of the tus
