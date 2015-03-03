@@ -41,7 +41,7 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [Christian Ulbrich](https://github.com/ChristianUlbrich),
 [Jon Gjengset](https://github.com/jonhoo),
 [Michael Elovskikh](https://github.com/wronglink),
-[risk danger olson](https://github.com/technoweenie)
+[Rick Olson](https://github.com/technoweenie)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
