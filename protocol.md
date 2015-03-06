@@ -274,7 +274,8 @@ or a comma.
 
 Clients MUST use a `POST` against a well known file creation URL to request the
 creation of a new file resource. The request MUST include an `Entity-Length`
-header unless the streams extension is used to upload a file of unknown size.
+header. If the [Streams](#streams) extension is used to upload a file of unknown
+size the header `Entity-Length: streaming` MUST be included.
 
 The client MAY supply the `Metadata` header to add additional metadata to the
 file creation request. The server MAY decide to ignore or use this information
