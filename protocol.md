@@ -374,7 +374,7 @@ transfers.
 **Request**:
 
 ```
-PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83
+PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
 Content-Length: 40
 Offset: 0
 TUS-Resumable: 1.0.0
@@ -386,7 +386,7 @@ Die Würde des Menschen ist unantastbar.
 **Response**:
 
 ```
-204 No Content
+HTTP/1.1 204 No Content
 TUS-Resumable: 1.0.0
 ```
 
