@@ -251,14 +251,6 @@ TUS-Resumable: 1.0.0
 The new resource has an implicit offset of `0` allowing the client to use the
 core protocol for performing the actual upload.
 
-The client MAY supply the `Metadata` header to add additional metadata to the
-file creation request. The server MAY decide to ignore or use this information
-to further process the request or to reject it.
-
-If an upload contains additional metadata responses to `HEAD` requests against
-these uploads MUST include the `Metadata` header and its value as sent in the
-file creation request.
-
 #### Headers
 
 ##### Entity-Length
@@ -283,6 +275,14 @@ or a comma.
 Clients MUST use a `POST` against a well known file creation URL to request the
 creation of a new file resource. The request MUST include an `Entity-Length`
 header unless the streams extension is used to upload a file of unknown size.
+
+The client MAY supply the `Metadata` header to add additional metadata to the
+file creation request. The server MAY decide to ignore or use this information
+to further process the request or to reject it.
+
+If an upload contains additional metadata responses to `HEAD` requests against
+these uploads MUST include the `Metadata` header and its value as sent in the
+file creation request.
 
 Servers MUST acknowledge a successful file creation request with a `201
 Created` response code and include an absolute URL for the created resource in
