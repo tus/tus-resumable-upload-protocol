@@ -295,7 +295,8 @@ protocol.
 ### Upload Expiration
 
 The server may want to remove unfinished uploads. In order to indicate this
-behavior to the client this extension SHOULD be implemented.
+behavior to the client, the server MUST include the `upload-expiration` element
+in the `TUS-Extension` header.
 
 #### Example
 
