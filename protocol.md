@@ -162,7 +162,7 @@ request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
 Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
-or `200 Ok` status, which implicitly means that clients can assume that the new
+or `200 OK` status, which implicitly means that clients can assume that the new
 `Offset` = `Offset` \+ `Content-Length`.
 
 If the clients sends an `Expect` request-header field with the `100-continue`
