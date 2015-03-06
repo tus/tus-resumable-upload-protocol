@@ -153,16 +153,16 @@ bytes contained in the message at the given `Offset`. All `PATCH` requests
 MUST use `Content-Type: application/offset+octet-stream`.
 
 The `Offset` value MUST be equal to the current offset of the resource. In order
-to achieve parallel upload the Concatenation extension MAY be used. If the offsets
-do not match the server MUST return the `409 Conflict` status code without
-modifying the upload resource.
+to achieve parallel upload the [Concatenation](#concatenation) extension MAY be
+used. If the offsets do not match the server MUST return the `409 Conflict`
+status code without modifying the upload resource.
 
 Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
 Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
-or `200 OK` status, which implicitly means that clients can assume that the new
+or `200 Ok` status, which implicitly means that clients can assume that the new
 `Offset` = `Offset` \+ `Content-Length`.
 
 If the clients sends an `Expect` request-header field with the `100-continue`
@@ -192,8 +192,8 @@ configuration of the server. The response MUST contain the `TUS-Extension`,
 This example clarifies the response for an `OPTIONS` request. The version used
 in both, request and response, is `1.0.0` while the server is also capable of
 handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are
-supported and the extensions for file creation, upload expiration and retries
-are enabled.
+supported and the extensions for [File Creation](#file-creation) and
+[Upload Expiration](#upload-expiration) are enabled.
 
 **Request:**
 
@@ -210,7 +210,7 @@ HTTP/1.1 204 No Content
 TUS-Resumable: 1.0.0
 TUS-Version: 1.0.0,0.2.2,0.2.1
 TUS-Max-Size: 1073741824
-TUS-Extension: file-creation,upload-expiration,retries
+TUS-Extension: file-creation,upload-expiration
 ```
 
 ## Protocol Extensions
@@ -266,7 +266,7 @@ file creation request.
 The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer or the string `streaming` indicating that
-the streams extension is used to send the entity's length later.
+the [Streams](#streams) extension is used to send the entity's length later.
 
 ##### Metadata
 
@@ -340,7 +340,7 @@ server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
 one SHOULD be used if the server is keeping track of expired uploads. In both
 cases the client MUST start a new upload.
 
-The value of the  `Upload-Expires` header MUST be in
+The value of the `Upload-Expires` header MUST be in
 [RFC 2616](http://tools.ietf.org/html/rfc2616) datetime format.
 
 ### Checksums
@@ -406,7 +406,7 @@ include the `streams` element in the `TUS-Extension` header.
 
 #### Example
 
-After creating a new upload using the file creation extension, 100 bytes are
+After creating a new upload using the [File Creation](#file-creation) extension, 100 bytes are
 uploaded. The next request transfers additional 100 bytes and the total entity
 length. In the end of this example the server knows that the resource will have
 a size of 300 bytes but only the first 200 are transferred.
@@ -521,7 +521,7 @@ element to the values of the `TUS-Extension` header.
 
 A partial upload is an upload which represents a chunk of a file. It is
 constructed by including the `Concat: partial` header when creating a new
-resource using the file creation extension. Multiple partial uploads are merged
+resource using the [File Creation](#file-creation) extension. Multiple partial uploads are merged
 into a final upload in a specific order. The server SHOULD NOT process these
 partial uploads until they are merged to form a final upload. The length of the
 final resource MUST be the sum of the length of all partial resources. A final
