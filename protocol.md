@@ -66,7 +66,7 @@ interrupted after 70 bytes were transferred.
 ```
 HEAD /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 **Response:**
@@ -74,7 +74,7 @@ TUS-Resumable: 1.0.0
 ```
 HTTP/1.1 204 No Content
 Offset: 70
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 Given the offset, the client uses the PATCH method to resume the upload:
@@ -88,7 +88,7 @@ Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
 Offset: 70
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 
 [remaining 30 bytes]
 ```
@@ -97,7 +97,7 @@ TUS-Resumable: 1.0.0
 
 ```
 HTTP/1.1 204 No Content
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 ### Headers
@@ -107,9 +107,9 @@ TUS-Resumable: 1.0.0
 The `Offset` header is a request and response header that indicates a byte
 offset within a resource. The value MUST be a non-negative integer.
 
-#### TUS-Resumable
+#### Tus-Resumable
 
-The `TUS-Resumable` header MUST be sent in every response and request except
+The `Tus-Resumable` header MUST be sent in every response and request except
 `OPTIONS` requests. Its value is a string set to the current version of the
 used tus resumable upload protocol by the client or server.
 
@@ -117,21 +117,21 @@ If the client requests the use of a version which is not supported by the server
 latter one MUST return `412 Precondition Failed` without processing the request
 further.
 
-#### TUS-Extension
+#### Tus-Extension
 
 This header MUST be a comma-separated list of the extensions supported by the
-server. If no extensions are supported `TUS-Extension` MAY be omitted.
+server. If no extensions are supported `Tus-Extension` MAY be omitted.
 
-#### TUS-Max-Size
+#### Tus-Max-Size
 
-The `TUS-Max-Size` header MUST be a non-negative integer indicating the maximum
+The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
 allowed size of a single fully uploaded file in bytes. If no hard-limit is
 presented or the server is not able to calculate it this header MUST be omitted.
 
 Requests violating this constraint MUST be responded to with the status code
 `413 Request Entity Too Large`.
 
-#### TUS-Version
+#### Tus-Version
 
 This header MUST be a comma-separated list of the supported versions of the tus
 resumable upload protocol by the server. The elements are sorted by the
@@ -179,10 +179,10 @@ store as much of the received data as possible.
 #### OPTIONS
 
 An `OPTIONS` request MAY be used to gather information about the current
-configuration of the server. The response MUST contain the `TUS-Extension`,
-`TUS-Version` and `TUS-Max-Size` if available.
+configuration of the server. The response MUST contain the `Tus-Extension`,
+`Tus-Version` and `Tus-Max-Size` if available.
 
-The server MUST NOT validate the `TUS-Resumable` header sent in the request.
+The server MUST NOT validate the `Tus-Resumable` header sent in the request.
 
 ##### Example
 
@@ -197,24 +197,24 @@ supported and the extensions for [File Creation](#file-creation) and
 ```
 OPTIONS /files HTTP/1.1
 Host: tus.example.org
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 **Response:**
 
 ```
 HTTP/1.1 204 No Content
-TUS-Resumable: 1.0.0
-TUS-Version: 1.0.0,0.2.2,0.2.1
-TUS-Max-Size: 1073741824
-TUS-Extension: file-creation,upload-expiration
+Tus-Resumable: 1.0.0
+Tus-Version: 1.0.0,0.2.2,0.2.1
+Tus-Max-Size: 1073741824
+Tus-Extension: file-creation,upload-expiration
 ```
 
 ## Protocol Extensions
 
 Clients and servers are encouraged to implement as many of the extensions
 described below as possible. Feature detection SHOULD be achieved using the
-`TUS-Extension` header in the response to an `OPTIONS` request.
+`Tus-Extension` header in the response to an `OPTIONS` request.
 
 ### File Creation
 
@@ -232,7 +232,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
 Entity-Length: 100
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
 ```
 
@@ -241,7 +241,7 @@ Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
 ```
 HTTP/1.1 201 Created
 Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 The new resource has an implicit offset of `0` allowing the client to use the
@@ -292,7 +292,7 @@ protocol.
 
 The server MAY remove unfinished uploads. In order to indicate this behavior
 to the client, the server MUST include the `upload-expiration` element
-in the `TUS-Extension` header.
+in the `Tus-Extension` header.
 
 #### Example
 
@@ -307,7 +307,7 @@ Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
 Offset: 70
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 
 [remaining 30 bytes]
 ```
@@ -317,7 +317,7 @@ TUS-Resumable: 1.0.0
 ```
 HTTP/1.1 204 No Content
 Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 #### Headers
@@ -348,7 +348,7 @@ The value of the `Upload-Expires` header MUST be in
 
 Clients and servers MAY implement and use this extension to verify data
 integrity per chunk. In this case the server MUST add the `checksum` element to
-the `TUS-Extension` header.
+the `Tus-Extension` header.
 
 A client MAY include the `Content-MD5` header and its appropriate value in a
 `PATCH` request. The value MUST be the Base64 encoded string of the MD5 digest
@@ -363,7 +363,7 @@ addition the file and its offsets MUST not be updated.
 
 If the hash cannot be calculated at the beginning of the upload it MAY be
 included as a trailer. If the server can handle trailers, this behavior MUST be
-promoted by adding the `checksum-trailer` element to the `TUS-Extension` header.
+promoted by adding the `checksum-trailer` element to the `Tus-Extension` header.
 Trailers, also known as trailing headers, are headers which are sent after the
 request's body has been transmitted already. Following
 [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1) they
@@ -378,7 +378,7 @@ transfers.
 PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
 Content-Length: 40
 Offset: 0
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 Content-MD5: vVgjt92XwLTGjdkIiNdlSw==
 
 Die Würde des Menschen ist unantastbar.
@@ -388,7 +388,7 @@ Die Würde des Menschen ist unantastbar.
 
 ```
 HTTP/1.1 204 No Content
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 ### Stream
@@ -403,7 +403,7 @@ in the next `PATCH` request. Once the entity's length has been set it MUST NOT
 be changed.
 
 In order to indicate that this extension is supported by the server it MUST
-include the `stream` element in the `TUS-Extension` header.
+include the `stream` element in the `Tus-Extension` header.
 
 #### Example
 
@@ -417,7 +417,7 @@ a size of 300 bytes but only the first 200 are transferred.
 ```
 POST /files HTTP/1.1
 Host: tus.example.org
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 Content-Length: 0
 Entity-Length: streaming
 ```
@@ -426,7 +426,7 @@ Entity-Length: streaming
 
 ```
 HTTP/1.1 201 Created
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 ```
 
@@ -435,7 +435,7 @@ Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 ```
 PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 Content-Length: 100
 Offset: 0
@@ -447,7 +447,7 @@ Offset: 0
 
 ```
 HTTP/1.1 204 No Content
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 **Request:**
@@ -455,7 +455,7 @@ TUS-Resumable: 1.0.0
 ```
 PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 Content-Length: 100
 Offset: 100
@@ -468,7 +468,7 @@ Entity-Length: 300
 
 ```
 HTTP/1.1 204 No Content
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 ### Retries
@@ -495,7 +495,7 @@ confirming that the upload was terminated. For all future requests to this URL
 the server MUST return `404 Not Found` or `410 Gone`.
 
 If this extension is supported by the server it MUST be announced by adding the
-`termination` element to the `TUS-Extension` header.
+`termination` element to the `Tus-Extension` header.
 
 #### Example 
 
@@ -505,14 +505,14 @@ If this extension is supported by the server it MUST be announced by adding the
 DELETE /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 **Response:**
 
 ```
 HTTP/1.1 204 No Content
-TUS-Resumable: 1.0.0
+Tus-Resumable: 1.0.0
 ```
 
 ### Concatenation
@@ -520,7 +520,7 @@ TUS-Resumable: 1.0.0
 This extension can be used to merge multiple uploads into a single one enabling
 clients to perform parallel uploads and uploading non-contiguous chunks. If the
 server supports this extension it MUST be announced by adding the `concatenation`
-element to the `TUS-Extension` header.
+element to the `Tus-Extension` header.
 
 A partial upload is an upload which represents a chunk of a file. It is
 constructed by including the `Concat: partial` header when creating a new
@@ -543,7 +543,7 @@ not be transferred to the new final upload.
 
 The merge request MAY even be sent before all partial uploads are finished. This
 feature MUST be explicitly announced by the server by including the
-`concatenation-unfinished` element in the `TUS-Extension` header.
+`concatenation-unfinished` element in the `Tus-Extension` header.
 
 The server MAY delete partial uploads once they are concatenated but they MAY be
 used multiple times to form a final resource.
@@ -570,7 +570,7 @@ of the current request.
 
 #### Example
 
-In the following example the `Host` and `TUS-Resumable` headers are omitted for
+In the following example the `Host` and `Tus-Resumable` headers are omitted for
 readability although they are required by the specification.
 In the beginning two partial uploads are created:
 
