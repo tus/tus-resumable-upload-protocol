@@ -109,9 +109,9 @@ offset within a resource. The value MUST be a non-negative integer.
 
 #### TUS-Resumable
 
-The `TUS-Resumable` header MUST be sent in every response and request. Its
-value is a string set to the current version of the used tus resumable upload
-protocol by the client or server.
+The `TUS-Resumable` header MUST be sent in every response and request except
+`OPTIONS` requests. Its value is a string set to the current version of the
+used tus resumable upload protocol by the client or server.
 
 If the client requests the use of a version which is not supported by the server
 latter one MUST return `412 Precondition Failed` without processing the request
@@ -181,6 +181,8 @@ store as much of the received data as possible.
 An `OPTIONS` request MAY be used to gather information about the current
 configuration of the server. The response MUST contain the `TUS-Extension`,
 `TUS-Version` and `TUS-Max-Size` if available.
+
+The server MUST NOT validate the `TUS-Resumable` header sent in the request.
 
 ##### Example
 
