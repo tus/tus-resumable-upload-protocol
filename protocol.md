@@ -564,9 +564,7 @@ a partial or final upload. If a partial upload is constructed, the header value
 MUST be `partial`. In the case of creating a final resource its value is the
 string `final` followed by a semicolon and a space-separated list of the URLs of
 the partial uploads which will be concatenated and form the file. All of the URLs MUST
-NOT contain a space. The host and protocol scheme of the URLs MAY be omitted. In
-this case the value of the `Host` header MUST be used as the host and the scheme
-of the current request.
+NOT contain a space and MAY be relative URLs.
 
 #### Example
 
