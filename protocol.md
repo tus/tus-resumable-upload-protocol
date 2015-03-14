@@ -170,16 +170,11 @@ expectation, the server SHOULD respond with the `100 Continue` status code befor
 reading the request's body and sending the final response.
 
 Both, client and server, SHOULD attempt to detect and handle network errors
-predictably. They may do so by checking for read/write socket errors, as well
-as setting read/write timeouts. Both clients and servers SHOULD use a 30 second
-timeout. A timeout SHOULD be handled by closing the underlying connection.
+predictably. They MAY do so by checking for read/write socket errors, as well
+as setting read/write timeouts. A timeout SHOULD be handled by closing the underlying connection.
 
 Servers SHOULD always attempt to process partial message bodies in order to
 store as much of the received data as possible.
-
-Clients SHOULD use a randomized exponential back off strategy after
-encountering a network error or receiving a `500 Internal Server Error`. It is
-up to the client to decide to give up at some point.
 
 #### OPTIONS
 
@@ -477,6 +472,9 @@ In the case of the server not being able to accept the current request it MAY
 return `503 Service Unavailable`. The client SHOULD retry the request after
 waiting an appropriated duration. It MAY retry for other status codes including
 `4xx` and `5xx` and network errors or timeouts where no status code is returned.
+
+Clients SHOULD use a randomized exponential back off strategy. It is up to the
+client to decide to give up at some point.
 
 ### Termination
 
