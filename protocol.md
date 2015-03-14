@@ -331,7 +331,10 @@ use this header to determine if an upload is still valid before attempting to
 upload another chunk and otherwise start a new upload.
 
 This header MUST be included in the response to every `PATCH` request if the
-upload is going to expire. Its value MAY change over time.
+upload is going to expire. If the upload is constructed using the
+[File Creation](#file-creation) extension and the expiration date and time are
+known during the construction, the `Upload-Expires` header MUST be included in
+the reponse to the inital `POST` request. Its value MAY change over time.
 
 If a client does attempt to resume an upload which has since been removed by the
 server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
