@@ -550,12 +550,12 @@ feature MUST be explicitly announced by the Server by including the
 The Server MAY delete partial uploads once they are concatenated but they MAY be
 used multiple times to form a final resource.
 
-Any `PATCH` request against a final upload MUST be denied and MUST neither
-modify the final nor any of its partial resources. The response of a `HEAD`
-request MUST NOT contain the `Offset` header. The `Entity-Length` header MUST be
-included if the length of the final resource can be calculated at the time.
-Responses to `HEAD` requests against partial or final uploads MUST include the
-`Concat` header and its value as sent in the file creation request.
+Any `PATCH` request against a final upload MUST be denied responding with the
+`403 Forbidden` status code and MUST neither modify the final nor any of its partial
+resources. The response of a `HEAD` request MUST NOT contain the `Offset` header.
+The `Entity-Length` header MUST be included if the length of the final resource can
+be calculated at the time. Responses to `HEAD` requests against partial or final
+uploads MUST include the `Concat` header and its value as sent in the file creation request.
 
 #### Headers
 
