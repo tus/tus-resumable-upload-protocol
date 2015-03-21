@@ -44,14 +44,14 @@ The core protocol describes how to resume an interrupted upload. It assumes that
 you already have a URL for the upload, usually created via the [File
 Creation](#file-creation) extension.
 
-All clients and servers MUST implement the core protocol.
+All Clients and Servers MUST implement the core protocol.
 
 This specification does not describe the structure of URLs, as that is left for
 the specific implementation to decide.  All URLs shown in this document are
 meant for example purposes only.
 
 In addition, the implementation of authentication and authorization is left for
-the server to decide.
+the Server to decide.
 
 ### Example
 
@@ -77,7 +77,7 @@ Offset: 70
 Tus-Resumable: 1.0.0
 ```
 
-Given the offset, the client uses the PATCH method to resume the upload:
+Given the offset, the Client uses the PATCH method to resume the upload:
 
 
 **Request:**
@@ -111,22 +111,22 @@ offset within a resource. The value MUST be a non-negative integer.
 
 The `Tus-Resumable` header MUST be sent in every response and request except
 `OPTIONS` requests. Its value is a string set to the current version of the
-used tus resumable upload protocol by the client or server.
+used tus resumable upload protocol by the Client or Server.
 
-If the client requests the use of a version which is not supported by the server
+If the Client requests the use of a version which is not supported by the Server
 latter one MUST return `412 Precondition Failed` without processing the request
 further.
 
 #### Tus-Extension
 
 This header MUST be a comma-separated list of the extensions supported by the
-server. If no extensions are supported `Tus-Extension` MAY be omitted.
+Server. If no extensions are supported `Tus-Extension` MAY be omitted.
 
 #### Tus-Max-Size
 
 The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
 allowed size of a single fully uploaded file in bytes. If no hard-limit is
-presented or the server is not able to calculate it this header MUST be omitted.
+presented or the Server is not able to calculate it this header MUST be omitted.
 
 Requests violating this constraint MUST be responded to with the status code
 `413 Request Entity Too Large`.
@@ -134,8 +134,8 @@ Requests violating this constraint MUST be responded to with the status code
 #### Tus-Version
 
 This header MUST be a comma-separated list of the supported versions of the tus
-resumable upload protocol by the server. The elements are sorted by the
-server's preference whereas the first element is the most preferred one.
+resumable upload protocol by the Server. The elements are sorted by the
+Server's preference whereas the first element is the most preferred one.
 
 ### Requests
 
@@ -154,7 +154,7 @@ MUST use `Content-Type: application/offset+octet-stream`.
 
 The `Offset` value MUST be equal to the current offset of the resource. In order
 to achieve parallel upload the [Concatenation](#concatenation) extension MAY be
-used. If the offsets do not match the server MUST respond with the `409 Conflict`
+used. If the offsets do not match the Server MUST respond with the `409 Conflict`
 status code without modifying the upload resource.
 
 Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
@@ -162,14 +162,14 @@ request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
 Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
-or `200 Ok` status, which implicitly means that clients can assume that the new
+or `200 Ok` status, which implicitly means that Clients can assume that the new
 `Offset` = `Offset` \+ `Content-Length`.
 
-If the client sends an `Expect` request-header field with the `100-continue`
-expectation, the server SHOULD respond with the `100 Continue` status code before
+If the Client sends an `Expect` request-header field with the `100-continue`
+expectation, the Server SHOULD respond with the `100 Continue` status code before
 reading the request's body and sending the final response.
 
-Both, client and server, SHOULD attempt to detect and handle network errors
+Both, Client and Server, SHOULD attempt to detect and handle network errors
 predictably. They MAY do so by checking for read/write socket errors, as well
 as setting read/write timeouts. A timeout SHOULD be handled by closing the underlying connection.
 
@@ -179,15 +179,15 @@ store as much of the received data as possible.
 #### OPTIONS
 
 An `OPTIONS` request MAY be used to gather information about the current
-configuration of the server. The response MUST contain the `Tus-Extension`,
+configuration of the Server. The response MUST contain the `Tus-Extension`,
 `Tus-Version` and `Tus-Max-Size` if available.
 
-The server MUST NOT validate the `Tus-Resumable` header sent in the request.
+The Server MUST NOT validate the `Tus-Resumable` header sent in the request.
 
 ##### Example
 
 This example clarifies the response for an `OPTIONS` request. The version used
-in both, request and response, is `1.0.0` while the server is also capable of
+in both, request and response, is `1.0.0` while the Server is also capable of
 handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are
 supported and the extensions for [File Creation](#file-creation) and
 [Upload Expiration](#upload-expiration) are enabled.
@@ -212,13 +212,13 @@ Tus-Extension: file-creation,upload-expiration
 
 ## Protocol Extensions
 
-Clients and servers are encouraged to implement as many of the extensions
+Clients and Servers are encouraged to implement as many of the extensions
 described below as possible. Feature detection SHOULD be achieved using the
 `Tus-Extension` header in the response to an `OPTIONS` request.
 
 ### File Creation
 
-All clients and servers SHOULD implement the file creation API.
+All Clients and Servers SHOULD implement the file creation API.
 
 #### Example
 
@@ -244,7 +244,7 @@ Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
 Tus-Resumable: 1.0.0
 ```
 
-The new resource has an implicit offset of `0` allowing the client to use the
+The new resource has an implicit offset of `0` allowing the Client to use the
 core protocol for performing the actual upload.
 
 #### Headers
@@ -252,7 +252,7 @@ core protocol for performing the actual upload.
 ##### Entity-Length
 
 The `Entity-Length` header indicates the final size of a new entity in bytes.
-This way a server will implicitly know when a file has completed uploading. The
+This way a Server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer or the string `streaming` indicating that
 the [Streams](#streams) extension is used to send the entity's length later.
 
@@ -273,25 +273,25 @@ creation of a new file resource. The request MUST include an `Entity-Length`
 header. If the [Streams](#streams) extension is used to upload a file of unknown
 size the header `Entity-Length: streaming` MUST be included.
 
-The client MAY supply the `Metadata` header to add additional metadata to the
-file creation request. The server MAY decide to ignore or use this information
+The Client MAY supply the `Metadata` header to add additional metadata to the
+file creation request. The Server MAY decide to ignore or use this information
 to further process the request or to reject it.
 
 If an upload contains additional metadata responses to `HEAD` requests against
 these uploads MUST include the `Metadata` header and its value as sent in the
 file creation request.
 
-The server MUST acknowledge a successful file creation request with a `201
+The Server MUST acknowledge a successful file creation request with a `201
 Created` response code and include a URL for the created resource in
 the `Location` header.
 
-The client then continues to perform the actual upload of the file using the core
+The Client then continues to perform the actual upload of the file using the core
 protocol.
 
 ### Upload Expiration
 
-The server MAY remove unfinished uploads. In order to indicate this behavior
-to the client, the server MUST include the `upload-expiration` element
+The Server MAY remove unfinished uploads. In order to indicate this behavior
+to the Client, the Server MUST include the `upload-expiration` element
 in the `Tus-Extension` header.
 
 #### Example
@@ -325,8 +325,8 @@ Tus-Resumable: 1.0.0
 ##### Upload-Expires
 
 The `Upload-Expires` header indicates how much time an upload has to complete
-before it expires. A server MAY wish to remove incomplete uploads after a given
-period to prevent abandoned uploads from taking up space. The client SHOULD
+before it expires. A Server MAY wish to remove incomplete uploads after a given
+period to prevent abandoned uploads from taking up space. The Client SHOULD
 use this header to determine if an upload is still valid before attempting to
 upload another chunk and otherwise start a new upload.
 
@@ -336,33 +336,33 @@ upload is going to expire. If the upload is constructed using the
 known during the construction, the `Upload-Expires` header MUST be included in
 the reponse to the inital `POST` request. Its value MAY change over time.
 
-If a client does attempt to resume an upload which has since been removed by the
-server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
-one SHOULD be used if the server is keeping track of expired uploads. In both
-cases the client MUST start a new upload.
+If a Client does attempt to resume an upload which has since been removed by the
+Server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
+one SHOULD be used if the Server is keeping track of expired uploads. In both
+cases the Client MUST start a new upload.
 
 The value of the `Upload-Expires` header MUST be in
 [RFC 2616](http://tools.ietf.org/html/rfc2616) datetime format.
 
 ### Checksum
 
-Clients and servers MAY implement and use this extension to verify data
-integrity per chunk. In this case the server MUST add the `checksum` element to
+Clients and Servers MAY implement and use this extension to verify data
+integrity per chunk. In this case the Server MUST add the `checksum` element to
 the `Tus-Extension` header.
 
-A client MAY include the `Content-MD5` header and its appropriate value in a
+A Client MAY include the `Content-MD5` header and its appropriate value in a
 `PATCH` request. The value MUST be the Base64 encoded string of the MD5 digest
 of the entire chunk which is currently uploading as defined in
 [RFC2616 Section 14.15 Content-MD5](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.15).
-Once all the data of the current uploading chunk has been received by the server
+Once all the data of the current uploading chunk has been received by the Server
 it MUST verify the uploaded chunk against the provided checksum. If the
-verification succeeds the server continues processing the data. In the
-case of mismatching checksums the server MUST abort handling the request and
+verification succeeds the Server continues processing the data. In the
+case of mismatching checksums the Server MUST abort handling the request and
 MUST respond with the tus-specific `460 Checksum Mismatch` status code. In
 addition the file and its offsets MUST not be updated.
 
 If the hash cannot be calculated at the beginning of the upload it MAY be
-included as a trailer. If the server can handle trailers, this behavior MUST be
+included as a trailer. If the Server can handle trailers, this behavior MUST be
 promoted by adding the `checksum-trailer` element to the `Tus-Extension` header.
 Trailers, also known as trailing headers, are headers which are sent after the
 request's body has been transmitted already. Following
@@ -402,14 +402,14 @@ entire upload is known it MUST be included as the `Entity-Length` header's value
 in the next `PATCH` request. Once the entity's length has been set it MUST NOT
 be changed.
 
-In order to indicate that this extension is supported by the server it MUST
+In order to indicate that this extension is supported by the Server it MUST
 include the `stream` element in the `Tus-Extension` header.
 
 #### Example
 
 After creating a new upload using the [File Creation](#file-creation) extension, 100 bytes are
 uploaded. The next request transfers an additional 100 bytes and the total
-`Entity-Length`. In the end of this example the server knows that the resource will have
+`Entity-Length`. In the end of this example the Server knows that the resource will have
 a size of 300 bytes but only the first 200 are transferred.
 
 **Request:**
@@ -473,28 +473,28 @@ Tus-Resumable: 1.0.0
 
 ### Retries
 
-In the case of the server not being able to accept the current request it MAY
-return `503 Service Unavailable`. The client SHOULD retry the request after
+In the case of the Server not being able to accept the current request it MAY
+return `503 Service Unavailable`. The Client SHOULD retry the request after
 waiting an appropriated duration. It MAY retry for other status codes including
 `4xx` and `5xx` and network errors or timeouts where no status code is returned.
 
 Clients SHOULD use a randomized exponential back off strategy. It is up to the
-client to decide to give up at some point.
+Client to decide to give up at some point.
 
 ### Termination
 
-This extension defines a way for clients to terminate unfinished uploads which
-won't be continued allowing servers to free up used resources.
+This extension defines a way for Clients to terminate unfinished uploads which
+won't be continued allowing Servers to free up used resources.
 
 Clients MAY terminate an upload by sending a `DELETE` request to the upload's
 URL.
 
-When receiving a `DELETE` request for an existing upload the server SHOULD free
+When receiving a `DELETE` request for an existing upload the Server SHOULD free
 associated resources and MUST return the `204 No Content` status code,
 confirming that the upload was terminated. For all future requests to this URL
-the server MUST return `404 Not Found` or `410 Gone`.
+the Server MUST return `404 Not Found` or `410 Gone`.
 
-If this extension is supported by the server it MUST be announced by adding the
+If this extension is supported by the Server it MUST be announced by adding the
 `termination` element to the `Tus-Extension` header.
 
 #### Example 
@@ -518,19 +518,19 @@ Tus-Resumable: 1.0.0
 ### Concatenation
 
 This extension can be used to merge multiple uploads into a single one enabling
-clients to perform parallel uploads and uploading non-contiguous chunks. If the
-server supports this extension it MUST be announced by adding the `concatenation`
+Clients to perform parallel uploads and uploading non-contiguous chunks. If the
+Server supports this extension it MUST be announced by adding the `concatenation`
 element to the `Tus-Extension` header.
 
 A partial upload is an upload which represents a chunk of a file. It is
 constructed by including the `Concat: partial` header when creating a new
 resource using the [File Creation](#file-creation) extension. Multiple partial uploads are merged
-into a final upload in a specific order. The server SHOULD NOT process these
+into a final upload in a specific order. The Server SHOULD NOT process these
 partial uploads until they are merged to form a final upload. The length of the
 final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
-In order to create a new final upload the client MUST omit the `Entity-Length`
+In order to create a new final upload the Client MUST omit the `Entity-Length`
 header and add the `Concat` header to the file creation request. The headers
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be merged. The order of this list
@@ -542,10 +542,10 @@ When creating a new final upload the partial uploads' metadata SHALL
 not be transferred to the new final upload.
 
 The merge request MAY even be sent before all partial uploads are finished. This
-feature MUST be explicitly announced by the server by including the
+feature MUST be explicitly announced by the Server by including the
 `concatenation-unfinished` element in the `Tus-Extension` header.
 
-The server MAY delete partial uploads once they are concatenated but they MAY be
+The Server MAY delete partial uploads once they are concatenated but they MAY be
 used multiple times to form a final resource.
 
 Any `PATCH` request against a final upload MUST be denied and MUST neither
@@ -654,7 +654,7 @@ method](http://www.w3.org/TR/XMLHttpRequest/#the-send-method) does not allow
 streaming arbitrary data without loading all of it into memory.
 
 That being said, custom headers also allowed us to greatly simplify the
-implementation requirements for clients and servers, so we're quite happy with
+implementation requirements for Clients and Servers, so we're quite happy with
 them.
 
 ### Why are you not using the "X-" prefix for your headers?
@@ -675,15 +675,15 @@ defining a compatibility protocol extension.
 
 The tus protocol is built upon the principles of simple pausing and resuming. In
 order to pause an upload you are allowed to end the current open request. The
-server will store the uploaded data as long as no violations against other
+Server will store the uploaded data as long as no violations against other
 constraints (e.g. checksums) or internal errors occur. Once you are ready to
 resume an upload, send a `HEAD` request to the correspondig file URL in order to
 obtain the available offsets. After receiving a valid response you can upload
-more data using `PATCH` requests. You should keep in mind that the server may
+more data using `PATCH` requests. You should keep in mind that the Server may
 delete an unfinished upload if it is not continued for a longer time period (see
 Upload Expires extension).
 
-Before deleting an outstanding upload the server should give the client enough
+Before deleting an outstanding upload the Server should give the Client enough
 time to resolve potential networking issues. Since this duration depends heavily
 on the underlying application model, the protocol does not contain a specific
 number, but we recommend one week for a general use case.
