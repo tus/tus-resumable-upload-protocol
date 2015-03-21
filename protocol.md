@@ -540,7 +540,8 @@ without adding, modifying or removing any bytes. This concatenation request SHOU
 happen if all of the corresponding partial uploads are finished.
 
 When creating a new final upload the partial uploads' metadata SHALL
-not be transferred to the new final upload.
+not be transferred to the new final upload. Instead, all metadata SHOULD be included
+in the concatenation request using the `Metadata` header.
 
 The concatenation request MAY even be sent before all partial uploads are finished. This
 feature MUST be explicitly announced by the Server by including the
