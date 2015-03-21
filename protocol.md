@@ -128,9 +128,6 @@ The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
 allowed size of a single fully uploaded file in bytes. If no hard-limit is
 presented or the Server is not able to calculate it this header MUST be omitted.
 
-Requests violating this constraint MUST be responded to with the status code
-`413 Request Entity Too Large`.
-
 #### Tus-Version
 
 This header MUST be a comma-separated list of the supported versions of the tus
@@ -276,6 +273,10 @@ size the header `Entity-Length: streaming` MUST be included.
 The Client MAY supply the `Metadata` header to add additional metadata to the
 file creation request. The Server MAY decide to ignore or use this information
 to further process the request or to reject it.
+
+If the size of the upload exceeds the maximum which MAY be indicated using the
+`Tus-Max-Size` headers, the Server MUST respond with the
+`413 Request Entity Too Large` status code. 
 
 If an upload contains additional metadata responses to `HEAD` requests against
 these uploads MUST include the `Metadata` header and its value as sent in the
