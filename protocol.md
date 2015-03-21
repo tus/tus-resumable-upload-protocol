@@ -533,7 +533,7 @@ final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
 In order to create a new final upload the Client MUST omit the `Entity-Length`
-header and add the `Concat` header to the file creation request. The headers
+header and add the `Concat` header to the file creation request. The header's
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be concatenated. The order of this list
 MUST represent the order by which the partial uploads are concatenated
