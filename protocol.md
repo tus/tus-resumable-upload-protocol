@@ -486,16 +486,17 @@ Client to decide to give up at some point.
 This extension defines a way for Clients to terminate unfinished uploads which
 won't be continued allowing Servers to free up used resources.
 
-Clients MAY terminate an upload by sending a `DELETE` request to the upload's
-URL.
+If this extension is supported by the Server it MUST be announced by adding the
+`termination` element to the `Tus-Extension` header.
+
+#### Requests
+
+##### DELETE
 
 When receiving a `DELETE` request for an existing upload the Server SHOULD free
 associated resources and MUST return the `204 No Content` status code,
 confirming that the upload was terminated. For all future requests to this URL
 the Server MUST return `404 Not Found` or `410 Gone`.
-
-If this extension is supported by the Server it MUST be announced by adding the
-`termination` element to the `Tus-Extension` header.
 
 #### Example 
 
