@@ -518,31 +518,31 @@ Tus-Resumable: 1.0.0
 
 ### Concatenation
 
-This extension can be used to merge multiple uploads into a single one enabling
+This extension can be used to concatenate multiple uploads into a single one enabling
 Clients to perform parallel uploads and uploading non-contiguous chunks. If the
 Server supports this extension it MUST be announced by adding the `concatenation`
 element to the `Tus-Extension` header.
 
 A partial upload is an upload which represents a chunk of a file. It is
 constructed by including the `Concat: partial` header when creating a new
-resource using the [File Creation](#file-creation) extension. Multiple partial uploads are merged
+resource using the [File Creation](#file-creation) extension. Multiple partial uploads are concatenated
 into a final upload in a specific order. The Server SHOULD NOT process these
-partial uploads until they are merged to form a final upload. The length of the
+partial uploads until they are concatenated to form a final upload. The length of the
 final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
 In order to create a new final upload the Client MUST omit the `Entity-Length`
 header and add the `Concat` header to the file creation request. The headers
 value is the string `final` followed by a semicolon and a space-separated list
-of the URLs of the partial uploads which will be merged. The order of this list
+of the URLs of the partial uploads which will be concatenated. The order of this list
 MUST represent the order by which the partial uploads are concatenated
-without adding, modifying or removing any bytes. This merge request SHOULD
+without adding, modifying or removing any bytes. This concatenation request SHOULD
 happen if all of the corresponding partial uploads are finished.
 
 When creating a new final upload the partial uploads' metadata SHALL
 not be transferred to the new final upload.
 
-The merge request MAY even be sent before all partial uploads are finished. This
+The concatenation request MAY even be sent before all partial uploads are finished. This
 feature MUST be explicitly announced by the Server by including the
 `concatenation-unfinished` element in the `Tus-Extension` header.
 
