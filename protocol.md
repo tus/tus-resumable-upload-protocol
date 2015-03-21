@@ -472,16 +472,6 @@ HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
 ```
 
-### Retries
-
-In the case of the Server not being able to accept the current request it MAY
-return `503 Service Unavailable`. The Client SHOULD retry the request after
-waiting an appropriated duration. It MAY retry for other status codes including
-`4xx` and `5xx` and network errors or timeouts where no status code is returned.
-
-Clients SHOULD use a randomized exponential back off strategy. It is up to the
-Client to decide to give up at some point.
-
 ### Termination
 
 This extension defines a way for Clients to terminate unfinished uploads which
