@@ -670,8 +670,8 @@ The tus protocol is built upon the principles of simple pausing and resuming. In
 order to pause an upload you are allowed to end the current open request. The
 Server will store the uploaded data as long as no violations against other
 constraints (e.g. checksums) or internal errors occur. Once you are ready to
-resume an upload, send a `HEAD` request to the correspondig file URL in order to
-obtain the available offsets. After receiving a valid response you can upload
+resume an upload, send a `HEAD` request to the correspondig upload URL in order to
+obtain the available offset. After receiving a valid response you can upload
 more data using `PATCH` requests. You should keep in mind that the Server may
 delete an unfinished upload if it is not continued for a longer time period (see
 Upload Expires extension).
