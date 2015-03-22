@@ -73,7 +73,7 @@ Tus-Resumable: 1.0.0
 
 ```
 HTTP/1.1 204 No Content
-Offset: 70
+Upload-Offset: 70
 Tus-Resumable: 1.0.0
 ```
 
@@ -87,7 +87,7 @@ PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
-Offset: 70
+Upload-Offset: 70
 Tus-Resumable: 1.0.0
 
 [remaining 30 bytes]
@@ -102,9 +102,9 @@ Tus-Resumable: 1.0.0
 
 ### Headers
 
-#### Offset
+#### Upload-Offset
 
-The `Offset` header is a request and response header that indicates a byte
+The `Upload-Offset` header is a request and response header that indicates a byte
 offset within a resource. The value MUST be a non-negative integer.
 
 #### Tus-Resumable
@@ -138,18 +138,18 @@ Server's preference whereas the first element is the most preferred one.
 
 #### HEAD
 
-Servers MUST always return an `Offset` header for `HEAD` requests against a tus
+Servers MUST always return an `Upload-Offset` header for `HEAD` requests against a tus
 resource, even if it is `0`, or the upload is already considered completed.
 If the tus resource is not found Servers MUST return either `404` or `403` 
-without an `Offset` header.
+without an `Upload-Offset` header.
 
 #### PATCH
 
 Servers MUST accept `PATCH` requests against any tus resource and apply the
-bytes contained in the message at the given `Offset`. All `PATCH` requests
+bytes contained in the message at the given `Upload-Offset`. All `PATCH` requests
 MUST use `Content-Type: application/offset+octet-stream`.
 
-The `Offset` value MUST be equal to the current offset of the resource. In order
+The `Upload-Offset` value MUST be equal to the current offset of the resource. In order
 to achieve parallel upload the [Concatenation](#concatenation) extension MAY be
 used. If the offsets do not match the Server MUST respond with the `409 Conflict`
 status code without modifying the upload resource.
@@ -160,7 +160,7 @@ desirable (e.g. NGINX buffering requests before they reach their backend).
 
 Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
 or `200 Ok` status, which implicitly means that Clients can assume that the new
-`Offset` = `Offset` \+ `Content-Length`.
+`Upload-Offset` = `Offset` \+ `Content-Length`.
 
 If the Client sends an `Expect` request-header field with the `100-continue`
 expectation, the Server SHOULD respond with the `100 Continue` status code before
@@ -307,7 +307,7 @@ PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Host: tus.example.org
 Content-Type: application/offset+octet-stream
 Content-Length: 30
-Offset: 70
+Upload-Offset: 70
 Tus-Resumable: 1.0.0
 
 [remaining 30 bytes]
@@ -378,7 +378,7 @@ transfers.
 ```
 PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
 Content-Length: 40
-Offset: 0
+Upload-Offset: 0
 Tus-Resumable: 1.0.0
 Content-MD5: vVgjt92XwLTGjdkIiNdlSw==
 
@@ -439,7 +439,7 @@ Host: tus.example.org
 Tus-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 Content-Length: 100
-Offset: 0
+Upload-Offset: 0
 
 [100 bytes]
 ```
@@ -459,7 +459,7 @@ Host: tus.example.org
 Tus-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 Content-Length: 100
-Offset: 100
+Upload-Offset: 100
 Upload-Length: 300
 
 [100 bytes]
@@ -543,7 +543,7 @@ used multiple times to form a final resource.
 
 Any `PATCH` request against a final upload MUST be denied responding with the
 `403 Forbidden` status code and MUST neither modify the final nor any of its partial
-resources. The response of a `HEAD` request MUST NOT contain the `Offset` header.
+resources. The response of a `HEAD` request MUST NOT contain the `Upload-Offset` header.
 The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time. Responses to `HEAD` requests against partial or final
 uploads MUST include the `Upload-Concat` header and its value as sent in the upload creation request.
@@ -587,7 +587,7 @@ requests:
 
 ```
 PATCH /files/a HTTP/1.1
-Offset: 0
+Upload-Offset: 0
 Content-Length: 5
 
 hello
@@ -596,7 +596,7 @@ HTTP/1.1 204 No Content
 ```
 ```
 PATCH /files/b HTTP/1.1
-Offset: 0
+Upload-Offset: 0
 Content-Length: 6
 
  world
