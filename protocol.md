@@ -334,7 +334,7 @@ This header MUST be included in the response to every `PATCH` request if the
 upload is going to expire. If the upload is constructed using the
 [Creation](#creation) extension and the expiration date and time are
 known during the construction, the `Upload-Expires` header MUST be included in
-the reponse to the inital `POST` request. Its value MAY change over time.
+the response to the initial `POST` request. Its value MAY change over time.
 
 If a Client does attempt to resume an upload which has since been removed by the
 Server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
@@ -486,7 +486,7 @@ If this extension is supported by the Server it MUST be announced by adding the
 When receiving a `DELETE` request for an existing upload the Server SHOULD free
 associated resources and MUST return the `204 No Content` status code,
 confirming that the upload was terminated. For all future requests to this URL
-the Server SHOULD responed with the `404 Not Found` or `410 Gone` status code.
+the Server SHOULD respond with the `404 Not Found` or `410 Gone` status code.
 
 #### Example 
 
@@ -669,7 +669,7 @@ The tus protocol is built upon the principles of simple pausing and resuming. In
 order to pause an upload you are allowed to end the current open request. The
 Server will store the uploaded data as long as no violations against other
 constraints (e.g. checksums) or internal errors occur. Once you are ready to
-resume an upload, send a `HEAD` request to the correspondig upload URL in order to
+resume an upload, send a `HEAD` request to the corresponding upload URL in order to
 obtain the available offset. After receiving a valid response you can upload
 more data using `PATCH` requests. You should keep in mind that the Server may
 delete an unfinished upload if it is not continued for a longer time period (see
