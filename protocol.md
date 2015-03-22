@@ -41,8 +41,8 @@ Characters enclosed by square brackets indicate a placeholder (e.g. `[size]`).
 ## Core Protocol
 
 The core protocol describes how to resume an interrupted upload. It assumes that
-you already have a URL for the upload, usually created via the [File
-Creation](#file-creation) extension.
+you already have a URL for the upload, usually created via the
+[Creation](#creation) extension.
 
 All Clients and Servers MUST implement the core protocol.
 
@@ -186,7 +186,7 @@ The Server MUST NOT validate the `Tus-Resumable` header sent in the request.
 This example clarifies the response for an `OPTIONS` request. The version used
 in both, request and response, is `1.0.0` while the Server is also capable of
 handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are
-supported and the extensions for [File Creation](#file-creation) and
+supported and the extensions for [Creation](#creation) and
 [Upload Expiration](#upload-expiration) are enabled.
 
 **Request:**
@@ -204,7 +204,7 @@ HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
 Tus-Version: 1.0.0,0.2.2,0.2.1
 Tus-Max-Size: 1073741824
-Tus-Extension: file-creation,upload-expiration
+Tus-Extension: creation,upload-expiration
 ```
 
 ## Protocol Extensions
@@ -213,9 +213,9 @@ Clients and Servers are encouraged to implement as many of the extensions
 described below as possible. Feature detection SHOULD be achieved using the
 `Tus-Extension` header in the response to an `OPTIONS` request.
 
-### File Creation
+### Creation
 
-All Clients and Servers SHOULD implement the file creation API.
+All Clients and Servers SHOULD implement the upload creation API.
 
 #### Example
 
@@ -256,7 +256,7 @@ the [Streams](#streams) extension is used to send the entity's length later.
 ##### Metadata
 
 The `Metadata` header MUST be a comma-separated list adding one or multiple
-key-value-pairs to the file creation request. Its elements MUST consist of the
+key-value-pairs to the upload creation request. Its elements MUST consist of the
 key and the according Base64 encoded value separated by a space. Both entities,
 the key and value, MUST be non-empty strings. The key MUST NOT contain a space
 or a comma.
@@ -265,13 +265,13 @@ or a comma.
 
 ##### POST
 
-Clients MUST use a `POST` against a well known file creation URL to request the
+Clients MUST use a `POST` against a well known upload creation URL to request the
 creation of a new file resource. The request MUST include an `Entity-Length`
 header. If the [Streams](#streams) extension is used to upload a file of unknown
 size the header `Entity-Length: streaming` MUST be included.
 
 The Client MAY supply the `Metadata` header to add additional metadata to the
-file creation request. The Server MAY decide to ignore or use this information
+upload creation request. The Server MAY decide to ignore or use this information
 to further process the request or to reject it.
 
 If the size of the upload exceeds the maximum which MAY be indicated using the
@@ -280,9 +280,9 @@ If the size of the upload exceeds the maximum which MAY be indicated using the
 
 If an upload contains additional metadata responses to `HEAD` requests against
 these uploads MUST include the `Metadata` header and its value as sent in the
-file creation request.
+upload creation request.
 
-The Server MUST acknowledge a successful file creation request with a `201
+The Server MUST acknowledge a successful upload creation request with a `201
 Created` response code and include a URL for the created resource in
 the `Location` header.
 
@@ -333,7 +333,7 @@ upload another chunk and otherwise start a new upload.
 
 This header MUST be included in the response to every `PATCH` request if the
 upload is going to expire. If the upload is constructed using the
-[File Creation](#file-creation) extension and the expiration date and time are
+[Creation](#creation) extension and the expiration date and time are
 known during the construction, the `Upload-Expires` header MUST be included in
 the reponse to the inital `POST` request. Its value MAY change over time.
 
@@ -397,7 +397,7 @@ Tus-Resumable: 1.0.0
 This extension defines how to upload finite streams of data that have an
 unknown length at the beginning of the upload.
 
-If the file creation extension is used to initiate a new upload the
+If the [Creation](#creation) extension is used to initiate a new upload the
 `Entity-Length` header MUST be set to the string `streaming`. Once the total size of the
 entire upload is known it MUST be included as the `Entity-Length` header's value
 in the next `PATCH` request. Once the entity's length has been set it MUST NOT
@@ -408,7 +408,7 @@ include the `stream` element in the `Tus-Extension` header.
 
 #### Example
 
-After creating a new upload using the [File Creation](#file-creation) extension, 100 bytes are
+After creating a new upload using the [Creation](#creation) extension, 100 bytes are
 uploaded. The next request transfers an additional 100 bytes and the total
 `Entity-Length`. In the end of this example the Server knows that the resource will have
 a size of 300 bytes but only the first 200 are transferred.
@@ -516,14 +516,14 @@ element to the `Tus-Extension` header.
 
 A partial upload is an upload which represents a chunk of a file. It is
 constructed by including the `Concat: partial` header when creating a new
-resource using the [File Creation](#file-creation) extension. Multiple partial uploads are concatenated
+resource using the [Creation](#creation) extension. Multiple partial uploads are concatenated
 into a final upload in a specific order. The Server SHOULD NOT process these
 partial uploads until they are concatenated to form a final upload. The length of the
 final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
 In order to create a new final upload the Client MUST omit the `Entity-Length`
-header and add the `Concat` header to the file creation request. The header's
+header and add the `Concat` header to the upload creation request. The header's
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be concatenated. The order of this list
 MUST represent the order by which the partial uploads are concatenated
@@ -546,7 +546,7 @@ Any `PATCH` request against a final upload MUST be denied responding with the
 resources. The response of a `HEAD` request MUST NOT contain the `Offset` header.
 The `Entity-Length` header MUST be included if the length of the final resource can
 be calculated at the time. Responses to `HEAD` requests against partial or final
-uploads MUST include the `Concat` header and its value as sent in the file creation request.
+uploads MUST include the `Concat` header and its value as sent in the upload creation request.
 
 #### Headers
 
