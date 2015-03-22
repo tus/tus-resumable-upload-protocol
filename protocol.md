@@ -251,7 +251,7 @@ core protocol for performing the actual upload.
 The `Entity-Length` header indicates the final size of a new entity in bytes.
 This way a Server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer or the string `streaming` indicating that
-the [Streams](#streams) extension is used to send the entity's length later.
+the [Stream](#stream) extension is used to send the entity's length later.
 
 ##### Metadata
 
@@ -267,7 +267,7 @@ or a comma.
 
 Clients MUST use a `POST` against a well known upload creation URL to request the
 creation of a new file resource. The request MUST include an `Entity-Length`
-header. If the [Streams](#streams) extension is used to upload a file of unknown
+header. If the [Stream](#stream) extension is used to upload a file of unknown
 size the header `Entity-Length: streaming` MUST be included.
 
 The Client MAY supply the `Metadata` header to add additional metadata to the
