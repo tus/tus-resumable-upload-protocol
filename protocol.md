@@ -140,8 +140,8 @@ Server's preference whereas the first element is the most preferred one.
 
 Servers MUST always return an `Upload-Offset` header for `HEAD` requests against a tus
 resource, even if it is `0`, or the upload is already considered completed.
-If the tus resource is not found Servers MUST return either `404` or `403` 
-without an `Upload-Offset` header.
+If the tus resource is not found Servers SHOULD return either `404 Not Found`,
+`410 Gone` or `403 Forbidden` without an `Upload-Offset` header.
 
 #### PATCH
 
@@ -337,7 +337,7 @@ known during the construction, the `Upload-Expires` header MUST be included in
 the response to the initial `POST` request. Its value MAY change over time.
 
 If a Client does attempt to resume an upload which has since been removed by the
-Server, the server MUST respond with `404 Not Found` or `410 Gone`. The latter
+Server, the server SHOULD respond with `404 Not Found` or `410 Gone`. The latter
 one SHOULD be used if the Server is keeping track of expired uploads. In both
 cases the Client MUST start a new upload.
 
