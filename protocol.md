@@ -187,7 +187,7 @@ This example clarifies the response for an `OPTIONS` request. The version used
 in both, request and response, is `1.0.0` while the Server is also capable of
 handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are
 supported and the extensions for [Creation](#creation) and
-[Upload Expiration](#upload-expiration) are enabled.
+[Expiration](#expiration) are enabled.
 
 **Request:**
 
@@ -204,7 +204,7 @@ HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
 Tus-Version: 1.0.0,0.2.2,0.2.1
 Tus-Max-Size: 1073741824
-Tus-Extension: creation,upload-expiration
+Tus-Extension: creation,expiration
 ```
 
 ## Protocol Extensions
@@ -289,10 +289,10 @@ the `Location` header.
 The Client then continues to perform the actual upload of the file using the core
 protocol.
 
-### Upload Expiration
+### Expiration
 
 The Server MAY remove unfinished uploads. In order to indicate this behavior
-to the Client, the Server MUST include the `upload-expiration` element
+to the Client, the Server MUST include the `expiration` element
 in the `Tus-Extension` header.
 
 #### Example
@@ -674,7 +674,7 @@ resume an upload, send a `HEAD` request to the correspondig upload URL in order 
 obtain the available offset. After receiving a valid response you can upload
 more data using `PATCH` requests. You should keep in mind that the Server may
 delete an unfinished upload if it is not continued for a longer time period (see
-Upload Expires extension).
+[Expiration](#expiration) extension).
 
 Before deleting an outstanding upload the Server should give the Client enough
 time to resolve potential networking issues. Since this duration depends heavily
