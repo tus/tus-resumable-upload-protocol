@@ -487,7 +487,7 @@ If this extension is supported by the Server it MUST be announced by adding the
 When receiving a `DELETE` request for an existing upload the Server SHOULD free
 associated resources and MUST return the `204 No Content` status code,
 confirming that the upload was terminated. For all future requests to this URL
-the Server MUST return `404 Not Found` or `410 Gone`.
+the Server SHOULD responed with the `404 Not Found` or `410 Gone` status code.
 
 #### Example 
 
