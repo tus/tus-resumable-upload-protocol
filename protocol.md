@@ -255,11 +255,10 @@ the [Stream](#stream) extension is used to send the entity's length later.
 
 ##### Upload-Metadata
 
-The `Upload-Metadata` header MUST be a comma-separated list adding one or multiple
-key-value-pairs to the upload creation request. Its elements MUST consist of the
-key and the according Base64 encoded value separated by a space. Both entities,
-the key and value, MUST be non-empty strings. The key MUST NOT contain a space
-or a comma.
+The `Upload-Metadata` header MUST consist of one or more key-value pairs. The
+key-value pairs MUST be separated by comma. The key and value MUST be separated
+by a space and MUST NOT be empty. The key MUST NOT contain a space or a comma. The
+key SHOULD be ASCII encoded and the value MUST be Base64 encoded.
 
 #### Requests
 
