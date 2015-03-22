@@ -515,7 +515,7 @@ Server supports this extension it MUST be announced by adding the `concatenation
 element to the `Tus-Extension` header.
 
 A partial upload is an upload which represents a chunk of a file. It is
-constructed by including the `Concat: partial` header when creating a new
+constructed by including the `Upload-Concat: partial` header when creating a new
 resource using the [Creation](#creation) extension. Multiple partial uploads are concatenated
 into a final upload in a specific order. The Server SHOULD NOT process these
 partial uploads until they are concatenated to form a final upload. The length of the
@@ -523,7 +523,7 @@ final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
 In order to create a new final upload the Client MUST omit the `Upload-Length`
-header and add the `Concat` header to the upload creation request. The header's
+header and add the `Upload-Concat` header to the upload creation request. The header's
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be concatenated. The order of this list
 MUST represent the order by which the partial uploads are concatenated
@@ -546,13 +546,13 @@ Any `PATCH` request against a final upload MUST be denied responding with the
 resources. The response of a `HEAD` request MUST NOT contain the `Offset` header.
 The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time. Responses to `HEAD` requests against partial or final
-uploads MUST include the `Concat` header and its value as sent in the upload creation request.
+uploads MUST include the `Upload-Concat` header and its value as sent in the upload creation request.
 
 #### Headers
 
-##### Concat
+##### Upload-Concat
 
-The `Concat` header indicates whether the upload created by the request is either
+The `Upload-Concat` header indicates whether the upload created by the request is either
 a partial or final upload. If a partial upload is constructed, the header value
 MUST be `partial`. In the case of creating a final resource its value is the
 string `final` followed by a semicolon and a space-separated list of the URLs of
@@ -567,7 +567,7 @@ In the beginning two partial uploads are created:
 
 ```
 POST /files HTTP/1.1
-Concat: partial
+Upload-Concat: partial
 Upload-Length: 5
 
 HTTP/1.1 204 No Content
@@ -575,7 +575,7 @@ Location: https://tus.example.org/files/a
 ```
 ```
 POST /files HTTP/1.1
-Concat: partial
+Upload-Concat: partial
 Upload-Length: 6
 
 HTTP/1.1 204 No Content
@@ -613,7 +613,7 @@ presented.
 
 ```
 POST /files HTTP/1.1
-Concat: final; /files/a https://tus.example.org/files/b
+Upload-Concat: final; /files/a https://tus.example.org/files/b
 
 HTTP/1.1 204 No Content
 Location: https://tus.example.org/files/ab
@@ -627,7 +627,7 @@ HEAD /files/ab HTTP/1.1
 
 HTTP/1.1 204 No Content
 Upload-Length: 11
-Concat: final; /files/a /files/b
+Upload-Concat: final; /files/a /files/b
 ```
 
 ## FAQ
