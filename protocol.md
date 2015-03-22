@@ -248,10 +248,10 @@ core protocol for performing the actual upload.
 
 ##### Upload-Length
 
-The `Upload-Length` header indicates the final size of a new entity in bytes.
+The `Upload-Length` header indicates the final size of the new upload in bytes.
 This way a Server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer or the string `streaming` indicating that
-the [Stream](#stream) extension is used to send the entity's length later.
+the [Stream](#stream) extension is used to send the upload's length later.
 
 ##### Upload-Metadata
 
@@ -399,7 +399,7 @@ unknown length at the beginning of the upload.
 If the [Creation](#creation) extension is used to initiate a new upload the
 `Upload-Length` header MUST be set to the string `streaming`. Once the total size of the
 entire upload is known it MUST be included as the `Upload-Length` header's value
-in the next `PATCH` request. Once the entity's length has been set it MUST NOT
+in the next `PATCH` request. Once the upload's length has been set it MUST NOT
 be changed.
 
 In order to indicate that this extension is supported by the Server it MUST
