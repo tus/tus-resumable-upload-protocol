@@ -230,7 +230,7 @@ Host: tus.example.org
 Content-Length: 0
 Upload-Length: 100
 Tus-Resumable: 1.0.0
-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
+Upload-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
 ```
 
 **Response:**
@@ -253,9 +253,9 @@ This way a Server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer or the string `streaming` indicating that
 the [Stream](#stream) extension is used to send the entity's length later.
 
-##### Metadata
+##### Upload-Metadata
 
-The `Metadata` header MUST be a comma-separated list adding one or multiple
+The `Upload-Metadata` header MUST be a comma-separated list adding one or multiple
 key-value-pairs to the upload creation request. Its elements MUST consist of the
 key and the according Base64 encoded value separated by a space. Both entities,
 the key and value, MUST be non-empty strings. The key MUST NOT contain a space
@@ -270,7 +270,7 @@ creation of a new file resource. The request MUST include an `Upload-Length`
 header. If the [Stream](#stream) extension is used to upload a file of unknown
 size the header `Upload-Length: streaming` MUST be included.
 
-The Client MAY supply the `Metadata` header to add additional metadata to the
+The Client MAY supply the `Upload-Metadata` header to add additional metadata to the
 upload creation request. The Server MAY decide to ignore or use this information
 to further process the request or to reject it.
 
@@ -279,7 +279,7 @@ If the size of the upload exceeds the maximum which MAY be indicated using the
 `413 Request Entity Too Large` status code. 
 
 If an upload contains additional metadata responses to `HEAD` requests against
-these uploads MUST include the `Metadata` header and its value as sent in the
+these uploads MUST include the `Upload-Metadata` header and its value as sent in the
 upload creation request.
 
 The Server MUST acknowledge a successful upload creation request with a `201
@@ -532,7 +532,7 @@ happen if all of the corresponding partial uploads are finished.
 
 When creating a new final upload the partial uploads' metadata SHALL
 not be transferred to the new final upload. Instead, all metadata SHOULD be included
-in the concatenation request using the `Metadata` header.
+in the concatenation request using the `Upload-Metadata` header.
 
 The concatenation request MAY even be sent before all partial uploads are finished. This
 feature MUST be explicitly announced by the Server by including the
