@@ -220,7 +220,7 @@ All Clients and Servers SHOULD implement the upload creation API.
 #### Example
 
 An empty POST request is used to create a new upload resource. The
-`Entity-Length` header indicates the size of the file that will be uploaded.
+`Upload-Length` header indicates the size of the file that will be uploaded.
 
 **Request:**
 
@@ -228,7 +228,7 @@ An empty POST request is used to create a new upload resource. The
 POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 0
-Entity-Length: 100
+Upload-Length: 100
 Tus-Resumable: 1.0.0
 Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
 ```
@@ -246,9 +246,9 @@ core protocol for performing the actual upload.
 
 #### Headers
 
-##### Entity-Length
+##### Upload-Length
 
-The `Entity-Length` header indicates the final size of a new entity in bytes.
+The `Upload-Length` header indicates the final size of a new entity in bytes.
 This way a Server will implicitly know when a file has completed uploading. The
 value MUST be a non-negative integer or the string `streaming` indicating that
 the [Stream](#stream) extension is used to send the entity's length later.
@@ -266,9 +266,9 @@ or a comma.
 ##### POST
 
 Clients MUST use a `POST` against a well known upload creation URL to request the
-creation of a new file resource. The request MUST include an `Entity-Length`
+creation of a new file resource. The request MUST include an `Upload-Length`
 header. If the [Stream](#stream) extension is used to upload a file of unknown
-size the header `Entity-Length: streaming` MUST be included.
+size the header `Upload-Length: streaming` MUST be included.
 
 The Client MAY supply the `Metadata` header to add additional metadata to the
 upload creation request. The Server MAY decide to ignore or use this information
@@ -398,8 +398,8 @@ This extension defines how to upload finite streams of data that have an
 unknown length at the beginning of the upload.
 
 If the [Creation](#creation) extension is used to initiate a new upload the
-`Entity-Length` header MUST be set to the string `streaming`. Once the total size of the
-entire upload is known it MUST be included as the `Entity-Length` header's value
+`Upload-Length` header MUST be set to the string `streaming`. Once the total size of the
+entire upload is known it MUST be included as the `Upload-Length` header's value
 in the next `PATCH` request. Once the entity's length has been set it MUST NOT
 be changed.
 
@@ -410,7 +410,7 @@ include the `stream` element in the `Tus-Extension` header.
 
 After creating a new upload using the [Creation](#creation) extension, 100 bytes are
 uploaded. The next request transfers an additional 100 bytes and the total
-`Entity-Length`. In the end of this example the Server knows that the resource will have
+`Upload-Length`. In the end of this example the Server knows that the resource will have
 a size of 300 bytes but only the first 200 are transferred.
 
 **Request:**
@@ -420,7 +420,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 Tus-Resumable: 1.0.0
 Content-Length: 0
-Entity-Length: streaming
+Upload-Length: streaming
 ```
 
 **Response:**
@@ -460,7 +460,7 @@ Tus-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 Content-Length: 100
 Offset: 100
-Entity-Length: 300
+Upload-Length: 300
 
 [100 bytes]
 ```
@@ -522,7 +522,7 @@ partial uploads until they are concatenated to form a final upload. The length o
 final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
-In order to create a new final upload the Client MUST omit the `Entity-Length`
+In order to create a new final upload the Client MUST omit the `Upload-Length`
 header and add the `Concat` header to the upload creation request. The header's
 value is the string `final` followed by a semicolon and a space-separated list
 of the URLs of the partial uploads which will be concatenated. The order of this list
@@ -544,7 +544,7 @@ used multiple times to form a final resource.
 Any `PATCH` request against a final upload MUST be denied responding with the
 `403 Forbidden` status code and MUST neither modify the final nor any of its partial
 resources. The response of a `HEAD` request MUST NOT contain the `Offset` header.
-The `Entity-Length` header MUST be included if the length of the final resource can
+The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time. Responses to `HEAD` requests against partial or final
 uploads MUST include the `Concat` header and its value as sent in the upload creation request.
 
@@ -568,7 +568,7 @@ In the beginning two partial uploads are created:
 ```
 POST /files HTTP/1.1
 Concat: partial
-Entity-Length: 5
+Upload-Length: 5
 
 HTTP/1.1 204 No Content
 Location: https://tus.example.org/files/a
@@ -576,7 +576,7 @@ Location: https://tus.example.org/files/a
 ```
 POST /files HTTP/1.1
 Concat: partial
-Entity-Length: 6
+Upload-Length: 6
 
 HTTP/1.1 204 No Content
 Location: https://tus.example.org/files/b
@@ -608,7 +608,7 @@ In the first request the string `hello` was uploaded while the second file now
 contains ` world` with a leading space.
 
 The next step is to create the final upload consisting of the two earlier
-generated partial uploads. In following request no `Entity-Length` header is
+generated partial uploads. In following request no `Upload-Length` header is
 presented.
 
 ```
@@ -626,7 +626,7 @@ The length of the final resource is now 11 bytes consisting of the string
 HEAD /files/ab HTTP/1.1
 
 HTTP/1.1 204 No Content
-Entity-Length: 11
+Upload-Length: 11
 Concat: final; /files/a /files/b
 ```
 
