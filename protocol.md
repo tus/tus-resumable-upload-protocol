@@ -397,7 +397,6 @@ unknown length at the beginning of the upload.
 If the [Creation](#creation) extension is used to initiate a new upload the
 `Upload-Stream` header MUST be set to 1. Once the total size of the entire 
 upload is known `Upload-Length` MUST be set in the next `PATCH` request. 
-`Upload-Length` once set SHALL NOT be changed.
 
 In order to indicate that this extension is supported by the Server it MUST
 include the `stream` element in the `Tus-Extension` header.
@@ -410,7 +409,7 @@ The `Upload-Stream: 1` MUST be included with the file creation request.
 
 ##### Upload-Length
 
-The `Upload-Length` MUST be set only once with the `PATCH` request.
+The `Upload-Length` once set MUST NOT be changed.
 
 #### Example
 
