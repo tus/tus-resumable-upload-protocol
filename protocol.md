@@ -162,6 +162,8 @@ Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
 or `200 Ok` status, which implicitly means that Clients can assume that the new
 `Upload-Offset` = `Offset` \+ `Content-Length`.
 
+Servers MAY return `Upload-Offset` header to indicate the bytes received.
+
 If the Client sends an `Expect` request-header field with the `100-continue`
 expectation, the Server SHOULD respond with the `100 Continue` status code before
 reading the request's body and sending the final response.
@@ -249,9 +251,8 @@ core protocol for performing the actual upload.
 ##### Upload-Length
 
 The `Upload-Length` header indicates the final size of the new upload in bytes.
-This way a Server will implicitly know when a file has completed uploading. The
-value MUST be a non-negative integer or the string `streaming` indicating that
-the [Stream](#stream) extension is used to send the upload's length later.
+This way a Server will implicitly know when a file has completed uploading.
+The `Upload-Length` MUST be a non-negative integer.
 
 ##### Upload-Metadata
 
@@ -265,9 +266,9 @@ key SHOULD be ASCII encoded and the value MUST be Base64 encoded.
 ##### POST
 
 Clients MUST use a `POST` against a well known upload creation URL to request the
-creation of a new file resource. The request MUST include an `Upload-Length`
-header. If the [Stream](#stream) extension is used to upload a file of unknown
-size the header `Upload-Length: streaming` MUST be included.
+creation of a new file resource. The request MAY include one or more of the `Upload-Length`, 
+`Upload-Concat`, `Upload-Stream` headers. The headers included here SHALL be dictated by 
+the rules set by supported extensions.
 
 The Client MAY supply the `Upload-Metadata` header to add additional metadata to the
 upload creation request. The Server MAY decide to ignore or use this information
@@ -397,13 +398,19 @@ This extension defines how to upload finite streams of data that have an
 unknown length at the beginning of the upload.
 
 If the [Creation](#creation) extension is used to initiate a new upload the
-`Upload-Length` header MUST be set to the string `streaming`. Once the total size of the
-entire upload is known it MUST be included as the `Upload-Length` header's value
-in the next `PATCH` request. Once the upload's length has been set it MUST NOT
-be changed.
+`Upload-Stream` header MUST be set to 1. The `Upload-Length` header MUST NOT
+be set in during POST. Once the total size of the entire upload is known 
+`Upload-Length` MUST be set in the next `PATCH` request. The `Upload-Length`
+once set MUST NOT be changed. 
 
 In order to indicate that this extension is supported by the Server it MUST
 include the `stream` element in the `Tus-Extension` header.
+
+#### Headers
+
+##### Upload-Stream
+
+The `Upload-Stream: 1` MUST be included with the file creation request.
 
 #### Example
 
@@ -419,7 +426,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 Tus-Resumable: 1.0.0
 Content-Length: 0
-Upload-Length: streaming
+Upload-Stream: 1
 ```
 
 **Response:**
