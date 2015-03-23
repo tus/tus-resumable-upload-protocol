@@ -486,7 +486,6 @@ won't be continued allowing Servers to free up used resources.
 If this extension is supported by the Server it MUST be announced by adding the
 `termination` element to the `Tus-Extension` header.
 
-
 #### Requests
 
 ##### DELETE
