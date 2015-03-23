@@ -263,8 +263,9 @@ key SHOULD be ASCII encoded and the value MUST be Base64 encoded.
 ##### POST
 
 Clients MUST use a `POST` against a well known upload creation URL to request the
-creation of a new file resource. The request MUST include either `Upload-Length`
-header when upload size is known.
+creation of a new file resource. The request MUST include `Upload-Length`
+header when upload size is known. The request MUST include `Upload-Stream: 1` when
+upload size is unknown. The headers included here SHALL be dictated by dependent extensions.
 
 The Client MAY supply the `Upload-Metadata` header to add additional metadata to the
 upload creation request. The Server MAY decide to ignore or use this information
