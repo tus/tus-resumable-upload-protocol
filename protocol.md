@@ -225,7 +225,9 @@ described below as possible. Feature detection SHOULD be achieved using the
 
 ### Creation
 
-All Clients and Servers SHOULD implement the upload creation API.
+All Clients and Servers SHOULD implement the upload creation extension. If
+the Server supports this extension, it MUST include the `creation`
+element in the `Tus-Extension` header.
 
 #### Example
 
