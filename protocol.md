@@ -107,6 +107,12 @@ Tus-Resumable: 1.0.0
 The `Upload-Offset` header is a request and response header that indicates a byte
 offset within a resource. The value MUST be a non-negative integer.
 
+##### Upload-Length
+
+The `Upload-Length` header indicates the final size of the an upload in bytes.
+The value MUST be a non-negative integer.
+
+
 #### Tus-Resumable
 
 The `Tus-Resumable` header MUST be sent in every response and request except
@@ -140,6 +146,8 @@ Server's preference whereas the first element is the most preferred one.
 
 Servers MUST always return an `Upload-Offset` header for `HEAD` requests against a tus
 resource, even if it is `0`, or the upload is already considered completed.
+If the size of the upload is known the Server MUST include the `Upload-Length` header
+in the response.
 If the tus resource is not found Servers SHOULD return either `404 Not Found`,
 `410 Gone` or `403 Forbidden` without an `Upload-Offset` header.
 
@@ -248,12 +256,10 @@ core protocol for performing the actual upload.
 
 #### Headers
 
-##### Upload-Length
+##### Upload-Defer-Length
 
-The `Upload-Length` header indicates the final size of the new upload in bytes.
-This way a Server will implicitly know when a file has completed uploading. The
-value MUST be a non-negative integer or the string `streaming` indicating that
-the [Stream](#stream) extension is used to send the upload's length later.
+The `Upload-Defer-Length` header indicates that the size of the upload is not known
+currently and will be transferred later. Its value MUST be `1`.
 
 ##### Upload-Metadata
 
@@ -267,9 +273,23 @@ key SHOULD be ASCII encoded and the value MUST be Base64 encoded.
 ##### POST
 
 Clients MUST use a `POST` against a well known upload creation URL to request the
-creation of a new file resource. The request MUST include an `Upload-Length`
-header. If the [Stream](#stream) extension is used to upload a file of unknown
-size the header `Upload-Length: streaming` MUST be included.
+creation of a new upload resource. The request MUST include an `Upload-Length`
+header or `Upload-Defer-Length` header.
+
+If the entire size of the upload is known in advance, the Client MUST include the
+`Upload-Length` header and set its value to the entire size if the upload in bytes.
+In the case that the entire size is not known before the upload is created, the
+Client MUST NOT include the `Upload-Length` header and instead add
+`Upload-Defer-Length: 1` to the `POST` request. Once the entire size of the upload
+is known the Client MUST include the `Upload-Length` in the next `PATCH` request.
+Once the upload's length has been set it MUST NOT be changed.
+
+As long as the Server is not aware of the upload's length it MUST include
+`Upload-Defer-Length: 1` into and MUST exclude `Upload-Length` from responses to
+`HEAD` requests.
+
+If the Server supports deferring length, it MUST add `creation-defer-length` to
+the `Tus-Extension` header. 
 
 The Client MAY supply the `Upload-Metadata` header to add additional metadata to the
 upload creation request. The Server MAY decide to ignore or use this information
@@ -387,86 +407,6 @@ Die Würde des Menschen ist unantastbar.
 ```
 
 **Response**:
-
-```
-HTTP/1.1 204 No Content
-Tus-Resumable: 1.0.0
-```
-
-### Stream
-
-This extension defines how to upload finite streams of data that have an
-unknown length at the beginning of the upload.
-
-If the [Creation](#creation) extension is used to initiate a new upload the
-`Upload-Length` header MUST be set to the string `streaming`. Once the total size of the
-entire upload is known it MUST be included as the `Upload-Length` header's value
-in the next `PATCH` request. Once the upload's length has been set it MUST NOT
-be changed.
-
-In order to indicate that this extension is supported by the Server it MUST
-include the `stream` element in the `Tus-Extension` header.
-
-#### Example
-
-After creating a new upload using the [Creation](#creation) extension, 100 bytes are
-uploaded. The next request transfers an additional 100 bytes and the total
-`Upload-Length`. In the end of this example the Server knows that the resource will have
-a size of 300 bytes but only the first 200 are transferred.
-
-**Request:**
-
-```
-POST /files HTTP/1.1
-Host: tus.example.org
-Tus-Resumable: 1.0.0
-Content-Length: 0
-Upload-Length: streaming
-```
-
-**Response:**
-
-```
-HTTP/1.1 201 Created
-Tus-Resumable: 1.0.0
-Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
-```
-
-**Request:**
-
-```
-PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
-Host: tus.example.org
-Tus-Resumable: 1.0.0
-Content-Type: application/offset+octet-stream
-Content-Length: 100
-Upload-Offset: 0
-
-[100 bytes]
-```
-
-**Response:**
-
-```
-HTTP/1.1 204 No Content
-Tus-Resumable: 1.0.0
-```
-
-**Request:**
-
-```
-PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
-Host: tus.example.org
-Tus-Resumable: 1.0.0
-Content-Type: application/offset+octet-stream
-Content-Length: 100
-Upload-Offset: 100
-Upload-Length: 300
-
-[100 bytes]
-```
-
-**Response:**
 
 ```
 HTTP/1.1 204 No Content
