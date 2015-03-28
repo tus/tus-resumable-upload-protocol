@@ -158,9 +158,11 @@ Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
-Servers MUST acknowledge successful `PATCH` operations using a `204 No Content`
-or `200 Ok` status, which implicitly means that Clients can assume that the new
-`Upload-Offset` = `Offset` \+ `Content-Length`.
+Servers MUST acknowledge successful PATCH operations using a `204 No Content`
+or `200 OK` status code and MUST include the `Upload-Offset` header containing
+the new offset. The new offset MUST be the sum of the offset before the `PATCH`
+request and the number of bytes received and processed or stored during the
+current `PATCH` request.
 
 If the Client sends an `Expect` request-header field with the `100-continue`
 expectation, the Server SHOULD respond with the `100 Continue` status code before
