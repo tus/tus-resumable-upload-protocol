@@ -107,7 +107,7 @@ Tus-Resumable: 1.0.0
 The `Upload-Offset` header is a request and response header that indicates a byte
 offset within a resource. The value MUST be a non-negative integer.
 
-##### Upload-Length
+#### Upload-Length
 
 The `Upload-Length` header indicates the final size of the an upload in bytes.
 The value MUST be a non-negative integer.
