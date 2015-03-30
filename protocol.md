@@ -513,7 +513,7 @@ POST /files HTTP/1.1
 Upload-Concat: partial
 Upload-Length: 5
 
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
 Location: https://tus.example.org/files/a
 ```
 ```
@@ -521,7 +521,7 @@ POST /files HTTP/1.1
 Upload-Concat: partial
 Upload-Length: 6
 
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
 Location: https://tus.example.org/files/b
 ```
 
@@ -558,7 +558,7 @@ presented.
 POST /files HTTP/1.1
 Upload-Concat: final; /files/a https://tus.example.org/files/b
 
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
 Location: https://tus.example.org/files/ab
 ```
 
@@ -568,7 +568,7 @@ The length of the final resource is now 11 bytes consisting of the string
 ```
 HEAD /files/ab HTTP/1.1
 
-HTTP/1.1 204 No Content
+HTTP/1.1 200 OK
 Upload-Length: 11
 Upload-Concat: final; /files/a /files/b
 ```
