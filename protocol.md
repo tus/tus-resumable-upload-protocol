@@ -486,7 +486,12 @@ used multiple times to form a final resource.
 
 Any `PATCH` request against a final upload MUST be denied responding with the
 `403 Forbidden` status code and MUST neither modify the final nor any of its partial
-resources. The response of a `HEAD` request MUST NOT contain the `Upload-Offset` header.
+resources.
+
+The response of a `HEAD` request MUST NOT contain the `Upload-Offset` header unless
+the concatenation has been successfully finished. In this case, the value of the
+`Upload-Offset` MUST be the length of the final upload indicating to the Client that
+the Server completed the concatenation.
 The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time. Responses to `HEAD` requests against partial or final
 uploads MUST include the `Upload-Concat` header and its value as sent in the upload creation request.
