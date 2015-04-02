@@ -261,7 +261,8 @@ core protocol for performing the actual upload.
 ##### Upload-Defer-Length
 
 The `Upload-Defer-Length` header indicates that the size of the upload is not known
-currently and will be transferred later. Its value MUST be `1`.
+currently and will be transferred later. Its value MUST be `1`. If an upload is not
+deferred this header MUST be omitted.
 
 ##### Upload-Metadata
 
