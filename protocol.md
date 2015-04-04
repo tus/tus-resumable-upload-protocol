@@ -116,8 +116,8 @@ The value MUST be a non-negative integer.
 #### Tus-Resumable
 
 The `Tus-Resumable` header MUST be sent in every response and request except
-`OPTIONS` requests. Its value is a string set to the current version of the
-used tus resumable upload protocol by the Client or Server.
+`OPTIONS` request. Its value MUST be set to the current version of the protocol
+used by the Client or the Server.
 
 If the Client requests the use of a version which is not supported by the Server
 latter one MUST return `412 Precondition Failed` without processing the request
