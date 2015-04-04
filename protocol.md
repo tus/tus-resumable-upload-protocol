@@ -414,8 +414,8 @@ Tus-Resumable: 1.0.0
 
 ### Termination
 
-This extension defines a way for Clients to terminate unfinished uploads which
-won't be continued allowing Servers to free up used resources.
+This extension defines a way for Clients to terminate completed and unfinished
+uploads which won't be continued allowing Servers to free up used resources.
 
 If this extension is supported by the Server it MUST be announced by adding the
 `termination` element to the `Tus-Extension` header.
