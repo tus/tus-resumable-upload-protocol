@@ -137,8 +137,8 @@ presented or the Server is not able to calculate it this header MUST be omitted.
 #### Tus-Version
 
 This header MUST be a comma-separated list of the supported versions of the tus
-resumable upload protocol by the Server. The elements are sorted by the
-Server's preference where the first element is the most preferred one.
+resumable upload protocol by the Server. The versions MUST be sorted by Server's 
+preference where the first one is the most preferred one.
 
 ### Requests
 
