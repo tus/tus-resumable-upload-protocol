@@ -138,7 +138,7 @@ presented or the Server is not able to calculate it this header MUST be omitted.
 
 This header MUST be a comma-separated list of the supported versions of the tus
 resumable upload protocol by the Server. The elements are sorted by the
-Server's preference whereas the first element is the most preferred one.
+Server's preference where the first element is the most preferred one.
 
 ### Requests
 
