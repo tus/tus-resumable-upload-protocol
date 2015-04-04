@@ -447,7 +447,7 @@ Tus-Resumable: 1.0.0
 **Response:**
 
 ```
-HTTP/1.1 200 OK
+HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
 ```
 
