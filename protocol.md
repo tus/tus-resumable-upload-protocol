@@ -172,10 +172,6 @@ the new offset. The new offset MUST be the sum of the offset before the `PATCH`
 request and the number of bytes received and processed or stored during the
 current `PATCH` request.
 
-If the Client sends an `Expect` request-header field with the `100-continue`
-expectation, the Server SHOULD respond with the `100 Continue` status code before
-reading the request's body and sending the final response.
-
 Both, Client and Server, SHOULD attempt to detect and handle network errors
 predictably. They MAY do so by checking for read/write socket errors, as well
 as setting read/write timeouts. A timeout SHOULD be handled by closing the underlying connection.
