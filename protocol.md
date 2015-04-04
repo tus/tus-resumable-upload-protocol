@@ -429,9 +429,9 @@ If this extension is supported by the Server it MUST be announced by adding the
 ##### DELETE
 
 When receiving a `DELETE` request for an existing upload the Server SHOULD free
-associated resources and MUST return the `204 No Content` status code,
-confirming that the upload was terminated. For all future requests to this URL
-the Server SHOULD respond with the `404 Not Found` or `410 Gone` status code.
+associated resources and MUST return the 2xx response confirming that the upload
+was terminated. For all future requests to this URL the Server SHOULD respond with
+the `404 Not Found` or `410 Gone` status code.
 
 #### Example 
 
@@ -447,7 +447,7 @@ Tus-Resumable: 1.0.0
 **Response:**
 
 ```
-HTTP/1.1 204 No Content
+HTTP/1.1 200 OK
 Tus-Resumable: 1.0.0
 ```
 
