@@ -153,7 +153,7 @@ If the tus resource is not found Servers SHOULD return either `404 Not Found`,
 
 #### PATCH
 
-Servers MUST accept `PATCH` requests against any tus resource and apply the
+Servers MUST accept `PATCH` requests against any unfinished upload and apply the
 bytes contained in the message at the given `Upload-Offset`. All `PATCH` requests
 MUST use `Content-Type: application/offset+octet-stream`.
 
