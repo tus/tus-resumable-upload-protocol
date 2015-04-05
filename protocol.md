@@ -546,7 +546,7 @@ presented.
 
 ```
 POST /files HTTP/1.1
-Upload-Concat: final; /files/a https://tus.example.org/files/b
+Upload-Concat: final; /files/a /files/b
 
 HTTP/1.1 201 Created
 Location: https://tus.example.org/files/ab
