@@ -48,7 +48,7 @@ All Clients and Servers MUST implement the core protocol.
 
 This specification does not describe the structure of URLs, as that is left for
 the specific implementation to decide.  All URLs shown in this document are
-meant for example purposes only. The URLS MAY be absolute or relative.
+meant for example purposes only. The URLs MAY be absolute or relative.
 
 In addition, the implementation of authentication and authorization is left for
 the Server to decide.
