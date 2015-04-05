@@ -48,7 +48,7 @@ All Clients and Servers MUST implement the core protocol.
 
 This specification does not describe the structure of URLs, as that is left for
 the specific implementation to decide.  All URLs shown in this document are
-meant for example purposes only.
+meant for example purposes only. The URLS MAY be absolute or relative.
 
 In addition, the implementation of authentication and authorization is left for
 the Server to decide.
@@ -72,7 +72,7 @@ Tus-Resumable: 1.0.0
 **Response:**
 
 ```
-HTTP/1.1 204 No Content
+HTTP/1.1 200 OK
 Upload-Offset: 70
 Tus-Resumable: 1.0.0
 ```
@@ -116,8 +116,8 @@ The value MUST be a non-negative integer.
 #### Tus-Resumable
 
 The `Tus-Resumable` header MUST be sent in every response and request except
-`OPTIONS` requests. Its value is a string set to the current version of the
-used tus resumable upload protocol by the Client or Server.
+`OPTIONS` request. Its value MUST be set to the current version of the protocol
+used by the Client or the Server.
 
 If the Client requests the use of a version which is not supported by the Server
 latter one MUST return `412 Precondition Failed` without processing the request
@@ -137,8 +137,8 @@ presented or the Server is not able to calculate it this header MUST be omitted.
 #### Tus-Version
 
 This header MUST be a comma-separated list of the supported versions of the tus
-resumable upload protocol by the Server. The elements are sorted by the
-Server's preference whereas the first element is the most preferred one.
+resumable upload protocol by the Server. The versions MUST be sorted by Server's 
+preference where the first one is the most preferred one.
 
 ### Requests
 
@@ -153,7 +153,7 @@ If the tus resource is not found Servers SHOULD return either `404 Not Found`,
 
 #### PATCH
 
-Servers MUST accept `PATCH` requests against any tus resource and apply the
+Servers MUST accept `PATCH` requests against any unfinished upload and apply the
 bytes contained in the message at the given `Upload-Offset`. All `PATCH` requests
 MUST use `Content-Type: application/offset+octet-stream`.
 
@@ -172,10 +172,6 @@ the new offset. The new offset MUST be the sum of the offset before the `PATCH`
 request and the number of bytes received and processed or stored during the
 current `PATCH` request.
 
-If the Client sends an `Expect` request-header field with the `100-continue`
-expectation, the Server SHOULD respond with the `100 Continue` status code before
-reading the request's body and sending the final response.
-
 Both, Client and Server, SHOULD attempt to detect and handle network errors
 predictably. They MAY do so by checking for read/write socket errors, as well
 as setting read/write timeouts. A timeout SHOULD be handled by closing the underlying connection.
@@ -186,7 +182,7 @@ store as much of the received data as possible.
 #### OPTIONS
 
 An `OPTIONS` request MAY be used to gather information about the current
-configuration of the Server. The response MUST contain the `Tus-Extension`,
+configuration of the Server. A 200 response MUST contain the `Tus-Extension`,
 `Tus-Version` and `Tus-Max-Size` if available.
 
 The Server MUST NOT validate the `Tus-Resumable` header sent in the request.
@@ -210,7 +206,7 @@ Tus-Resumable: 1.0.0
 **Response:**
 
 ```
-HTTP/1.1 204 No Content
+HTTP/1.1 200 OK
 Tus-Resumable: 1.0.0
 Tus-Version: 1.0.0,0.2.2,0.2.1
 Tus-Max-Size: 1073741824
@@ -418,8 +414,8 @@ Tus-Resumable: 1.0.0
 
 ### Termination
 
-This extension defines a way for Clients to terminate unfinished uploads which
-won't be continued allowing Servers to free up used resources.
+This extension defines a way for Clients to terminate completed and unfinished
+uploads which won't be continued allowing Servers to free up used resources.
 
 If this extension is supported by the Server it MUST be announced by adding the
 `termination` element to the `Tus-Extension` header.
@@ -429,9 +425,9 @@ If this extension is supported by the Server it MUST be announced by adding the
 ##### DELETE
 
 When receiving a `DELETE` request for an existing upload the Server SHOULD free
-associated resources and MUST return the `204 No Content` status code,
-confirming that the upload was terminated. For all future requests to this URL
-the Server SHOULD respond with the `404 Not Found` or `410 Gone` status code.
+associated resources and MUST return the 2xx response confirming that the upload
+was terminated. For all future requests to this URL the Server SHOULD respond with
+the `404 Not Found` or `410 Gone` status code.
 
 #### Example 
 
@@ -505,8 +501,7 @@ The `Upload-Concat` header indicates whether the upload created by the request i
 a partial or final upload. If a partial upload is constructed, the header value
 MUST be `partial`. In the case of creating a final resource its value is the
 string `final` followed by a semicolon and a space-separated list of the URLs of
-the partial uploads which will be concatenated and form the file. All of the URLs MUST
-NOT contain a space and MAY be relative URLs.
+the partial uploads which will be concatenated and form the file.
 
 #### Example
 
