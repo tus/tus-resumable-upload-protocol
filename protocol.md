@@ -455,10 +455,10 @@ upload is considered finished if all of its partial uploads are finished.
 
 In order to create a new final upload the Client MUST add the `Upload-Concat` header 
 to the upload creation request. The value is the string `final` followed by a semicolon 
-and a space-separated list of the URLs of the partial uploads which will be concatenated. 
-The order of this list MUST represent the order by which the partial uploads are concatenated
-without adding, modifying or removing any bytes. This concatenation request SHOULD
-happen if all of the corresponding partial uploads are finished.
+and a space-separated list of the partial upload URLs that need to be concatenated. 
+The partial uploads MUST be concatenated as per the order specified in the list.
+This concatenation request SHOULD happen when all of the corresponding partial uploads 
+are finished.
 
 When creating a new final upload the partial uploads' metadata SHALL
 not be transferred to the new final upload. All metadata SHOULD be included
@@ -471,26 +471,26 @@ in progress. This feature MUST be explicitly announced by the Server by adding
 The Server MAY delete partial uploads after concatenation. They MAY however be 
 used multiple times to form a final resource.
 
-The Server MUST respond with `403 Forbidden` status to `PATCH` request against 
-a final upload. And also it MUST NOT modify the final or its partial resources.
+The Server MUST respond with `403 Forbidden` status to the `PATCH` request against 
+a final upload. The Server MUST NOT modify the final or its partial resources.
 
 The response to a `HEAD` request SHOULD NOT contain the `Upload-Offset` header unless
 the concatenation has been successfully finished. After successful  concatenation, the
-`Upload-Offset` and `Upload-Length` MUST be set and their values MUST be equal.
+`Upload-Offset` and `Upload-Length` headers MUST be set and their values MUST be equal.
 The `Upload-Length` header MUST be included if the length of the final resource can
-be calculated at the time. Responses to `HEAD` requests against partial or final
-uploads MUST include the `Upload-Concat` header and its value as sent in the upload 
-creation request.
+be calculated at the time of the request. Responses to `HEAD` requests against partial
+or final uploads MUST include the `Upload-Concat` header and its value as received in 
+the upload creation request.
 
 #### Headers
 
 ##### Upload-Concat
 
-The `Upload-Concat` header indicates whether the upload created by the request is either
-a partial or final upload. If a partial upload is constructed, the header value
-MUST be `partial`. In the case of creating a final resource its value is the
-string `final` followed by a semicolon and a space-separated list of the URLs of
-the partial uploads which will be concatenated and form the file.
+The `Upload-Concat` header MUST be set in both partial and final upload creation
+requests. If a partial upload is constructed, the header value MUST be `partial`. 
+In the case of creating a final resource its value is the string `final` followed
+by a semicolon and a space-separated list of partial upload URLs that will be
+concatenated.
 
 #### Example
 
@@ -509,7 +509,7 @@ Location: https://tus.example.org/files/a
 ```
 POST /files HTTP/1.1
 Upload-Concat: partial
-Upload-Length: 6
+Upload-Defer-Length: 1
 
 HTTP/1.1 201 Created
 Location: https://tus.example.org/files/b
@@ -531,6 +531,7 @@ HTTP/1.1 204 No Content
 PATCH /files/b HTTP/1.1
 Upload-Offset: 0
 Content-Length: 6
+Upload-Length: 6
 
  world
 
