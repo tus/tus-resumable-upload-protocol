@@ -119,42 +119,42 @@ The `Tus-Resumable` header MUST be included in every request and response except
 `OPTIONS` request. The value MUST be the version of the protocol used by the 
 Client and the Server.
 
-If the Client requests the use of a version which is not supported by the Server
-latter one MUST return `412 Precondition Failed` without processing the request
-further.
+The Server MUST return `412 Precondition Failed` status without processing 
+the request if the the version specified by the Client is not supported.
 
 #### Tus-Extension
 
-This `Tus-Extension` header MUST be a comma-separated list of the extensions 
+The `Tus-Extension` header MUST be a comma-separated list of the extensions 
 supported by the Server. If no extensions are supported `Tus-Extension` MAY be 
-omitted. The extension MUST NOT contain comma.
+omitted. The extension MUST NOT contain a comma.
 
 #### Tus-Max-Size
 
 The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
-allowed size of an entire upload in bytes. The Server MUST be omit this header 
-if it is unable to calculate or if there is no known hard-limit.
+allowed size of an entire upload in bytes. The Server MUST omit this header 
+in the absence any known hard-limit or upon being unable to calculate the value.
 
 #### Tus-Version
 
-This header MUST be a comma-separated list of protocol versions supported by the Server. 
-The versions MUST be sorted by Server's preference where the first one is the most 
-preferred one.
+The `Tus-Version` header MUST be a comma-separated list of protocol versions 
+supported by the Server. The list MUST be sorted by Server's preference 
+where the first one is the most preferred one.
 
 ### Requests
 
 #### HEAD
 
-Servers MUST always return an `Upload-Offset` header for `HEAD` requests against an
-upload resource, even if it is `0`, or the upload is already considered completed.
-If the size of the upload is known the Server MUST include the `Upload-Length` header
-in the response. If the resource is not found Servers SHOULD return either 
-`404 Not Found`, `410 Gone` or `403 Forbidden` without an `Upload-Offset` header.
-The Client SHOULD NOT cache the `HEAD` responses.
+The Server MUST always include `Upload-Offset` header in `HEAD` response, even if 
+it is `0`, or the upload is already considered completed. If the size of the upload
+is known the Server MUST include the `Upload-Length` header in the response. If 
+the resource is not found Servers SHOULD return either `404 Not Found`, `410 Gone` 
+or `403 Forbidden` status without an `Upload-Offset` header. 
+
+The Client SHOULD NOT cache the `HEAD` response.
 
 #### PATCH
 
-Servers MUST accept `PATCH` requests against any unfinished upload and apply the
+The Server MUST accept `PATCH` request against any unfinished upload and apply the
 bytes contained in the message at the given `Upload-Offset`. All `PATCH` requests
 MUST use `Content-Type: application/offset+octet-stream`.
 
@@ -163,12 +163,12 @@ to achieve parallel upload the [Concatenation](#concatenation) extension MAY be
 used. If the offsets do not match the Server MUST respond with the `409 Conflict`
 status without modifying the upload resource.
 
-Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
+The Client SHOULD send all the remaining bytes of a resource in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
-Servers MUST acknowledge successful PATCH operations using a `204 No Content`
-or `200 OK` status and MUST include the `Upload-Offset` header containing
+The Server MUST acknowledge successful PATCH operations with a `204 No Content`
+or `200 OK` status. It MUST include the `Upload-Offset` header containing
 the new offset. The new offset MUST be the sum of the offset before the `PATCH`
 request and the number of bytes received and processed or stored during the
 current `PATCH` request.
@@ -177,23 +177,22 @@ Both, Client and Server, SHOULD attempt to detect and handle network errors
 predictably. They MAY do so by checking for read/write socket errors, as well
 as setting read/write timeouts. A timeout SHOULD be handled by closing the underlying connection.
 
-Servers SHOULD always attempt to process partial message bodies in order to
-store as much of the received data as possible.
+The Server SHOULD always attempt to store as much of the received data as possible.
 
 #### OPTIONS
 
 An `OPTIONS` request MAY be used to gather information about the current
-configuration of the Server. A 204 response MUST contain the `Tus-Extension`,
-`Tus-Version` and `Tus-Max-Size` if available.
+configuration of the Server. A 204 response MUST contain the `Tus-Version`.
+It MAY include `Tus-Extension` and `Tus-Max-Size` headers.
 
-The Server MUST NOT validate the `Tus-Resumable` header sent in the request.
+The Client SHOULD omit this header in the request and the Server MUST discard it.
 
 ##### Example
 
 This example clarifies the response for an `OPTIONS` request. The version used
 in both, request and response, is `1.0.0` while the Server is also capable of
 handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are
-supported and the extensions for [Creation](#creation) and
+allowed and the extensions for [Creation](#creation) and
 [Expiration](#expiration) are enabled.
 
 **Request:**
@@ -217,8 +216,8 @@ Tus-Extension: creation,expiration
 ## Protocol Extensions
 
 Clients and Servers are encouraged to implement as many of the extensions
-described below as possible. Feature detection SHOULD be achieved using the
-`Tus-Extension` header in the response to an `OPTIONS` request.
+as possible. Feature detection SHOULD be achieved by the Client sending an
+`OPTIONS` request and the Server responding with a`Tus-Extension` header.
 
 ### Creation
 
@@ -229,7 +228,7 @@ header.
 #### Example
 
 An empty POST request is used to create a new upload resource. The
-`Upload-Length` header indicates the size of the file that will be uploaded.
+`Upload-Length` header indicates the size of entire upload in bytes.
 
 **Request:**
 
@@ -263,28 +262,26 @@ deferred this header MUST be omitted.
 
 ##### Upload-Metadata
 
-The `Upload-Metadata` header MUST consist of one or more key-value pairs. The
-key-value pairs MUST be separated by comma. The key and value MUST be separated
-by a space. The key MUST NOT contain a space or a comma and also MUST not be 
-empty. The key SHOULD be ASCII encoded and the value MUST be Base64 encoded.
-All keys MUST be unique.
+The `Upload-Metadata` header MUST consist of one or more comma-separated 
+key-value pairs. The key and value MUST be separated by a space. The key 
+MUST NOT contain space, comma and MUST NOT be empty. The key SHOULD be
+ASCII encoded and the value MUST be Base64 encoded. All keys MUST be unique.
 
 #### Requests
 
 ##### POST
 
-Clients MUST use a `POST` against a well known upload creation URL to request the
-creation of a new upload resource. The request MUST include one of the following 
-headers:
+The Client MUST `POST` against a well known upload creation URL to request a new 
+upload resource. The request MUST include one of the following headers:
 
 a) `Upload-Length` to indicate the size of an entire upload in bytes.
 
-b) `Upload-Defer-Length: 1` if upload size is not known. 
+b) `Upload-Defer-Length: 1` if upload size is not known at the time. 
 
 Once it is known the Client MUST set the `Upload-Length` in the next `PATCH` request.
 Once set it MUST NOT be changed.
 
-If `Upload-Length` is not known to the Server, it MUST set `Upload-Defer-Length: 1`
+If `Upload-Length` is not known, the Server MUST set `Upload-Defer-Length: 1`
 in all `PATCH` and `HEAD` responses.
 
 If the Server supports deferring length, it MUST add `creation-defer-length` to
@@ -295,13 +292,13 @@ upload creation request. The Server MAY decide to ignore or use this information
 to further process the request or to reject it.
 
 If the `Upload-Length` is greater than the optional `Tus-Max-Size` header, the 
-Server MUST respond with the `413 Request Entity Too Large`. 
+Server MUST respond with the `413 Request Entity Too Large` status. 
 
-The Server MUST acknowledge a successful upload creation request with a `201
-Created` response and MUST set `Location` header to the URL representing the created
+The Server MUST acknowledge a successful upload creation with a `201 Created`
+status. The server MUST set the `Location` header to the URL of the created
 resource.
 
-The Client MUST perform the actual upload of the file using the core protocol.
+The Client MUST perform the actual upload using the core protocol.
 
 ### Expiration
 
@@ -310,8 +307,8 @@ behavior to the Client, the Server MUST add `expiration` to the `Tus-Extension` 
 
 #### Example
 
-The upload will be available until the time specified in `Upload-Expires`.
-After this date the upload isn't available and can't be continued.
+The unfinished upload is available until the time specified in `Upload-Expires`.
+After this date the upload can not be resumed.
 
 **Request:**
 
@@ -338,20 +335,18 @@ Tus-Resumable: 1.0.0
 
 ##### Upload-Expires
 
-The `Upload-Expires` header indicates how much time an upload has to complete
-before it expires. A Server MAY wish to remove incomplete uploads after a given
-period to prevent abandoned uploads from taking up space. The Client SHOULD
+The `Upload-Expires` header indicates time after which the unfinished upload
+expires. A Server MAY wish to remove incomplete uploads after a given
+period of time to prevent abandoned uploads from taking up space. The Client SHOULD
 use this header to determine if an upload is still valid before attempting to
 the resume the upload.
 
-This header MUST be included in the response to every `PATCH` request if the
-upload is going to expire. If the upload is constructed using the
-[Creation](#creation) extension and the expiration date and time are
-known during the construction, the `Upload-Expires` header MUST be included in
-the response to the initial `POST` request. Its value MAY change over time.
+This header MUST be included in every `PATCH` response if the upload is going
+to expire. If the expiration is known at the creation the `Upload-Expires` header 
+MUST be included in response to the initial `POST` request. Its value MAY change over time.
 
 If a Client does attempt to resume an upload which has since been removed by the
-Server, the server SHOULD respond with `404 Not Found` or `410 Gone`. The latter
+Server, the server SHOULD respond with `404 Not Found` or `410 Gone` status. The latter
 one SHOULD be used if the Server is keeping track of expired uploads. In both
 cases the Client MUST start a new upload.
 
@@ -360,7 +355,7 @@ The value of the `Upload-Expires` header MUST be in
 
 ### Checksum
 
-Clients and Servers MAY implement and use this extension to verify data integrity
+Clients and Servers MAY implement and use the extension to verify data integrity
 of each `PATCH` request. If supported the Server MUST add `checksum` to the 
 `Tus-Extension` header.
 
@@ -369,13 +364,13 @@ A Client MAY include the `Content-MD5` header and its appropriate value in a
 of the request body
 [RFC2616 Section 14.15 Content-MD5](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.15).
 Once the entire request has been received the Server MUST verify the against 
-the provided checksum. If the verification succeeds the Server continues processing the data. In the
+the provided checksum. If the verification succeeds the Server MUST process the data. In the
 case of mismatching checksums the Server MUST abort handling the request and MUST respond with the 
-tus-specific `460 Checksum Mismatch` status. In addition the file and its offsets MUST not be updated.
+tus-specific `460 Checksum Mismatch` status. In addition the file and its offset MUST NOT be updated.
 
 If the hash cannot be calculated at the beginning of the upload it MAY be
 included as a trailer. If the Server can handle trailers, this behavior MUST be
-promoted by adding the `checksum-trailer` to the `Tus-Extension` header.
+announced by adding the `checksum-trailer` to the `Tus-Extension` header.
 Trailers, also known as trailing headers, are headers which are sent after the
 request's body has been transmitted already. Following
 [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1) they
@@ -445,28 +440,27 @@ Clients to perform parallel uploads and uploading non-contiguous chunks. If the
 Server supports this extension it MUST add `concatenation` to the 
 `Tus-Extension` header.
 
-A partial upload is an upload which represents a chunk of a file. It is
-constructed by including the `Upload-Concat: partial` header when creating a new
-resource using the [Creation](#creation) extension. Multiple partial uploads are concatenated
-into a final upload in a specific order. The Server SHOULD NOT process these
+A partial upload represents a chunk of a file. It is constructed by including the 
+`Upload-Concat: partial` header while creating a new resource using the 
+[Creation](#creation) extension. Multiple partial uploads are concatenated
+into a final upload in the specified order. The Server SHOULD NOT process these
 partial uploads until they are concatenated to form a final upload. The length of the
-final resource MUST be the sum of the length of all partial resources. A final
-upload is considered finished if all of its partial uploads are finished.
+final resource MUST be the sum of the length of all partial resources.
 
 In order to create a new final upload the Client MUST add the `Upload-Concat` header 
-to the upload creation request. The value is the string `final` followed by a semicolon 
+to the upload creation request. The value MUST be `final` followed by a semicolon 
 and a space-separated list of the partial upload URLs that need to be concatenated. 
 The partial uploads MUST be concatenated as per the order specified in the list.
 This concatenation request SHOULD happen when all of the corresponding partial uploads 
 are finished.
 
-When creating a new final upload the partial uploads' metadata SHALL
-not be transferred to the new final upload. All metadata SHOULD be included
-in the final concatenation request using the `Upload-Metadata` header.
-
 The Client may send final concatenation request while partial uploads are still 
 in progress. This feature MUST be explicitly announced by the Server by adding 
 `concatenation-unfinished` to the `Tus-Extension` header.
+
+When creating a new final upload the partial uploads' metadata SHALL
+not be transferred to the new final upload. All metadata SHOULD be included
+in the final concatenation request using the `Upload-Metadata` header.
 
 The Server MAY delete partial uploads after concatenation. They MAY however be 
 used multiple times to form a final resource.
@@ -475,11 +469,11 @@ The Server MUST respond with `403 Forbidden` status to the `PATCH` request again
 a final upload. The Server MUST NOT modify the final or its partial resources.
 
 The response to a `HEAD` request SHOULD NOT contain the `Upload-Offset` header unless
-the concatenation has been successfully finished. After successful  concatenation, the
+the concatenation has been successfully finished. After successful concatenation, the
 `Upload-Offset` and `Upload-Length` headers MUST be set and their values MUST be equal.
 The `Upload-Length` header MUST be included if the length of the final resource can
-be calculated at the time of the request. Responses to `HEAD` requests against partial
-or final uploads MUST include the `Upload-Concat` header and its value as received in 
+be calculated at the time of the request. Response to `HEAD` request against partial
+or final upload MUST include the `Upload-Concat` header and its value as received in 
 the upload creation request.
 
 #### Headers
