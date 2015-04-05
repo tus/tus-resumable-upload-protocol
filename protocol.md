@@ -152,7 +152,6 @@ in the response. If the resource is not found Servers SHOULD return either
 `404 Not Found`, `410 Gone` or `403 Forbidden` without an `Upload-Offset` header.
 The Client SHOULD NOT cache the `HEAD` responses.
 
-
 #### PATCH
 
 Servers MUST accept `PATCH` requests against any unfinished upload and apply the
@@ -454,36 +453,34 @@ partial uploads until they are concatenated to form a final upload. The length o
 final resource MUST be the sum of the length of all partial resources. A final
 upload is considered finished if all of its partial uploads are finished.
 
-In order to create a new final upload the Client MUST omit the `Upload-Length`
-header and add the `Upload-Concat` header to the upload creation request. The header's
-value is the string `final` followed by a semicolon and a space-separated list
-of the URLs of the partial uploads which will be concatenated. The order of this list
-MUST represent the order by which the partial uploads are concatenated
+In order to create a new final upload the Client MUST add the `Upload-Concat` header 
+to the upload creation request. The value is the string `final` followed by a semicolon 
+and a space-separated list of the URLs of the partial uploads which will be concatenated. 
+The order of this list MUST represent the order by which the partial uploads are concatenated
 without adding, modifying or removing any bytes. This concatenation request SHOULD
 happen if all of the corresponding partial uploads are finished.
 
 When creating a new final upload the partial uploads' metadata SHALL
-not be transferred to the new final upload. Instead, all metadata SHOULD be included
-in the concatenation request using the `Upload-Metadata` header.
+not be transferred to the new final upload. All metadata SHOULD be included
+in the final concatenation request using the `Upload-Metadata` header.
 
-The concatenation request MAY even be sent before all partial uploads are finished. This
-feature MUST be explicitly announced by the Server by adding `concatenation-unfinished`
-to the `Tus-Extension` header.
+The Client may send final concatenation request while partial uploads are still 
+in progress. This feature MUST be explicitly announced by the Server by adding 
+`concatenation-unfinished` to the `Tus-Extension` header.
 
-The Server MAY delete partial uploads once they are concatenated but they MAY be
+The Server MAY delete partial uploads after concatenation. They MAY however be 
 used multiple times to form a final resource.
 
-Any `PATCH` request against a final upload MUST be denied responding with the
-`403 Forbidden` status code and MUST neither modify the final nor any of its partial
-resources.
+The Server MUST respond with `403 Forbidden` status to `PATCH` request against 
+a final upload. And also it MUST NOT modify the final or its partial resources.
 
-The response of a `HEAD` request MUST NOT contain the `Upload-Offset` header unless
-the concatenation has been successfully finished. In this case, the value of the
-`Upload-Offset` MUST be the length of the final upload indicating to the Client that
-the Server completed the concatenation.
+The response to a `HEAD` request SHOULD NOT contain the `Upload-Offset` header unless
+the concatenation has been successfully finished. After successful  concatenation, the
+`Upload-Offset` and `Upload-Length` MUST be set and their values MUST be equal.
 The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time. Responses to `HEAD` requests against partial or final
-uploads MUST include the `Upload-Concat` header and its value as sent in the upload creation request.
+uploads MUST include the `Upload-Concat` header and its value as sent in the upload 
+creation request.
 
 #### Headers
 
