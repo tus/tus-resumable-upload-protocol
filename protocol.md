@@ -44,7 +44,7 @@ The core protocol describes how to resume an interrupted upload. It assumes that
 you already have a URL for the upload, usually created via the
 [Creation](#creation) extension.
 
-All Clients and Servers MUST implement the core protocol.
+The Client and the Server MUST implement the core protocol.
 
 This specification does not describe the structure of URLs, as that is left for
 the specific implementation to decide.  All URLs shown in this document are
@@ -147,7 +147,7 @@ where the first one is the most preferred one.
 The Server MUST always include `Upload-Offset` header in `HEAD` response, even if 
 it is `0`, or the upload is already considered completed. If the size of the upload
 is known the Server MUST include the `Upload-Length` header in the response. If 
-the resource is not found Servers SHOULD return either `404 Not Found`, `410 Gone` 
+the resource is not found the Server SHOULD return either `404 Not Found`, `410 Gone` 
 or `403 Forbidden` status without an `Upload-Offset` header. 
 
 The Client SHOULD NOT cache the `HEAD` response.
@@ -221,7 +221,7 @@ as possible. Feature detection SHOULD be achieved by the Client sending an
 
 ### Creation
 
-All Clients and Servers SHOULD implement the upload creation extension. If
+The Client and the Server SHOULD implement the upload creation extension. If
 the Server supports this extension, it MUST add `creation` to the `Tus-Extension`
 header.
 
@@ -355,7 +355,7 @@ The value of the `Upload-Expires` header MUST be in
 
 ### Checksum
 
-Clients and Servers MAY implement and use the extension to verify data integrity
+The Client and the Server MAY implement and use the extension to verify data integrity
 of each `PATCH` request. If supported the Server MUST add `checksum` to the 
 `Tus-Extension` header.
 
@@ -400,8 +400,8 @@ Tus-Resumable: 1.0.0
 
 ### Termination
 
-This extension defines a way for Clients to terminate completed and unfinished
-uploads allowing Servers to free up used resources.
+This extension defines a way for the Client to terminate completed and unfinished
+uploads allowing the Server to free up used resources.
 
 If this extension is supported by the Server it MUST be announced by adding
 `termination` to the `Tus-Extension` header.
@@ -575,8 +575,7 @@ method](http://www.w3.org/TR/XMLHttpRequest/#the-send-method) does not allow
 streaming arbitrary data without loading all of it into memory.
 
 That being said, custom headers also allowed us to greatly simplify the
-implementation requirements for Clients and Servers, so we're quite happy with
-them.
+Client and Server implementations, so we're quite happy with them.
 
 ### Why are you not using the "X-" prefix for your headers?
 
