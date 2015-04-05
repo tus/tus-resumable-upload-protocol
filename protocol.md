@@ -132,7 +132,7 @@ omitted. The extension MUST NOT contain comma.
 #### Tus-Max-Size
 
 The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
-allowed size of an entire upload in bytes. The Server MUST be ommit this header 
+allowed size of an entire upload in bytes. The Server MUST be omit this header 
 if it is unable to calculate or if there is no known hard-limit.
 
 #### Tus-Version
@@ -161,14 +161,14 @@ MUST use `Content-Type: application/offset+octet-stream`.
 The `Upload-Offset` value MUST be equal to the current offset of the resource. In order
 to achieve parallel upload the [Concatenation](#concatenation) extension MAY be
 used. If the offsets do not match the Server MUST respond with the `409 Conflict`
-status code without modifying the upload resource.
+status without modifying the upload resource.
 
 Clients SHOULD send all remaining bytes of a resource in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
 desirable (e.g. NGINX buffering requests before they reach their backend).
 
 Servers MUST acknowledge successful PATCH operations using a `204 No Content`
-or `200 OK` status code and MUST include the `Upload-Offset` header containing
+or `200 OK` status and MUST include the `Upload-Offset` header containing
 the new offset. The new offset MUST be the sum of the offset before the `PATCH`
 request and the number of bytes received and processed or stored during the
 current `PATCH` request.
@@ -371,7 +371,7 @@ of the request body
 Once the entire request has been received the Server MUST verify the against 
 the provided checksum. If the verification succeeds the Server continues processing the data. In the
 case of mismatching checksums the Server MUST abort handling the request and MUST respond with the 
-tus-specific `460 Checksum Mismatch` status code. In addition the file and its offsets MUST not be updated.
+tus-specific `460 Checksum Mismatch` status. In addition the file and its offsets MUST not be updated.
 
 If the hash cannot be calculated at the beginning of the upload it MAY be
 included as a trailer. If the Server can handle trailers, this behavior MUST be
@@ -418,7 +418,7 @@ If this extension is supported by the Server it MUST be announced by adding
 When receiving a `DELETE` request for an existing upload the Server SHOULD free
 associated resources and MUST return the 2xx response confirming that the upload
 was terminated. For all future requests to this URL the Server SHOULD respond with
-the `404 Not Found` or `410 Gone` status code.
+the `404 Not Found` or `410 Gone` status.
 
 #### Example 
 
