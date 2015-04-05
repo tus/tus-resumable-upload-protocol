@@ -182,7 +182,7 @@ store as much of the received data as possible.
 #### OPTIONS
 
 An `OPTIONS` request MAY be used to gather information about the current
-configuration of the Server. A 200 response MUST contain the `Tus-Extension`,
+configuration of the Server. A 204 response MUST contain the `Tus-Extension`,
 `Tus-Version` and `Tus-Max-Size` if available.
 
 The Server MUST NOT validate the `Tus-Resumable` header sent in the request.
@@ -206,7 +206,7 @@ Tus-Resumable: 1.0.0
 **Response:**
 
 ```
-HTTP/1.1 200 OK
+HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
 Tus-Version: 1.0.0,0.2.2,0.2.1
 Tus-Max-Size: 1073741824
