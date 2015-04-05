@@ -109,15 +109,15 @@ offset within a resource. The value MUST be a non-negative integer.
 
 #### Upload-Length
 
-The `Upload-Length` header indicates the final size of the an upload in bytes.
+The `Upload-Length` header indicates the size of the an entire upload in bytes.
 The value MUST be a non-negative integer.
 
 
 #### Tus-Resumable
 
-The `Tus-Resumable` header MUST be sent in every response and request except
-`OPTIONS` request. Its value MUST be set to the current version of the protocol
-used by the Client or the Server.
+The `Tus-Resumable` header MUST be included in every request and response except
+`OPTIONS` request. The value MUST be the version of the protocol used by the 
+Client and the Server.
 
 If the Client requests the use of a version which is not supported by the Server
 latter one MUST return `412 Precondition Failed` without processing the request
@@ -125,15 +125,15 @@ further.
 
 #### Tus-Extension
 
-This header MUST be a comma-separated list of the extensions supported by the
-Server. If no extensions are supported `Tus-Extension` MAY be omitted. The 
-extension MUST not contain comma.
+This `Tus-Extension` header MUST be a comma-separated list of the extensions 
+supported by the Server. If no extensions are supported `Tus-Extension` MAY be 
+omitted. The extension MUST NOT contain comma.
 
 #### Tus-Max-Size
 
 The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
-allowed size of a single fully uploaded file in bytes. If no hard-limit is
-presented or the Server is not able to calculate it this header MUST be omitted.
+allowed size of an entire upload in bytes. The Server MUST be ommit this header 
+if it is unable to calculate or if there is no known hard-limit.
 
 #### Tus-Version
 
@@ -145,12 +145,13 @@ preferred one.
 
 #### HEAD
 
-Servers MUST always return an `Upload-Offset` header for `HEAD` requests against a tus
-resource, even if it is `0`, or the upload is already considered completed.
+Servers MUST always return an `Upload-Offset` header for `HEAD` requests against an
+upload resource, even if it is `0`, or the upload is already considered completed.
 If the size of the upload is known the Server MUST include the `Upload-Length` header
-in the response.
-If the resource is not found Servers SHOULD return either `404 Not Found`,
-`410 Gone` or `403 Forbidden` without an `Upload-Offset` header.
+in the response. If the resource is not found Servers SHOULD return either 
+`404 Not Found`, `410 Gone` or `403 Forbidden` without an `Upload-Offset` header.
+The Client SHOULD NOT cache the `HEAD` responses.
+
 
 #### PATCH
 
