@@ -264,8 +264,9 @@ deferred this header MUST be omitted.
 
 The `Upload-Metadata` header MUST consist of one or more key-value pairs. The
 key-value pairs MUST be separated by comma. The key and value MUST be separated
-by a space and MUST NOT be empty. The key MUST NOT contain a space or a comma. The
-key SHOULD be ASCII encoded and the value MUST be Base64 encoded.
+by a space. The key MUST NOT contain a space or a comma and also MUST not be 
+empty. The key SHOULD be ASCII encoded and the value MUST be Base64 encoded.
+All keys MUST be unique.
 
 #### Requests
 
