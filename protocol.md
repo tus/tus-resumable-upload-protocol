@@ -126,7 +126,8 @@ further.
 #### Tus-Extension
 
 This header MUST be a comma-separated list of the extensions supported by the
-Server. If no extensions are supported `Tus-Extension` MAY be omitted.
+Server. If no extensions are supported `Tus-Extension` MAY be omitted. The 
+extension MUST not contain comma.
 
 #### Tus-Max-Size
 
@@ -136,9 +137,9 @@ presented or the Server is not able to calculate it this header MUST be omitted.
 
 #### Tus-Version
 
-This header MUST be a comma-separated list of the supported versions of the tus
-resumable upload protocol by the Server. The versions MUST be sorted by Server's 
-preference where the first one is the most preferred one.
+This header MUST be a comma-separated list of protocol versions supported by the Server. 
+The versions MUST be sorted by Server's preference where the first one is the most 
+preferred one.
 
 ### Requests
 
@@ -148,7 +149,7 @@ Servers MUST always return an `Upload-Offset` header for `HEAD` requests against
 resource, even if it is `0`, or the upload is already considered completed.
 If the size of the upload is known the Server MUST include the `Upload-Length` header
 in the response.
-If the tus resource is not found Servers SHOULD return either `404 Not Found`,
+If the resource is not found Servers SHOULD return either `404 Not Found`,
 `410 Gone` or `403 Forbidden` without an `Upload-Offset` header.
 
 #### PATCH
