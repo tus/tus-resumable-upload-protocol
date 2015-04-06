@@ -48,7 +48,7 @@ The Client and the Server MUST implement the core protocol.
 
 This specification does not describe the structure of URLs, as that is left for
 the specific implementation to decide.  All URLs shown in this document are
-meant for example purposes only. The URLs MAY be absolute or relative.
+meant for example purposes only.
 
 In addition, the implementation of authentication and authorization is left for
 the Server to decide.
@@ -296,7 +296,7 @@ Server MUST respond with the `413 Request Entity Too Large` status.
 
 The Server MUST acknowledge a successful upload creation with a `201 Created`
 status. The server MUST set the `Location` header to the URL of the created
-resource.
+resource. This URL MAY be absolute or relative.
 
 The Client MUST perform the actual upload using the core protocol.
 
