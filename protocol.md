@@ -115,9 +115,9 @@ The value MUST be a non-negative integer.
 
 #### Tus-Resumable
 
-The `Tus-Resumable` header MUST be included in every request and response except
-`OPTIONS` request. The value MUST be the version of the protocol used by the 
-Client and the Server.
+The `Tus-Resumable` header MUST be included in every request and response except 
+`OPTIONS`. The value MUST be the version of the protocol used by the Client and 
+the Server.
 
 The Server MUST return `412 Precondition Failed` status without processing 
 the request if the the version specified by the Client is not supported.
