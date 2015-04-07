@@ -131,8 +131,8 @@ omitted. The extension MUST NOT contain a comma.
 #### Tus-Max-Size
 
 The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
-allowed size of an entire upload in bytes. The Server MUST omit this header 
-in the absence any known hard-limit or upon being unable to calculate the value.
+allowed size of an entire upload in bytes. The Server SHOULD set this header if
+there is a known hard limit.
 
 #### Tus-Version
 
