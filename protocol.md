@@ -109,7 +109,7 @@ offset within a resource. The value MUST be a non-negative integer.
 
 #### Upload-Length
 
-The `Upload-Length` header indicates the size of the an entire upload in bytes.
+The `Upload-Length` header indicates the size of the entire upload in bytes.
 The value MUST be a non-negative integer.
 
 
