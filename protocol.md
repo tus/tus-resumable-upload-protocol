@@ -44,7 +44,7 @@ The core protocol describes how to resume an interrupted upload. It assumes that
 you already have a URL for the upload, usually created via the
 [Creation](#creation) extension.
 
-The Client and the Server MUST implement the core protocol.
+All Clients and Servers MUST implement the core protocol.
 
 This specification does not describe the structure of URLs, as that is left for
 the specific implementation to decide.  All URLs shown in this document are
