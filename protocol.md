@@ -263,8 +263,8 @@ deferred this header MUST be omitted.
 ##### Upload-Metadata
 
 The `Upload-Metadata` header MUST consist of one or more comma-separated 
-key-value pairs. The key and value MUST be separated by a space. The key 
-MUST NOT contain space, comma and MUST NOT be empty. The key SHOULD be
+key-value pairs. The key and value MUST be separated by a whitespace. The key 
+MUST NOT contain whitespace, comma and MUST NOT be empty. The key SHOULD be
 ASCII encoded and the value MUST be Base64 encoded. All keys MUST be unique.
 
 #### Requests
@@ -449,7 +449,7 @@ final resource MUST be the sum of the length of all partial resources.
 
 In order to create a new final upload the Client MUST add the `Upload-Concat` header 
 to the upload creation request. The value MUST be `final` followed by a semicolon 
-and a space-separated list of the partial upload URLs that need to be concatenated. 
+and a whitespace-separated list of the partial upload URLs that need to be concatenated. 
 The partial uploads MUST be concatenated as per the order specified in the list.
 This concatenation request SHOULD happen when all of the corresponding partial uploads 
 are finished.
@@ -483,7 +483,7 @@ the upload creation request.
 The `Upload-Concat` header MUST be set in both partial and final upload creation
 requests. If a partial upload is constructed, the header value MUST be `partial`. 
 In the case of creating a final resource its value is the string `final` followed
-by a semicolon and a space-separated list of partial upload URLs that will be
+by a semicolon and a whitespace-separated list of partial upload URLs that will be
 concatenated. The partial upload URL MUST NOT contain whitespace as defined in 
 [RFC 3986](https://tools.ietf.org/html/rfc3986).
 
@@ -534,7 +534,7 @@ HTTP/1.1 204 No Content
 ```
 
 In the first request the string `hello` was uploaded while the second file now
-contains ` world` with a leading space.
+contains ` world` with a leading whitespace.
 
 The next step is to create the final upload consisting of the two earlier
 generated partial uploads. In following request no `Upload-Length` header is
