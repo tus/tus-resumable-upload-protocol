@@ -454,7 +454,7 @@ The partial uploads MUST be concatenated as per the order specified in the list.
 This concatenation request SHOULD happen when all of the corresponding partial uploads 
 are finished.
 
-The Client may send final concatenation request while partial uploads are still 
+The Client MAY send the concatenation request while the partial uploads are still 
 in progress. This feature MUST be explicitly announced by the Server by adding 
 `concatenation-unfinished` to the `Tus-Extension` header.
 
