@@ -481,9 +481,10 @@ the upload creation request.
 ##### Upload-Concat
 
 The `Upload-Concat` header MUST be set in both partial and final upload creation
-requests. If a partial upload is constructed, the header value MUST be `partial`. 
-In the case of creating a final resource its value is the string `final` followed
-by a semicolon and a whitespace-separated list of partial upload URLs that will be
+requests. It indicates whether the upload created by the request is either a partial 
+or final upload. If a partial upload is constructed, the header value MUST be `partial`. 
+In the case of creating a final upload its value MUST be `final` followed by a 
+semicolon and a whitespace-separated list of partial upload URLs that will be
 concatenated. The partial upload URL MUST NOT contain whitespace as defined in 
 [RFC 3986](https://tools.ietf.org/html/rfc3986).
 
