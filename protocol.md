@@ -460,7 +460,7 @@ in progress. This feature MUST be explicitly announced by the Server by adding
 
 When creating a new final upload the partial uploads' metadata SHALL
 not be transferred to the new final upload. All metadata SHOULD be included
-in the final concatenation request using the `Upload-Metadata` header.
+in the concatenation request using the `Upload-Metadata` header.
 
 The Server MAY delete partial uploads after concatenation. They MAY however be 
 used multiple times to form a final resource.
