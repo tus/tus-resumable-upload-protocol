@@ -465,8 +465,8 @@ in the final concatenation request using the `Upload-Metadata` header.
 The Server MAY delete partial uploads after concatenation. They MAY however be 
 used multiple times to form a final resource.
 
-The Server MUST respond with `403 Forbidden` status to the `PATCH` request against 
-a final upload. The Server MUST NOT modify the final or its partial resources.
+The Server MUST respond with the `403 Forbidden` status to `PATCH` requests against 
+a final upload URL and MUST NOT modify the final or its partial resources.
 
 The response to a `HEAD` request SHOULD NOT contain the `Upload-Offset` header unless
 the concatenation has been successfully finished. After successful concatenation, the
