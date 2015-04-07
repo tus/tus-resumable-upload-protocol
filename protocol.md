@@ -282,7 +282,7 @@ Once it is known the Client MUST set the `Upload-Length` in the next `PATCH` req
 Once set it MUST NOT be changed.
 
 If `Upload-Length` is not known, the Server MUST set `Upload-Defer-Length: 1`
-in all `PATCH` and `HEAD` responses.
+in all `HEAD` responses.
 
 If the Server supports deferring length, it MUST add `creation-defer-length` to
 the `Tus-Extension` header. 
