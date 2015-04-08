@@ -494,7 +494,8 @@ concatenated. The partial upload URL MUST NOT contain whitespace as defined in
 
 In the following example the `Host` and `Tus-Resumable` headers are omitted for
 readability although they are required by the specification.
-In the beginning two partial uploads are created:
+In the beginning two partial uploads are created. The second partial upload
+describes an where Upload-len
 
 ```
 POST /files HTTP/1.1
@@ -507,7 +508,7 @@ Location: https://tus.example.org/files/a
 ```
 POST /files HTTP/1.1
 Upload-Concat: partial
-Upload-Defer-Length: 1
+Upload-Length: 6
 
 HTTP/1.1 201 Created
 Location: https://tus.example.org/files/b
@@ -529,7 +530,6 @@ HTTP/1.1 204 No Content
 PATCH /files/b HTTP/1.1
 Upload-Offset: 0
 Content-Length: 6
-Upload-Length: 6
 
  world
 
