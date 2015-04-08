@@ -487,8 +487,8 @@ requests. It indicates whether the upload created by the request is either a par
 or final upload. If a partial upload is constructed, the header value MUST be `partial`. 
 In the case of creating a final upload its value MUST be `final` followed by a 
 semicolon and a whitespace-separated list of partial upload URLs that will be
-concatenated. The partial upload URL MUST NOT contain whitespace as defined in 
-[RFC 3986](https://tools.ietf.org/html/rfc3986).
+concatenated. The partial upload URL MAY be absolute or relative and MUST NOT contain 
+whitespace as defined in [RFC 3986](https://tools.ietf.org/html/rfc3986).
 
 #### Example
 
