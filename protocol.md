@@ -470,7 +470,9 @@ a final upload URL and MUST NOT modify the final or its partial resources.
 
 The response to a `HEAD` request SHOULD NOT contain the `Upload-Offset` header unless
 the concatenation has been successfully finished. After successful concatenation, the
-`Upload-Offset` and `Upload-Length` headers MUST be set and their values MUST be equal.
+`Upload-Offset` and `Upload-Length` MUST be set and their values MUST be equal.
+The value of the `Upload-Offset` header before concatenation is not defined.
+
 The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time of the request. Response to `HEAD` request against partial
 or final upload MUST include the `Upload-Concat` header and its value as received in 
