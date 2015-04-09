@@ -494,8 +494,7 @@ whitespace as defined in [RFC 3986](https://tools.ietf.org/html/rfc3986).
 
 In the following example the `Host` and `Tus-Resumable` headers are omitted for
 readability although they are required by the specification.
-In the beginning two partial uploads are created. The second partial upload
-describes an where Upload-len
+In the beginning two partial uploads are created:
 
 ```
 POST /files HTTP/1.1
