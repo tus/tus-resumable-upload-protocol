@@ -127,7 +127,7 @@ server SHOULD set `Tus-Resumable` to it's most preferred version.
 
 The `Tus-Extension` header MUST be a comma-separated list of the extensions 
 supported by the Server. If no extensions are supported `Tus-Extension` MAY be 
-omitted. The extension MUST NOT contain a comma.
+omitted.
 
 #### Tus-Max-Size
 
