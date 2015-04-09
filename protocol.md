@@ -375,7 +375,7 @@ announced by adding the `checksum-trailer` to the `Tus-Extension` header.
 Trailers, also known as trailing headers, are headers which are sent after the
 request's body has been transmitted already. Following
 [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1) they
-must be announced using the `Trailer` header and are only allowed in chunked
+MUST be announced using the `Trailer` header and are only allowed in chunked
 transfers.
 
 #### Example
