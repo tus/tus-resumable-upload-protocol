@@ -126,7 +126,7 @@ the Server.
 
 If the the version specified by the Client is not supported by the Server, it 
 MUST return `412 Precondition Failed` with a `Tus-Version` header; see 
-[Tus-Version](#Tus-Version) for details). In addition, the Server MUST NOT 
+[Tus-Version](#tus-version) for the details. In addition, the Server MUST NOT 
 process the request.
 
 
