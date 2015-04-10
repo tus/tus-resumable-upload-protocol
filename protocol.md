@@ -112,6 +112,11 @@ offset within a resource. The value MUST be a non-negative integer.
 The `Upload-Length` header indicates the size of the entire upload in bytes.
 The value MUST be a non-negative integer.
 
+#### Tus-Version
+
+The `Tus-Version` header MUST be a comma-separated list of protocol versions 
+supported by the Server. The list MUST be sorted by Server's preference 
+where the first one is the most preferred one.
 
 #### Tus-Resumable
 
@@ -119,9 +124,11 @@ The `Tus-Resumable` header MUST be included in every request and response except
 `OPTIONS`. The value MUST be the version of the protocol used by the Client or 
 the Server.
 
-The Server MUST return `412 Precondition Failed` status without processing 
-the request if the the version specified by the Client is not supported. The 
-server SHOULD set `Tus-Resumable` to it's most preferred version.
+If the the version specified by the Client is not supported by the Server, it 
+MUST return `412 Precondition Failed` with a `Tus-Version` header; see 
+[Tus-Version](#Tus-Version) for details). In addition, the Server MUST NOT 
+process the request.
+
 
 #### Tus-Extension
 
@@ -135,11 +142,6 @@ The `Tus-Max-Size` header MUST be a non-negative integer indicating the maximum
 allowed size of an entire upload in bytes. The Server SHOULD set this header if
 there is a known hard limit.
 
-#### Tus-Version
-
-The `Tus-Version` header MUST be a comma-separated list of protocol versions 
-supported by the Server. The list MUST be sorted by Server's preference 
-where the first one is the most preferred one.
 
 ### Requests
 
