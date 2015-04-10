@@ -298,7 +298,7 @@ If the `Upload-Length` is greater than the optional `Tus-Max-Size` header, the
 Server MUST respond with the `413 Request Entity Too Large` status. 
 
 The Server MUST acknowledge a successful upload creation with a `201 Created`
-status. The server MUST set the `Location` header to the URL of the created
+status. The Server MUST set the `Location` header to the URL of the created
 resource. This URL MAY be absolute or relative.
 
 The Client MUST perform the actual upload using the core protocol.
@@ -349,7 +349,7 @@ to expire. If the expiration is known at the creation the `Upload-Expires` heade
 MUST be included in response to the initial `POST` request. Its value MAY change over time.
 
 If a Client does attempt to resume an upload which has since been removed by the
-Server, the server SHOULD respond with `404 Not Found` or `410 Gone` status. The latter
+Server, the Server SHOULD respond with `404 Not Found` or `410 Gone` status. The latter
 one SHOULD be used if the Server is keeping track of expired uploads. In both
 cases the Client MUST start a new upload.
 
