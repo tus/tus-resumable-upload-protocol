@@ -188,7 +188,8 @@ An `OPTIONS` request MAY be used to gather information about the current
 configuration of the Server. A 204 response MUST contain the `Tus-Version`.
 It MAY include `Tus-Extension` and `Tus-Max-Size` headers.
 
-The Client SHOULD omit this header in the request and the Server MUST discard it.
+The Client SHOULD NOT include `Tus-Resumable` in the request and the Server 
+MUST discard it.
 
 ##### Example
 
@@ -462,9 +463,9 @@ The Client MAY send the concatenation request while the partial uploads are stil
 in progress. This feature MUST be explicitly announced by the Server by adding 
 `concatenation-unfinished` to the `Tus-Extension` header.
 
-When creating a new final upload the partial uploads' metadata SHALL
-not be transferred to the new final upload. All metadata SHOULD be included
-in the concatenation request using the `Upload-Metadata` header.
+When creating a new final upload the partial uploads' metadata SHALL NOT be 
+transferred to the new final upload. All metadata SHOULD be included in the 
+concatenation request using the `Upload-Metadata` header.
 
 The Server MAY delete partial uploads after concatenation. They MAY however be 
 used multiple times to form a final resource.
