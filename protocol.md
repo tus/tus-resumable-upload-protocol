@@ -454,8 +454,9 @@ In order to create a new final upload the Client MUST add the `Upload-Concat` he
 to the upload creation request. The value MUST be `final` followed by a semicolon 
 and a whitespace-separated list of the partial upload URLs that need to be concatenated. 
 The partial uploads MUST be concatenated as per the order specified in the list.
-This concatenation request SHOULD happen when all of the corresponding partial uploads 
-are finished.
+This concatenation request SHOULD happen after all of the corresponding partial uploads 
+are completed. The Client MUST NOT include the `Upload-Length` header in the final 
+upload creation.
 
 The Client MAY send the concatenation request while the partial uploads are still 
 in progress. This feature MUST be explicitly announced by the Server by adding 
