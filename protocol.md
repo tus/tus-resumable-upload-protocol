@@ -292,8 +292,10 @@ If the Server supports deferring length, it MUST add `creation-defer-length` to
 the `Tus-Extension` header. 
 
 The Client MAY supply the `Upload-Metadata` header to add additional metadata to the
-upload creation request. The Server MAY decide to ignore or use this information
-to further process the request or to reject it.
+upload creation request. The Server MAY decide to ignore or use this information to 
+further process the request or to reject it. If the Server supports Client supplied
+metadata it MUST include `Upload-Metadata` in all `HEAD` responses and MUST set the
+value to the one specified by the Client during creation.
 
 If the `Upload-Length` is greater than the optional `Tus-Max-Size` header, the 
 Server MUST respond with the `413 Request Entity Too Large` status. 
