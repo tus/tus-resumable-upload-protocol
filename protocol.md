@@ -156,7 +156,7 @@ The Client SHOULD NOT cache the response.
 
 #### PATCH
 
-The Server MUST accept `PATCH` requests against any upload URL and apply the
+The Server SHOULD accept `PATCH` requests against any upload URL and apply the
 bytes contained in the message at the given offset specified by the
 `Upload-Offset` header. All `PATCH` requests MUST use
 `Content-Type: application/offset+octet-stream`.
