@@ -357,7 +357,7 @@ Its value MAY change over time.
 If a Client does attempt to resume an upload which has since been removed by the
 Server, the Server SHOULD respond with the`404 Not Found` or `410 Gone` status.
 The latter one SHOULD be used if the Server is keeping track of expired uploads.
-In both cases the Client MUST start a new upload.
+In both cases the Client SHOULD start a new upload.
 
 The value of the `Upload-Expires` header MUST be in
 [RFC 2616](http://tools.ietf.org/html/rfc2616) datetime format.
