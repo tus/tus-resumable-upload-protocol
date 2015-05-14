@@ -133,7 +133,7 @@ In addition, the Server MUST NOT process the request.
 
 The `Tus-Extension` header MUST be a comma-separated list of the extensions
 supported by the Server. If no extensions are supported, the `Tus-Extension`
-header MAY be omitted.
+header MUST be omitted.
 
 #### Tus-Max-Size
 
