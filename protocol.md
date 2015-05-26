@@ -172,8 +172,8 @@ request, but MAY also use multiple small requests successively for scenarios
 where this is desirable, for example, if the [Checksum](#checksum) extension is
 used.
 
-The Server MUST acknowledge successful `PATCH` requests with the `204 No Content`
-or `200 OK` status. It MUST include the `Upload-Offset` header containing
+The Server MUST acknowledge successful `PATCH` requests with the
+`204 No Content` status. It MUST include the `Upload-Offset` header containing
 the new offset. The new offset MUST be the sum of the offset before the `PATCH`
 request and the number of bytes received and processed or stored during the
 current `PATCH` request.
