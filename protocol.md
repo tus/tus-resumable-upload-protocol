@@ -278,7 +278,7 @@ ASCII encoded and the value MUST be Base64 encoded. All keys MUST be unique.
 
 ##### POST
 
-The Client MUST a `POST` request against a well known upload creation URL to
+The Client MUST send a `POST` request against a known upload creation URL to
 request a new upload resource. The request MUST include one of the following headers:
 
 a) `Upload-Length` to indicate the size of an entire upload in bytes.
