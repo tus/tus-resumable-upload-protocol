@@ -169,7 +169,7 @@ the upload resource.
 
 The Client SHOULD send all the remaining bytes of an upload in a single `PATCH`
 request, but MAY also use multiple small requests for scenarios where this is
-desirable (e.g. NGINX buffering requests before they reach their backend).
+desirable, for example, if the [Checksum](#checksum) extension is used.
 
 The Server MUST acknowledge successful `PATCH` requests with the `204 No Content`
 or `200 OK` status. It MUST include the `Upload-Offset` header containing
