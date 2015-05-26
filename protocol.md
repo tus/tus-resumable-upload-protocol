@@ -152,7 +152,8 @@ completed. If the size of the upload is known, the Server MUST include the
 SHOULD return either the `404 Not Found`, `410 Gone` or `403 Forbidden` status
 without the `Upload-Offset` header.
 
-The Client SHOULD NOT cache the response.
+The Server MUST prevent the client and/or proxies from caching the response by
+adding the `Cache-Control: no-store` header to the response.
 
 #### PATCH
 
