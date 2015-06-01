@@ -379,6 +379,9 @@ upload and its offset MUST NOT be updated.
 
 The Server MUST support at least the SHA1 checksum algorithm whose name is `sha1`.
 
+The `Tus-Checksum-Algorithm` header MUST be included in the response to an
+`OPTIONS` request.
+
 If the hash cannot be calculated at the beginning of the upload, it MAY be
 included as a trailer. If the Server can handle trailers, this behavior MUST be
 announced by adding `checksum-trailer` to the `Tus-Extension` header.
