@@ -390,9 +390,9 @@ transfers.
 
 #### Headers
 
-##### Tus-Checksum-Algorithms
+##### Tus-Checksum-Algorithm
 
-The `Tus-Checksum-Algorithms` response header MUST be a comma-separated list of
+The `Tus-Checksum-Algorithm` response header MUST be a comma-separated list of
 the checksum algorithms supported by the server. The names of the checksum
 algorithms MUST only consist of lowercase ASCII characters.
 
