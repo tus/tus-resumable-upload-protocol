@@ -371,11 +371,14 @@ to the `Tus-Extension` header.
 
 A Client MAY include the `Upload-Checksum` header in a `PATCH` request.
 Once the entire request has been received, the Server MUST verify the uploaded
-chunk against the provided checksum using the specified algorithm. If the
-verification succeeds, the Server MUST process the data as usual. In the case of
-mismatching checksums, the Server MUST abort handling the request and MUST
-respond with the tus-specific `460 Checksum Mismatch` status. In addition the
-upload and its offset MUST NOT be updated.
+chunk against the provided checksum using the specified algorithm. Depending on
+the result the Server MAY respond with one of the following status code:
+1) `400 Bad Request` if the checksum algorithm is not supported by the server,
+2) `460 Checksum Mismatch` if the checksums mismatch or
+3) `204 No Content` if the checksums match and the processing of the data
+succeeded.
+In the first two cases the uploaded chunk MUST be discarded, and the upload and
+its offset MUST NOT be updated.
 
 The Server MUST support at least support the SHA1 checksum algorithm identified
 by `sha1`.
