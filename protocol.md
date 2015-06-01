@@ -365,19 +365,20 @@ The value of the `Upload-Expires` header MUST be in
 
 ### Checksum
 
-The Client and the Server MAY implement and use the extension to verify data
+The Client and the Server MAY implement and use this extension to verify data
 integrity of each `PATCH` request. If supported, the Server MUST add `checksum`
 to the `Tus-Extension` header.
 
 A Client MAY include the `Upload-Checksum` header in a `PATCH` request.
 Once the entire request has been received, the Server MUST verify the uploaded
 chunk against the provided checksum using the specified algorithm. If the
-verification succeeds, the Server MUST process the data. In the case of
+verification succeeds, the Server MUST process the data as usual. In the case of
 mismatching checksums, the Server MUST abort handling the request and MUST
 respond with the tus-specific `460 Checksum Mismatch` status. In addition the
 upload and its offset MUST NOT be updated.
 
-The Server MUST support at least the SHA1 checksum algorithm whose name is `sha1`.
+The Server MUST support at least support the SHA1 checksum algorithm identified
+by `sha1`.
 
 The `Tus-Checksum-Algorithm` header MUST be included in the response to an
 `OPTIONS` request.
