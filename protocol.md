@@ -380,8 +380,9 @@ succeeded.
 In the first two cases the uploaded chunk MUST be discarded, and the upload and
 its offset MUST NOT be updated.
 
-The Server MUST support at least support the SHA1 checksum algorithm identified
-by `sha1`.
+The Server MUST support at least the SHA1 checksum algorithm identified
+by `sha1`. The names of the checksum algorithms MUST only consist of ASCII
+characters expect uppercased letters.
 
 The `Tus-Checksum-Algorithm` header MUST be included in the response to an
 `OPTIONS` request.
@@ -400,8 +401,7 @@ transfers.
 ##### Tus-Checksum-Algorithm
 
 The `Tus-Checksum-Algorithm` response header MUST be a comma-separated list of
-the checksum algorithms supported by the server. The names of the checksum
-algorithms MUST only consist of lowercase ASCII characters.
+the checksum algorithms supported by the server.
 
 ##### Upload-Checksum
 
