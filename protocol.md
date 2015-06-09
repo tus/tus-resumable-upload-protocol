@@ -366,20 +366,27 @@ The value of the `Upload-Expires` header MUST be in
 
 ### Checksum
 
-The Client and the Server MAY implement and use the extension to verify data integrity
-of each `PATCH` request. If supported, the Server MUST add `checksum` to the
-`Tus-Extension` header.
+The Client and the Server MAY implement and use this extension to verify data
+integrity of each `PATCH` request. If supported, the Server MUST add `checksum`
+to the `Tus-Extension` header.
 
-A Client MAY include the `Content-MD5` header and its appropriate value in a
-`PATCH` request. The value MUST be the Base64 encoded string of the MD5 digest
-of the request body as defined in
-[RFC 2616 Section 14.15 Content-MD5](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.15).
-Once the entire request has been received the Server MUST verify the uploaded
-chunk against the provided checksum. If the verification succeeds, the Server
-MUST process the data. In the case of mismatching checksums, the Server MUST
-abort handling the request and MUST respond with the tus-specific
-`460 Checksum Mismatch` status. In addition the upload and its offset MUST NOT
-be updated.
+A Client MAY include the `Upload-Checksum` header in a `PATCH` request.
+Once the entire request has been received, the Server MUST verify the uploaded
+chunk against the provided checksum using the specified algorithm. Depending on
+the result the Server MAY respond with one of the following status code:
+1) `400 Bad Request` if the checksum algorithm is not supported by the server,
+2) `460 Checksum Mismatch` if the checksums mismatch or
+3) `204 No Content` if the checksums match and the processing of the data
+succeeded.
+In the first two cases the uploaded chunk MUST be discarded, and the upload and
+its offset MUST NOT be updated.
+
+The Server MUST support at least the SHA1 checksum algorithm identified
+by `sha1`. The names of the checksum algorithms MUST only consist of ASCII
+characters expect uppercased letters.
+
+The `Tus-Checksum-Algorithm` header MUST be included in the response to an
+`OPTIONS` request.
 
 If the hash cannot be calculated at the beginning of the upload, it MAY be
 included as a trailer. If the Server can handle trailers, this behavior MUST be
@@ -390,18 +397,49 @@ request's body has been transmitted already. Following
 MUST be announced using the `Trailer` header and are only allowed in chunked
 transfers.
 
+#### Headers
+
+##### Tus-Checksum-Algorithm
+
+The `Tus-Checksum-Algorithm` response header MUST be a comma-separated list of
+the checksum algorithms supported by the server.
+
+##### Upload-Checksum
+
+The `Upload-Checksum` request header contains information about the checksum of
+the current body payload. The header MUST consist of the name of the used
+checksum algorithm and the Base64 encoded checksum separated by a whitespace.
+
 #### Example
 
 **Request**:
 
 ```
+OPTIONS /files HTTP/1.1
+Host: tus.example.org
+Tus-Resumable: 1.0.0
+```
+
+*Response**:
+
+```
+HTTP/1.1 204 No Content
+Tus-Resumable: 1.0.0
+Tus-Version: 1.0.0
+Tus-Extension: checksum
+Tus-Checksum-Algorithm: md5,sha1,crc32
+```
+
+**Request**:
+
+```
 PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
-Content-Length: 40
+Content-Length: 11
 Upload-Offset: 0
 Tus-Resumable: 1.0.0
-Content-MD5: vVgjt92XwLTGjdkIiNdlSw==
+Upload-Checksum: sha1 Kq5sNclPz7QV2+lfQIuc6R7oRu0=
 
-Die Würde des Menschen ist unantastbar.
+hello world
 ```
 
 **Response**:
