@@ -1,17 +1,8 @@
 # tus resumable upload protocol
 
-The protocol is in the `protocol.md` file, and you might want to use the
-development server to see a rendered HTML version with a table of content:
+The protocol is in the [protocol.md](protocol.md) file.
 
-```js
-node server.js
-```
-
-Creating a standalone HTML file:
-
-```bash
-make protocol.html
-```
+It is rendered as HTML via Jekyll/Kramdown by the tus.io repository (type `make preview` there).
 
 ## License
 
