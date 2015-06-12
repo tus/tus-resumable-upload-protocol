@@ -31,8 +31,9 @@ implementations (open source or commercial) if you'd like to be listed on the
 
 ## Abstract
 
-The protocol provides a mechanism for resumable file uploads via HTTP 1.1 ([RFC
-2616](http://tools.ietf.org/html/rfc2616)).
+The protocol provides a mechanism for resumable file uploads via HTTP/1.1 ([RFC
+7230](https://tools.ietf.org/html/rfc7230)) and HTTP/2 ([RFC
+7540](https://tools.ietf.org/html/rfc7540)).
 
 ## Notation
 
@@ -362,7 +363,7 @@ The latter one SHOULD be used if the Server is keeping track of expired uploads.
 In both cases the Client SHOULD start a new upload.
 
 The value of the `Upload-Expires` header MUST be in
-[RFC 2616](http://tools.ietf.org/html/rfc2616) datetime format.
+[RFC 7231](https://tools.ietf.org/html/rfc7231#section-7.1.1.1) datetime format.
 
 ### Checksum
 
@@ -393,7 +394,7 @@ included as a trailer. If the Server can handle trailers, this behavior MUST be
 announced by adding `checksum-trailer` to the `Tus-Extension` header.
 Trailers, also known as trailing headers, are headers which are sent after the
 request's body has been transmitted already. Following
-[RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1) they
+[RFC 7230](https://tools.ietf.org/html/rfc7230#section-4.1.2) they
 MUST be announced using the `Trailer` header and are only allowed in chunked
 transfers.
 
