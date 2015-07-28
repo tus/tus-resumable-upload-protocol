@@ -275,7 +275,7 @@ be `1`. If the length of an upload is not deferred, this header MUST be omitted.
 
 The `Upload-Metadata` request and response header MUST consist of one or more comma-separated
 key-value pairs. The key and value MUST be separated by a space. The key
-MUST NOT contain space and comma and MUST NOT be empty. The key SHOULD be
+MUST NOT contain spaces and commas and MUST NOT be empty. The key SHOULD be
 ASCII encoded and the value MUST be Base64 encoded. All keys MUST be unique.
 
 #### Requests
@@ -543,7 +543,7 @@ or final upload. If the upload is a partial one, the header value MUST be `parti
 In the case of a final upload, its value MUST be `final` followed by a
 semicolon and a space-separated list of partial upload URLs that will be
 concatenated. The partial uploads URLs MAY be absolute or relative and MUST NOT contain
-space as defined in [RFC 3986](https://tools.ietf.org/html/rfc3986).
+spaces as defined in [RFC 3986](https://tools.ietf.org/html/rfc3986).
 
 #### Example
 
