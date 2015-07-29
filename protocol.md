@@ -144,6 +144,13 @@ The `Tus-Max-Size` response header MUST be a non-negative integer indicating the
 allowed size of an entire upload in bytes. The Server SHOULD set this header if
 there is a known hard limit.
 
+#### Tus-Method-Override
+
+The `Tus-Method-Override` request header MUST be a string which MUST be
+interpreted as the request's method by the Server, if the header is presented.
+The actual method of the request MUST be ignored. The Client SHOULD use this
+header if its environment does not support the PATCH or DELETE methods.
+
 ### Requests
 
 #### HEAD
@@ -644,7 +651,9 @@ The "X-" prefix for headers has been deprecated, see [RFC
 
 If you are dealing with HTTP proxies that strip/modify HTTP headers or can't
 handle `PATCH` requests properly, you should consider using HTTPS which will
-make it impossible for proxies to modify your requests.
+make it impossible for proxies to modify your requests and use the
+[`Tus-Method-Override`](#tus-method-override) header which allows you to use
+`POST` requests.
 
 If that is not an option for you, please reach out to us, we are open to
 defining a compatibility protocol extension.
