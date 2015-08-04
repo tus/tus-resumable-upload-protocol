@@ -425,7 +425,7 @@ Host: tus.example.org
 Tus-Resumable: 1.0.0
 ```
 
-*Response**:
+**Response**:
 
 ```
 HTTP/1.1 204 No Content
