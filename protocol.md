@@ -101,6 +101,7 @@ Tus-Resumable: 1.0.0
 ```
 HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
+Upload-Offset: 100
 ```
 
 ### Headers
@@ -342,6 +343,7 @@ Tus-Resumable: 1.0.0
 HTTP/1.1 204 No Content
 Upload-Expires: Wed, 25 Jun 2014 16:00:00 GMT
 Tus-Resumable: 1.0.0
+Upload-Offset: 100
 ```
 
 #### Headers
@@ -450,6 +452,7 @@ hello world
 ```
 HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
+Upload-offset: 11
 ```
 
 ### Termination
