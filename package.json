@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "description": "",
   "dependencies": {
-    "async": "~0.2.7",
-    "robotskirt": "~2.7.1"
+    "async": "0.2.10",
+    "robotskirt": "2.7.1"
   },
   "devDependencies": {}
 }
