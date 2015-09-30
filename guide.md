@@ -20,4 +20,15 @@ While looking at the offical specification, a reader may notice the frequent use
 
 ## Technical details
 
-### 
+### Header naming conventions
+
+The protocol does not make any assumptions about the content of responses or about the URL design at all. Instead, headers are used as the main way of communicating between the client and server. Therefore, a lot of attention has been paid at developing a proper naming convention for them.
+
+All headers – but one exception – can be put into one of two categories:
+
+* Headers describing the currently used **protocol implementation** are prefixed with `Tus-`, such as `Tus-Resumable`, `Tus-Version` and `Tus-Extension`. Their values are used to retrieve implementation details. For example, the server, when handling a request, verifies that the client's version, contained inside the `Tus-Resumable` header, is supported. Other common use cases are the client checking the servers maximum upload size using `Tus-Max-Size` or the implemented extensions using `Tus-Extension`.
+* Headers describing properties of the currently handled **upload** use the `Upload-` prefix, e.g. `Upload-Length` and `Upload-Offset`. The most important values are the upload's length and offset, but it may also carry meta data or information about expiration or concation.
+
+Although the `X-` prefix is commonly used for naming custom headers which are not defined in the HTTP specification, we discourage the use of this convention. The reason for this behaviour is the deprecation of the prefix according to [RFC 6648](http://tools.ietf.org/html/rfc6648).
+
+The mentioned exception, which does not follow our prefixing convention, is `X-HTTP-Method-Override`. It can be used to overwrite a request's method and can be used in cases where an environment does not support the `PATCH` or `DELETE` methods. Originally, when adding this feature to the specification, we wanted to name it `Tus-Method-Override` but this would introduce two issues. Firstly, the header describes a property of the current request and not the client's implementation and therefore violates the constraint of the `Tus-` prefix. Secondly, the `X-HTTP-Method-Override` header is wildly adopted and has become a [de facto standard](https://en.wikipedia.org/wiki/De_facto_standard) without being defined anywhere. We didn't want to break this convention and therefore adopted this common implementation.
