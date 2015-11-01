@@ -41,3 +41,9 @@ Since the length of an upload - specified using the `Upload-Length` header - is 
 ### HTTP/2 support
 
 When tus development had been started, HTTP/1.1 was the dominating version but the process of standardizing HTTP/2 has already began. While the two protocols are not compatible in terms of their transfered data structures, the exposed interface mostly is. Therefore, we watched out to support both versions, HTTP/1.1 and HTTP/2. In most cases there has been no difference but minor incompatibilities are presented, e.g. the removal of custom reasons for status codes. To sum things up, tus can be used with any HTTP/1.1 or HTTP/2 compatible server and client.  
+
+### Handling 2XX status codes
+
+While the specification usually defines the status codes of responses in a strict way, sloppy server implementations can cause unexpected behavior on the client-side. For example, if a `PATCH` request finishes without any error, the status code `204 No Content` must be returned. The major difference between it and `200 OK` is the absence of a non-empty response body.
+
+However, some server, if they are not correctly implemented, may send the wrong status code, e.g. 200 instead of 204. This can cause major issues for the client which expects a 204 status code and therefore may interpret the 200 as a failure. Therefore, client-side implementations should handle these cases as the same and must be prepared to accepts alternative response codes. We recommend to treat every status code in the 2XX-group as the same in order to prevent the problems from the example above.
