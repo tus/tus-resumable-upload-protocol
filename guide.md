@@ -47,3 +47,11 @@ When tus development had been started, HTTP/1.1 was the dominating version but t
 While the specification usually defines the status codes of responses in a strict way, sloppy server implementations can cause unexpected behavior on the client-side. For example, if a `PATCH` request finishes without any error, the status code `204 No Content` must be returned. The major difference between it and `200 OK` is the absence of a non-empty response body.
 
 However, some server, if they are not correctly implemented, may send the wrong status code, e.g. 200 instead of 204. This can cause major issues for the client which expects a 204 status code and therefore may interpret the 200 as a failure. Therefore, client-side implementations should handle these cases as the same and must be prepared to accepts alternative response codes. We recommend to treat every status code in the 2XX-group as the same in order to prevent the problems from the example above.
+
+### Method overriding
+
+tus tries to follow a RESTful design and therefore uses different methods to express the purpose of a request. For example, `PATCH` requests are used to adding a chunk to an upload and `HEAD` ones fetch information about an upload. While this adds an immense amount of flexibility, there are still some issues with this approach. Some implementations - mostly on the client-side - restrict the number of available methods. The most important cases are some Java APIs and the Flash runtime in the browser. Neither of them support the newer `PATCH` and `DELETE` methods.
+
+This problem is not specific to tus and a more general issue. Therefore, a solution has already emerged into a de-facto standard and introduced the `X-HTTP-Method-Override` request header. Its value should be the method name as which the request should be interpreted. Using this approach, you can send a `POST` request in conjunction with the `X-HTTP-Method-Override: PATCH` header, which will be equivalent to a normal `PATCH` request.
+
+This solution has been adopted by tus and added to the specification to ensure compatible behavior across all server-side implementations.
