@@ -37,3 +37,7 @@ The mentioned exception, which does not follow our prefixing convention, is `X-H
 ### Empty files
 
 Since the length of an upload - specified using the `Upload-Length` header - is defined as a "non-negative integer", its value can also be 0. This has caused for some confusion in the community about the minimum size of a file and whether empty files are actually useful. According to the specification empty file with a length of zero are allowed and must be supported by all server-side and client-side implementations. This behavior may seem strange first since the usage of an empty upload is rare but still existent. For example, you can use it to indicate the absence of content or to trigger separate processing routines.
+
+### HTTP/2 support
+
+When tus development had been started, HTTP/1.1 was the dominating version but the process of standardizing HTTP/2 has already began. While the two protocols are not compatible in terms of their transfered data structures, the exposed interface mostly is. Therefore, we watched out to support both versions, HTTP/1.1 and HTTP/2. In most cases there has been no difference but minor incompatibilities are presented, e.g. the removal of custom reasons for status codes. To sum things up, tus can be used with any HTTP/1.1 or HTTP/2 compatible server and client.  
