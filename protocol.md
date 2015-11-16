@@ -7,7 +7,7 @@ Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_k
 [Naren Venkataraman](https://github.com/vayam), [Marius
 Kleidl](https://twitter.com/Acconut_)<br>
 **Collaborators**:
-[Bruno de Carvalho](https://github.com/brunodecarvalho),
+[Bruno de Carvalho](https://github.com/biasedbit),
 [James Butler](https://github.com/sandfox),
 [Øystein Steimler](https://github.com/cybic),
 [Sam Rijs](https://github.com/srijs),
