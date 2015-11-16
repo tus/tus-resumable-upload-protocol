@@ -5,7 +5,43 @@
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos),
 [Naren Venkataraman](https://github.com/vayam), [Marius
-Kleidl](https://twitter.com/Acconut_)
+Kleidl](https://twitter.com/Acconut_)<br>
+**Collaborators**:
+[Bruno de Carvalho](https://github.com/brunodecarvalho),
+[James Butler](https://github.com/sandfox),
+[Øystein Steimler](https://github.com/cybic),
+[Sam Rijs](https://github.com/srijs),
+[Khang Toh](https://github.com/khangtoh),
+[Jacques Boscq](https://github.com/Amodio),
+[Jérémy FRERE](https://github.com/jerefrer),
+[Pieter Hintjens](https://github.com/hintjens),
+[Stephan Seidt](https://github.com/ehd),
+[Aran Wilkinson](https://github.com/aranw),
+[Svein Ove Aas](https://github.com/Baughn),
+[Oliver Anan](https://github.com/noptic),
+[Tim](https://github.com/schmerg),
+[j4james](https://github.com/j4james),
+[Julian Reschke](https://github.com/reschke),
+[Evert Pot](https://github.com/evert),
+[Jochen Kupperschmidt](https://github.com/homeworkprod),
+[Andrew Fenn](https://github.com/andrewfenn),
+[Kevin Swiber](https://github.com/kevinswiber),
+[Jan Kohlhof](https://github.com/0x20h),
+[eno](https://github.com/radiospiel),
+[Luke Arduini](https://github.com/luk-),
+[Jim Schmid](https://github.com/sheeep),
+[Jeffrey 'jf' Lim](https://github.com/jf),
+[Daniel Lopretto](https://github.com/timemachine3030),
+[Mark Murphy](https://github.com/MarkMurphy),
+[Peter Darrow](https://github.com/pmdarrow),
+[Gargaj](https://github.com/Gargaj),
+[Tomasz Rydzyński](https://github.com/qsorix),
+[Tino de Bruijn](https://github.com/tino),
+[Jonas mg](https://github.com/kless),
+[Christian Ulbrich](https://github.com/ChristianUlbrich),
+[Jon Gjengset](https://github.com/jonhoo),
+[Michael Elovskikh](https://github.com/wronglink),
+[Rick Olson](https://github.com/technoweenie)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
