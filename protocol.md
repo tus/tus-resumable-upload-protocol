@@ -1,7 +1,7 @@
 # tus resumable upload protocol
 
 **Version:** 1.0.0 ([SemVer](http://semver.org))<br>
-**Date:** 2015-11-16<br>
+**Date:** 2016-03-25<br>
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos),
 [Naren Venkataraman](https://github.com/vayam), [Marius
@@ -41,7 +41,8 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [Christian Ulbrich](https://github.com/ChristianUlbrich),
 [Jon Gjengset](https://github.com/jonhoo),
 [Michael Elovskikh](https://github.com/wronglink),
-[Rick Olson](https://github.com/technoweenie)
+[Rick Olson](https://github.com/technoweenie),
+[J. Ryan Stinnett](https://convolv.es)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -431,7 +432,7 @@ its offset MUST NOT be updated.
 
 The Server MUST support at least the SHA1 checksum algorithm identified
 by `sha1`. The names of the checksum algorithms MUST only consist of ASCII
-characters expect uppercased letters.
+characters with the modification that uppercase characters are excluded.
 
 The `Tus-Checksum-Algorithm` header MUST be included in the response to an
 `OPTIONS` request.
