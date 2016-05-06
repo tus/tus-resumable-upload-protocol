@@ -210,6 +210,9 @@ bytes contained in the message at the given offset specified by the
 `Upload-Offset` header. All `PATCH` requests MUST use
 `Content-Type: application/offset+octet-stream`.
 
+If the `Upload-Offset` or `Content-Type` headers are invalid or missing from the
+request, the Server MUST return `412 Precondition Failed`.
+
 The `Upload-Offset` header's value MUST be equal to the current offset of the
 resource. In order to achieve parallel upload the
 [Concatenation](#concatenation) extension MAY be used. If the offsets do not
@@ -337,6 +340,9 @@ known the Client MUST set the `Upload-Length` header in the next `PATCH` request
 Once set the length MUST NOT be changed. As long as the length of the upload is
 not known, the Server MUST set `Upload-Defer-Length: 1` in all responses to
 `HEAD` requests.
+
+If the `Upload-Length` or `Upload-Defer-Length` headers are missing from the
+request, the Server MUST return `412 Precondition Failed`.
 
 If the Server supports deferring length, it MUST add `creation-defer-length` to
 the `Tus-Extension` header.
