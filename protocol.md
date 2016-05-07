@@ -5,7 +5,7 @@
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos),
 [Naren Venkataraman](https://github.com/vayam), [Marius
-Kleidl](https://twitter.com/Acconut_)<br>
+Kleidl](https://twitter.com/Acconut_), [Ben Stahl](https://github.com/bhstahl)<br>
 **Collaborators**:
 [Bruno de Carvalho](https://github.com/biasedbit),
 [James Butler](https://github.com/sandfox),
