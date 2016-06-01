@@ -670,11 +670,18 @@ Upload-Concat: final;/files/a /files/b
 
 ### Reset
 This extension allows clients to reset an upload by setting the offset of a 
-`PATCH` request to 0.  If the Server supports this extension, it MUST add `reset` 
-to the `Tus-Extension` header.
+`PATCH` request to an offset less than the current server offset.  If the Server 
+supports this extension, it MUST add `reset` to the `Tus-Extension` header.
 
-To reset the upload during a `PATCH` request, the client includes the header:
-`Upload-Reset: 0`
+#### Headers
+##### Upload-Reset
+The client MAY include a new offset with the header `Upload-Reset` during a `PATCH` request.  
+If the new offset value is less than or equal to the current server offset, the server MUST 
+reset the offset to the new value and SHOULD discard all stored data after that offset.  
+
+The `Upload-Reset` value MUST be equal to the value of the `Upload-Offset` header in the request.
+If the `Upload-Reset` and `Upload-Offset` headers do not have the same value, then the server MUST 
+respond with `400 Bad Request` without modifying the upload resource.
 
 ## FAQ
 
