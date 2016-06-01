@@ -578,7 +578,9 @@ The value of the `Upload-Offset` header before concatenation is not defined.
 The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time of the request. Response to `HEAD` request against partial
 or final upload MUST include the `Upload-Concat` header and its value as received in
-the upload creation request.
+the upload creation request. 
+
+`PATCH` requests to partial resources MAY begin at the current offset or at 0.
 
 #### Headers
 
