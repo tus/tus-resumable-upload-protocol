@@ -576,8 +576,7 @@ After successful concatenation, the `Upload-Offset` and `Upload-Length` MUST be 
 The value of the `Upload-Offset` header before concatenation is not defined for a final upload.
 
 The response to a `HEAD` request for a partial upload MUST contain the `Upload-Offset`
-header.  `PATCH` requests to partial resources MAY begin at the current offset or at 0.
-If `PATCH` requests begin at 0, all existing data for a partial resource is discarded.
+header.  
 
 The `Upload-Length` header MUST be included if the length of the final resource can
 be calculated at the time of the request. Response to `HEAD` request against partial
@@ -668,6 +667,14 @@ HTTP/1.1 200 OK
 Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
+
+### Reset
+This extension allows clients to reset an upload by setting the offset of a 
+`PATCH` request to 0.  If the Server supports this extension, it MUST add `reset` 
+to the `Tus-Extension` header.
+
+To reset the upload during a `PATCH` request, the client includes the header:
+`Upload-Reset: 0`
 
 ## FAQ
 
