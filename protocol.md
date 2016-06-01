@@ -661,6 +661,7 @@ HEAD /files/ab HTTP/1.1
 HTTP/1.1 200 OK
 Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
+```
 
 ### Reset
 This extension allows clients to reset an upload by setting the offset of a 
@@ -676,7 +677,6 @@ reset the offset to the new value and SHOULD discard all stored data after that 
 The `Upload-Reset` value MUST be equal to the value of the `Upload-Offset` header in the request.
 If the `Upload-Reset` and `Upload-Offset` headers do not have the same value, then the server MUST 
 respond with `400 Bad Request` without modifying the upload resource.
-```
 
 ## FAQ
 
