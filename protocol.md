@@ -351,18 +351,18 @@ If the length of the upload exceeds the maximum, which MAY be specified using
 the `Tus-Max-Size` header, the Server MUST respond with the
 `413 Request Entity Too Large` status.
 
-The Client MAY include the entire or a chunk of the data, which is meant to be
-uploaded, in the body of the `POST` request. In this case, similar rules as for
-the `PATCH` request and response apply. The Client MUST include the
+The Client MAY include the entire upload data or a chunk of it in the body of
+the `POST` request. In this case, similar rules as for the `PATCH` request and
+response apply. The Client MUST include the
 `Content-Type: application/offset+octet-stream` header. The Server SHOULD accept
 as many bytes as possible and MUST include the `Upload-Offset` in the response
 and MUST set its value to the offset of the upload after applying the accepted
 bytes. If the Server supports the functionality described in this paragraph, it
 MUST advertise this by including the `creation-with-chunk` value to the
-`Tus-Extension` header. The Client SHOULD verify that the Server is capable of
-handling this cases before sending the `POST` request. In addition, the Client
+`Tus-Extension` header. The Client SHOULD verify that the Server supports this
+extension before sending the `POST` request. In addition, the Client
 SHOULD include the `Expect: 100-continue` header in the request to receive
-early feedback from the Server whether it will accept the creation request
+early feedback from the Server, whether it will accept the creation request,
 before attempting to transfer the first chunk.
 
 The Server MUST acknowledge a successful upload creation with the `201 Created`
