@@ -351,25 +351,64 @@ If the length of the upload exceeds the maximum, which MAY be specified using
 the `Tus-Max-Size` header, the Server MUST respond with the
 `413 Request Entity Too Large` status.
 
+The Server MUST acknowledge a successful upload creation with the `201 Created`
+status. The Server MUST set the `Location` header to the URL of the created
+resource. This URL MAY be absolute or relative.
+
+The Client MUST perform the actual upload using the core protocol.
+
+### Creation With Upload
+
+The Client MAY want to include parts of the upload in the initial Creation
+request. This MAY be achieved using the Creation With Upload extension.
+
+If the Server supports this extension, it MUST advertise this by including
+`creation-with-chunk` in the `Tus-Extension` header. Furthermore, this extension
+depends directly on the Creation extension. Therefore, if the Server does not
+offer the Creation extension, it MUST NOT offer the Creation With Upload
+extension either.
+
 The Client MAY include the entire upload data or a chunk of it in the body of
 the `POST` request. In this case, similar rules as for the `PATCH` request and
 response apply. The Client MUST include the
 `Content-Type: application/offset+octet-stream` header. The Server SHOULD accept
 as many bytes as possible and MUST include the `Upload-Offset` in the response
 and MUST set its value to the offset of the upload after applying the accepted
-bytes. If the Server supports the functionality described in this paragraph, it
-MUST advertise this by including the `creation-with-chunk` value to the
-`Tus-Extension` header. The Client SHOULD verify that the Server supports this
-extension before sending the `POST` request. In addition, the Client
-SHOULD include the `Expect: 100-continue` header in the request to receive
-early feedback from the Server, whether it will accept the creation request,
-before attempting to transfer the first chunk.
+bytes.
 
-The Server MUST acknowledge a successful upload creation with the `201 Created`
-status. The Server MUST set the `Location` header to the URL of the created
-resource. This URL MAY be absolute or relative.
+The Client SHOULD verify that the Server supports this extension before sending
+the `POST` request. In addition, the Client SHOULD include the
+`Expect: 100-continue` header in the request to receive early feedback from the
+Server, whether it will accept the creation request, before attempting to
+transfer the first chunk.
 
-The Client MUST perform the actual upload using the core protocol.
+#### Example
+
+A non-empty `POST` request is used to create a new upload resource. The
+`Upload-Offset` header in the response indicates how much data has been accepted.
+
+**Request:**
+
+```
+POST /files HTTP/1.1
+Host: tus.example.org
+Content-Length: 5
+Upload-Length: 100
+Tus-Resumable: 1.0.0
+Content-Type: application/offset+octet-stream
+
+hello
+```
+
+**Response:**
+
+```
+HTTP/1.1 201 Created
+Location: https://tus.example.org/files/24e533e02ec3bc40c387f1a0e460e216
+Tus-Resumable: 1.0.0
+Upload-Offset: 5
+```
+
 
 ### Expiration
 
