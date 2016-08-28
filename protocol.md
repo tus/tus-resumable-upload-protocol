@@ -363,7 +363,7 @@ The Client MAY want to include parts of the upload in the initial Creation
 request. This MAY be achieved using the Creation With Upload extension.
 
 If the Server supports this extension, it MUST advertise this by including
-`creation-with-chunk` in the `Tus-Extension` header. Furthermore, this extension
+`creation-with-upload` in the `Tus-Extension` header. Furthermore, this extension
 depends directly on the Creation extension. Therefore, if the Server does not
 offer the Creation extension, it MUST NOT offer the Creation With Upload
 extension either.
