@@ -241,7 +241,7 @@ MUST contain the `Tus-Version` header. It MAY include the `Tus-Extension` and
 `Tus-Max-Size` headers.
 
 The Client SHOULD NOT include the `Tus-Resumable` header in the request and the
-Server MUST discard it.
+Server MUST ignore the header.
 
 ##### Example
 
