@@ -359,8 +359,8 @@ The Client MUST perform the actual upload using the core protocol.
 
 ### Creation With Upload
 
-The Client MAY want to include parts of the upload in the initial Creation
-request. This MAY be achieved using the Creation With Upload extension.
+The Client MAY include parts of the upload in the initial Creation request
+using the Creation With Upload extension.
 
 If the Server supports this extension, it MUST advertise this by including
 `creation-with-upload` in the `Tus-Extension` header. Furthermore, this extension
@@ -368,19 +368,19 @@ depends directly on the Creation extension. Therefore, if the Server does not
 offer the Creation extension, it MUST NOT offer the Creation With Upload
 extension either.
 
-The Client MAY include the entire upload data or a chunk of it in the body of
+The Client MAY include either the entirety or a chunk of the upload data in the body of
 the `POST` request. In this case, similar rules as for the `PATCH` request and
 response apply. The Client MUST include the
 `Content-Type: application/offset+octet-stream` header. The Server SHOULD accept
-as many bytes as possible and MUST include the `Upload-Offset` in the response
-and MUST set its value to the offset of the upload after applying the accepted
-bytes.
+as many bytes as possible and MUST include the `Upload-Offset` header in the
+response and MUST set its value to the offset of the upload after applying the
+accepted bytes.
 
-The Client SHOULD verify that the Server supports this extension before sending
-the `POST` request. In addition, the Client SHOULD include the
-`Expect: 100-continue` header in the request to receive early feedback from the
-Server, whether it will accept the creation request, before attempting to
-transfer the first chunk.
+If the Client wants to use this extension, the Client SHOULD verify that it is
+supported by the Server before sending the `POST` request.
+In addition, the Client SHOULD include the `Expect: 100-continue` header in
+the request to receive early feedback from the Server on whether it will accept
+the creation request, before attempting to transfer the first chunk.
 
 #### Example
 
