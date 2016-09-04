@@ -496,7 +496,7 @@ hello world
 ```
 HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
-Upload-offset: 11
+Upload-Offset: 11
 ```
 
 ### Termination
