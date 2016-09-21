@@ -256,7 +256,6 @@ allowed and the extensions for [Creation](#creation) and
 ```
 OPTIONS /files HTTP/1.1
 Host: tus.example.org
-Tus-Resumable: 1.0.0
 ```
 
 **Response:**
