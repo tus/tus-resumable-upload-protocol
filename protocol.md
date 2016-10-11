@@ -42,7 +42,8 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [Jon Gjengset](https://github.com/jonhoo),
 [Michael Elovskikh](https://github.com/wronglink),
 [Rick Olson](https://github.com/technoweenie),
-[J. Ryan Stinnett](https://convolv.es)
+[J. Ryan Stinnett](https://convolv.es),
+[Ifedapo Olarewaju](https://github.com/ifedapoolarewaju)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
