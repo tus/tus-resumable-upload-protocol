@@ -342,6 +342,8 @@ Once set the length MUST NOT be changed. As long as the length of the upload is
 not known, the Server MUST set `Upload-Defer-Length: 1` in all responses to
 `HEAD` requests.
 
+c) `Upload-Type` to indicate the mime type of the uploaded file.
+
 If the Server supports deferring length, it MUST add `creation-defer-length` to
 the `Tus-Extension` header.
 
