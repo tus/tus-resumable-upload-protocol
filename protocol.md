@@ -361,7 +361,8 @@ The Client MUST perform the actual upload using the core protocol.
 
 The Server MAY remove unfinished uploads once they expire. In order to indicate
 this behavior to the Client, the Server MUST add `expiration` to the
-`Tus-Extension` header.
+`Tus-Extension` header. The Server SHOULD NOT expire any files that are being
+actively uploaded.
 
 #### Example
 
@@ -404,6 +405,10 @@ This header MUST be included in every `PATCH` response if the upload is going
 to expire. If the expiration is known at the creation, the `Upload-Expires`
 header MUST be included in the response to the initial `POST` request.
 Its value MAY change over time.
+
+The Server SHOULD update a files `Upload-Expires` header with each PATCH request
+to prevent file expiration from occuring while the file is still being actively
+uploaded.
 
 If a Client does attempt to resume an upload which has since been removed by the
 Server, the Server SHOULD respond with the`404 Not Found` or `410 Gone` status.
