@@ -183,6 +183,29 @@ The `Tus-Max-Size` response header MUST be a non-negative integer indicating the
 allowed size of an entire upload in bytes. The Server SHOULD set this header if
 there is a known hard limit.
 
+#### Tus-Min-Chunk-Size
+
+The `Tus-Min-Chunk-Size` response header MUST be a non-negative integer indicating the
+recommended minimum size of a single chunk uploaded in a single `PATCH` request in bytes.
+The Server MAY set this recommendation if the underlying storage engine has a lower limit
+on how much data can be stored in a single take. The Client SHOULD use this number to
+determine in conjunction with other factors, such as the available bandwidth and the
+`Tus-Max-Chunk-Size` header, how much data SHOULD be transfered in one request. Furthermore,
+this header's value MAY represent a hard limit but also MAY be a recommendation. The Server
+SHOULD only set this header if it has this recommendation.
+
+#### Tus-Max-Chunk-Size
+
+The `Tus-Max-Chunk-Size` response header MUST be a non-negative integer indicating the
+recommended maximum size of a single chunk uploaded in a single `PATCH` request in bytes.
+The Server MAY set this recommendation if the underlying storage engine has an upper limit
+on how much data can be stored in a single take or if the used architecture does not allow
+streaming the body of the `PATCH` request. The Client SHOULD use this number to determine
+in conjunction with other factors, such as the available bandwidth and the
+`Tus-Min-Chunk-Size` header, how much data SHOULD be transfered in one request. Furthermore,
+this header's value MAY represent a hard limit but also MAY be a recommendation. The Server
+SHOULD only set this header if it has this recommendation.
+
 #### X-HTTP-Method-Override
 
 The `X-HTTP-Method-Override` request header MUST be a string which MUST be
@@ -238,8 +261,8 @@ The Server SHOULD always attempt to store as much of the received data as possib
 
 An `OPTIONS` request MAY be used to gather information about the Server's current
 configuration. A successful response indicated by the `204 No Content` status
-MUST contain the `Tus-Version` header. It MAY include the `Tus-Extension` and
-`Tus-Max-Size` headers.
+MUST contain the `Tus-Version` header. It MAY include the `Tus-Extension`,
+`Tus-Max-Size`, `Tus-Min-Chunk-Size` and `Tus-Max-Chunk-Size` headers.
 
 The Client SHOULD NOT include the `Tus-Resumable` header in the request and the
 Server MUST ignore the header.
@@ -249,8 +272,9 @@ Server MUST ignore the header.
 This example clarifies the response for an `OPTIONS` request. The version used
 in both, request and response, is `1.0.0` while the Server is also capable of
 handling `0.2.2` and `0.2.1`. Uploads with a total size of up to 1GB are
-allowed and the extensions for [Creation](#creation) and
-[Expiration](#expiration) are enabled.
+allowed and the Server recommends that a single chunk should be smaller than
+500MB. Furthermore, the  [Creation](#creation) and [Expiration](#expiration)
+extensions are enabled.
 
 **Request:**
 
@@ -266,6 +290,7 @@ HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
 Tus-Version: 1.0.0,0.2.2,0.2.1
 Tus-Max-Size: 1073741824
+Tus-Max-Chunk-Size: 524288000
 Tus-Extension: creation,expiration
 ```
 
