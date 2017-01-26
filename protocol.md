@@ -237,7 +237,7 @@ The Server SHOULD always attempt to store as much of the received data as possib
 #### OPTIONS
 
 An `OPTIONS` request MAY be used to gather information about the Server's current
-configuration. A successful response indicated by the `204 No Content` status
+configuration. A successful response indicated by the `204 No Content` or `200 OK` status
 MUST contain the `Tus-Version` header. It MAY include the `Tus-Extension` and
 `Tus-Max-Size` headers.
 
