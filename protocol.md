@@ -211,6 +211,10 @@ bytes contained in the message at the given offset specified by the
 `Upload-Offset` header. All `PATCH` requests MUST use
 `Content-Type: application/offset+octet-stream`.
 
+If the Request-URI does not point to an existing resource, the server MAY create 
+a new resource if the request fullfills the preconditions of a corresponding
+`POST` request.
+
 The `Upload-Offset` header's value MUST be equal to the current offset of the
 resource. In order to achieve parallel upload the
 [Concatenation](#concatenation) extension MAY be used. If the offsets do not
@@ -337,6 +341,8 @@ known the Client MUST set the `Upload-Length` header in the next `PATCH` request
 Once set the length MUST NOT be changed. As long as the length of the upload is
 not known, the Server MUST set `Upload-Defer-Length: 1` in all responses to
 `HEAD` requests.
+
+c) `Upload-Type` to indicate the mime type of the uploaded file.
 
 If the Server supports deferring length, it MUST add `creation-defer-length` to
 the `Tus-Extension` header.
