@@ -686,6 +686,10 @@ Client and Server implementations, so we're quite happy with them.
 The "X-" prefix for headers has been deprecated, see [RFC
 6648](http://tools.ietf.org/html/rfc6648).
 
+The only exception to this is `X-HTTP-Method-Override`, as the whole purpose of this 
+header is to accommodate real-world legacy systems that are crippled in their 
+adhering of standards and apparently hard to change.
+
 ### How can I deal with bad HTTP proxies?
 
 If you are dealing with HTTP proxies that strip/modify HTTP headers or can't
