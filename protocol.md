@@ -718,6 +718,16 @@ time to resolve potential networking issues. Since this duration depends heavily
 on the underlying application model, the protocol does not contain a specific
 number, but we recommend one week for a general use case.
 
+### How can I get the file name or file type for an upload?
+
+For itself, the tus protocol does not have a direct mechanism to obtain the type or
+filename of an upload as the specification does not have the principle of a disk-based
+file, allowing you to upload arbitrary data using tus. However, the wanted
+functionality can be achieved by utilizing metadata. A Client can attach the file's
+name and type to an upload when it's being created by setting the `Upload-Metadata`
+header. On the other side, the Server can read these values and determine the name and
+type of the upload.
+
 ## License
 
 Licensed under the MIT license, see
