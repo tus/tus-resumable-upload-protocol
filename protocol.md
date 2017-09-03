@@ -65,7 +65,7 @@ collaborators will be listed as such in the protocol header.
 
 Please also [let us know](https://github.com/tus/tus.io/issues/new) about any
 implementations (open source or commercial) if you'd like to be listed on the
-[implementations](http://www.tus.io/implementations.html) page.
+[implementations](https://www.tus.io/implementations.html) page.
 
 ## Abstract
 
