@@ -44,6 +44,7 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [Rick Olson](https://github.com/technoweenie),
 [J. Ryan Stinnett](https://convolv.es),
 [Ifedapo Olarewaju](https://github.com/ifedapoolarewaju)
+[Robert Nagy](https://github.com/ronag)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -209,13 +210,18 @@ adding the `Cache-Control: no-store` header to the response.
 The Server SHOULD accept `PATCH` requests against any upload URL and apply the
 bytes contained in the message at the given offset specified by the
 `Upload-Offset` header. All `PATCH` requests MUST use
-`Content-Type: application/offset+octet-stream`.
+`Content-Type: application/offset+octet-stream`, otherwise the server SHOULD
+return a `415 Unsupported Media Type` status.
 
 The `Upload-Offset` header's value MUST be equal to the current offset of the
 resource. In order to achieve parallel upload the
 [Concatenation](#concatenation) extension MAY be used. If the offsets do not
 match, the Server MUST respond with the `409 Conflict` status without modifying
 the upload resource.
+
+If a `PATCH` request does not include a `Content-Length` header containing an 
+integer value larger than 0, the server SHOULD return a 
+`400 Bad Request` status.
 
 The Client SHOULD send all the remaining bytes of an upload in a single `PATCH`
 request, but MAY also use multiple small requests successively for scenarios
@@ -227,6 +233,9 @@ The Server MUST acknowledge successful `PATCH` requests with the
 the new offset. The new offset MUST be the sum of the offset before the `PATCH`
 request and the number of bytes received and processed or stored during the
 current `PATCH` request.
+
+If the servers receives a `PATCH` request against a non-existent resource
+it SHOULD return a `404 Not Found` status.
 
 Both, Client and Server, SHOULD attempt to detect and handle network errors
 predictably. They MAY do so by checking for read/write socket errors, as well
@@ -336,7 +345,8 @@ b) `Upload-Defer-Length: 1` if upload size is not known at the time. Once it is
 known the Client MUST set the `Upload-Length` header in the next `PATCH` request.
 Once set the length MUST NOT be changed. As long as the length of the upload is
 not known, the Server MUST set `Upload-Defer-Length: 1` in all responses to
-`HEAD` requests.
+`HEAD` requests. If the `Upload-Defer-Length` header contains any other value
+than `1` the server should return a `400 Bad Request` status.
 
 If the Server supports deferring length, it MUST add `creation-defer-length` to
 the `Tus-Extension` header.
