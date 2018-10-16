@@ -219,10 +219,6 @@ resource. In order to achieve parallel upload the
 match, the Server MUST respond with the `409 Conflict` status without modifying
 the upload resource.
 
-If a `PATCH` request does not include a `Content-Length` header containing an 
-integer value larger than 0, the server SHOULD return a 
-`400 Bad Request` status.
-
 The Client SHOULD send all the remaining bytes of an upload in a single `PATCH`
 request, but MAY also use multiple small requests successively for scenarios
 where this is desirable. One example for these situations is when the
