@@ -404,7 +404,7 @@ The `Upload-Expires` response header indicates the time after which the unfinish
 expires. A Server MAY wish to remove incomplete uploads after a given
 period of time to prevent abandoned uploads from taking up extra storage. The
 Client SHOULD use this header to determine if an upload is still valid before
-attempting to the resume the upload.
+attempting to resume the upload.
 
 This header MUST be included in every `PATCH` response if the upload is going
 to expire. If the expiration is known at the creation, the `Upload-Expires`
