@@ -2,7 +2,7 @@
 
 This document is meant to provide a more general description of what tus is and how it can be used in the best way. This guide does not replace the [protocol specification](/protocols/resumable-upload.html) but instead complements it. While the specification tells you exactly what you can and must not do, this document is intented to give you a better understanding of how the protocol works and how you might use it in your application. It's similar to how laws and regulations get interpreted to know what they actually say. Anyways, let's get started!
 
-> This document is still a Word In Progress and is written as we speak. If you have any questios or topics you would like to see covered, [let us know](/about.html)! 
+> This document is still a work-in-progress and is written as we speak. If you have any questios or topics you would like to see covered, [let us know](/about.html)! 
 
 ## What is tus?
 
@@ -17,7 +17,7 @@ On a more technical side, the tus protocol is built upon HTTP/HTTPS to make it a
 If you are unsure if tus is a good fit for your use case, here is a list of criteria. If one of these points applies to you, it is very likely that you could benefit from tus:
 
 - You operate on partly unreliable networks where connection can get easily dropped or a connection may not be available at all for some time, e.g. when using mobile data
-- You handle large files and want to avoid having to reupload parts of it just because the upload got interrupted (Note: "large" is relative word. A 10MB file can large if you have an uplink speed of 100KB/s)
+- You handle large files and want to avoid having to reupload parts of it just because the upload got interrupted (Note: "large" is relative word. A 10MB file can be large if you have an uplink speed of 100KB/s)
 - You want to provide your users with the ability to pause an upload and resume it later (maybe even after a few days)
 - You do not want to rely on proprietary upload solution but instead want to base your work on free and open source projects
 
