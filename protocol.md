@@ -674,65 +674,7 @@ Upload-Concat: final;/files/a /files/b
 
 ## FAQ
 
-### Why is the protocol using custom headers?
-
-We have carefully investigated the use of existing headers such as `Range` and
-`Content-Range`, but unfortunately they are defined in a way that makes them
-unsuitable for resumable file uploads.
-
-We also considered using existing `PATCH` payload formats such as
-[multipart/byteranges](http://greenbytes.de/tech/webdav/draft-ietf-httpbis-p5-range-latest.html#internet.media.type.multipart.byteranges),
-but unfortunately the XHR2 [FormData
-interface](http://www.w3.org/TR/XMLHttpRequest/#interface-formdata) does not
-support custom headers for multipart parts, and the [send()
-method](http://www.w3.org/TR/XMLHttpRequest/#the-send-method) does not allow
-streaming arbitrary data without loading all of it into memory.
-
-That being said, custom headers also allowed us to greatly simplify the
-Client and Server implementations, so we're quite happy with them.
-
-### Why are you not using the "X-" prefix for your headers?
-
-The "X-" prefix for headers has been deprecated, see [RFC
-6648](http://tools.ietf.org/html/rfc6648).
-
-### How can I deal with bad HTTP proxies?
-
-If you are dealing with HTTP proxies that strip/modify HTTP headers or can't
-handle `PATCH` requests properly, you should consider using HTTPS which will
-make it impossible for proxies to modify your requests and use the
-[`X-HTTP-Method-Override`](#x-http-method-override) header which allows you to use
-`POST` requests.
-
-If that is not an option for you, please reach out to us, we are open to
-defining a compatibility protocol extension.
-
-### How are pause/resume handled? When should I delete partial uploads?
-
-The tus protocol is built upon the principles of simple pausing and resuming. In
-order to pause an upload you are allowed to end the current open request. The
-Server will store the uploaded data as long as no violations against other
-constraints (e.g. checksums) or internal errors occur. Once you are ready to
-resume an upload, send a `HEAD` request to the corresponding upload URL in order to
-obtain the available offset. After receiving a valid response you can upload
-more data using `PATCH` requests. You should keep in mind that the Server may
-delete an unfinished upload if it is not continued for a longer time period (see
-[Expiration](#expiration) extension).
-
-Before deleting an outstanding upload the Server should give the Client enough
-time to resolve potential networking issues. Since this duration depends heavily
-on the underlying application model, the protocol does not contain a specific
-number, but we recommend one week for a general use case.
-
-### How can I get the file name or file type for an upload?
-
-For itself, the tus protocol does not have a direct mechanism to obtain the type or
-filename of an upload as the specification does not have the principle of a disk-based
-file, allowing you to upload arbitrary data using tus. However, the wanted
-functionality can be achieved by utilizing metadata. A Client can attach the file's
-name and type to an upload when it's being created by setting the `Upload-Metadata`
-header. On the other side, the Server can read these values and determine the name and
-type of the upload.
+The FAQ is available online at <https://tus.io/faq.html>.
 
 ## License
 
