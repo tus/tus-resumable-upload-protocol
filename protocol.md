@@ -219,7 +219,9 @@ The `Upload-Offset` header's value MUST be equal to the current offset of the
 resource. In order to achieve parallel upload the
 [Concatenation](#concatenation) extension MAY be used. If the offsets do not
 match, the Server MUST respond with the `409 Conflict` status without modifying
-the upload resource.
+the upload resource. This response SHOULD include the upload's current offset
+in the `Upload-Offset` header to enable the Client to resume the upload from
+the correct offset without issuing an additional `HEAD` request first.
 
 The Client SHOULD send all the remaining bytes of an upload in a single `PATCH`
 request, but MAY also use multiple small requests successively for scenarios
