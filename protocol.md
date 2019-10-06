@@ -299,7 +299,7 @@ Host: tus.example.org
 Content-Length: 0
 Upload-Length: 100
 Tus-Resumable: 1.0.0
-Upload-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==
+Upload-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==,is_confidential
 ```
 
 **Response:**
@@ -327,6 +327,8 @@ The `Upload-Metadata` request and response header MUST consist of one or more co
 key-value pairs. The key and value MUST be separated by a space. The key
 MUST NOT contain spaces and commas and MUST NOT be empty. The key SHOULD be
 ASCII encoded and the value MUST be Base64 encoded. All keys MUST be unique.
+The value MAY be empty. In these cases, the space, which would normally separate
+the key and the value, MAY be left out.
 
 #### Requests
 
