@@ -203,7 +203,9 @@ SHOULD return either the `404 Not Found`, `410 Gone` or `403 Forbidden` status
 without the `Upload-Offset` header.
 
 The Server MUST prevent the client and/or proxies from caching the response by
-adding the `Cache-Control: no-store` header to the response.
+adding the `Cache-Control: no-store` header to the response while the upload is
+not finished. After the upload has been finished, the Server MAY set or omit the
+`Cache-Control` header as it desires.
 
 #### PATCH
 
