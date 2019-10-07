@@ -167,7 +167,7 @@ The `Tus-Resumable` header MUST be included in every request and response except
 for `OPTIONS` requests. The value MUST be the version of the protocol used by
 the Client or the Server.
 
-If the the version specified by the Client is not supported by the Server, it
+If the version specified by the Client is not supported by the Server, it
 MUST respond with the `412 Precondition Failed` status and MUST include the
 `Tus-Version` header into the response.
 In addition, the Server MUST NOT process the request.
@@ -217,7 +217,7 @@ The `Upload-Offset` header's value MUST be equal to the current offset of the
 resource. In order to achieve parallel upload the
 [Concatenation](#concatenation) extension MAY be used. If the offsets do not
 match, the Server MUST respond with the `409 Conflict` status without modifying
-the upload resource.
+the uploaded resource.
 
 The Client SHOULD send all the remaining bytes of an upload in a single `PATCH`
 request, but MAY also use multiple small requests successively for scenarios
@@ -230,10 +230,10 @@ the new offset. The new offset MUST be the sum of the offset before the `PATCH`
 request and the number of bytes received and processed or stored during the
 current `PATCH` request.
 
-If the servers receives a `PATCH` request against a non-existent resource
+If the server receives a `PATCH` request against a non-existent resource
 it SHOULD return a `404 Not Found` status.
 
-Both, Client and Server, SHOULD attempt to detect and handle network errors
+Both Client and Server, SHOULD attempt to detect and handle network errors
 predictably. They MAY do so by checking for read/write socket errors, as well
 as setting read/write timeouts. A timeout SHOULD be handled by closing the underlying connection.
 
@@ -289,7 +289,7 @@ header.
 #### Example
 
 An empty `POST` request is used to create a new upload resource. The
-`Upload-Length` header indicates the size of entire upload in bytes.
+`Upload-Length` header indicates the size of the entire upload in bytes.
 
 **Request:**
 
@@ -574,7 +574,7 @@ If this extension is supported by the Server, it MUST be announced by adding
 
 When receiving a `DELETE` request for an existing upload the Server SHOULD free
 associated resources and MUST respond with the `204 No Content` status
-confirming that the upload was terminated. For all future requests to this URL
+confirming that the upload was terminated. For all future requests to this URL,
 the Server SHOULD respond with the `404 Not Found` or `410 Gone` status.
 
 #### Example
@@ -609,7 +609,7 @@ into a final upload in the specified order. The Server SHOULD NOT process these
 partial uploads until they are concatenated to form a final upload. The length of the
 final upload MUST be the sum of the length of all partial uploads.
 
-In order to create a new final upload the Client MUST add the `Upload-Concat` header
+In order to create a new final upload, the Client MUST add the `Upload-Concat` header
 to the upload creation request. The value MUST be `final` followed by a semicolon
 and a space-separated list of the partial upload URLs that need to be concatenated.
 The partial uploads MUST be concatenated as per the order specified in the list.
@@ -658,7 +658,7 @@ spaces as defined in [RFC 3986](https://tools.ietf.org/html/rfc3986).
 
 #### Example
 
-In the following example the `Host` and `Tus-Resumable` headers are omitted for
+In the following example, the `Host` and `Tus-Resumable` headers are omitted for
 readability although they are required by the specification.
 In the beginning two partial uploads are created:
 
@@ -701,11 +701,11 @@ Content-Length: 6
 HTTP/1.1 204 No Content
 ```
 
-In the first request the string `hello` was uploaded while the second file now
+In the first request, the string `hello` was uploaded while the second file now
 contains ` world` with a leading space.
 
 The next step is to create the final upload consisting of the two earlier
-generated partial uploads. In following request no `Upload-Length` header is
+generated partial uploads. In the following request, no `Upload-Length` header is
 presented.
 
 ```
