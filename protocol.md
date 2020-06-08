@@ -733,7 +733,7 @@ With this extension, Clients can provide an Identifier for an upload - with whic
 can later retrieve the URL for the created resource.
 
 This allows Clients to resume an upload initiated through the [Creation With Upload](#creation-with-upload)
-or [Creation](#creation) extensions for which they did not reveive the response with
+or [Creation](#creation) extensions for which they did not receive the response with
 the newly created resource's URL (i.e. due to a broken connection).
 
 If the Server supports this extension, it MUST add `client-identifier` to the `Tus-Extension`
