@@ -44,7 +44,8 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [Rick Olson](https://github.com/technoweenie),
 [J. Ryan Stinnett](https://convolv.es),
 [Ifedapo Olarewaju](https://github.com/ifedapoolarewaju)
-[Robert Nagy](https://github.com/ronag)
+[Robert Nagy](https://github.com/ronag),
+[Felix Schwarz](https://github.com/felix-schwarz)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -725,6 +726,93 @@ HTTP/1.1 200 OK
 Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
+
+### Client Identifier
+
+With this extension, Clients can provide an Identifier for an upload - with which they
+can later retrieve the URL for the created resource.
+
+This allows Clients to resume an upload initiated through the [Creation With Upload](#creation-with-upload)
+or [Creation](#creation) extensions for which they did not reveive the response with
+the newly created resource's URL (i.e. due to a broken connection).
+
+If the Server supports this extension, it MUST add `client-identifier` to the `Tus-Extension`
+header.
+
+To initiate an upload with Client Identifier, Clients MUST include an `Upload-Client-Identifier`
+header with the initial `POST` request (as specified in the [Creation](#creation) and
+[Creation With Upload](#creation-with-upload) extensions).
+
+Clients can then send a `HEAD` request with the same `Upload-Client-Identifier` header to the
+same URL on the Server, which - upon success - MUST respond with the `200 OK` or `204 No Content`
+status, and the resource's URL in the response's `Location` header.
+
+A successful response MUST also contain the `Tus-Version` header. An `Upload-Offset` header that
+indicates how many bytes have already been received by the server MAY also be returned.
+
+Clients can then use the returned `Location` to resume the upload.
+
+If an `Upload-Client-Identifier` is not or no longer known by the Server, it MUST respond to
+`HEAD` requests with the `404 Not Found` or `410 Gone` status.
+
+#### Headers
+
+##### Upload-Client-Identifier
+
+The `Upload-Client-Identifier` request header MUST be a globally unique identifier
+created by the Client to avoid collissions. It is recommmended that Clients generate
+and use a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4) for this
+purpose.
+
+The `Upload-Client-Identifier` header MUST be included with the `POST` request that creates
+the resource. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
+`Location` of the newly created resource.
+
+#### Example
+
+The Client attempts to create and upload a file that is 100 bytes in length:
+
+**Request:**
+
+```
+POST /files HTTP/1.1
+Host: tus.example.org
+Content-Length: 100
+Upload-Length: 100
+Upload-Client-Identifier: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF 
+Tus-Resumable: 1.0.0
+Content-Type: application/offset+octet-stream
+
+hello[connection breaks down]
+```
+
+The connection is then interrupted, so that only the first 5 bytes of the upload are received
+by the Server. Meanwhile the Client could not receive the response with the `Location` header.
+
+To resume the upload, the Client sends a `HEAD` request to the same URL and includes the same
+`Upload-Client-Identifier` as in the `POST` request:
+
+**Request:**
+
+```
+HEAD /files HTTP/1.1
+Host: tus.example.org
+Tus-Resumable: 1.0.0
+Upload-Client-Identifier: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
+```
+
+The Server responds with a `204 No Content` status, the URL of the created resource in the `Location` header and the number of received bytes in the `Upload-Offset` header:
+
+**Response:**
+
+```
+HTTP/1.1 204 No Content
+Tus-Resumable: 1.0.0
+Location: https://tus.example.org/files/0e460e21624c387f1ae533e02ec3bc40
+Upload-Offset: 5
+```
+
+The Client can now resume the upload using the `Location` URL and `Upload-Offset` header. If an `Upload-Offset` header is not included, the Client can use another `HEAD` request to the URL returned in `Location` to retrieve it.
 
 ## FAQ
 
