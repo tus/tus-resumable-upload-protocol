@@ -741,10 +741,10 @@ header.
 
 To initiate an upload with Client Identifier, Clients MUST include an `Upload-Client-Identifier`
 header with the initial `POST` request (as specified in the [Creation](#creation) and
-[Creation With Upload](#creation-with-upload) extensions).
+[Creation With Upload](#creation-with-upload) extensions) made to the Upload URL.
 
 Clients can then send a `HEAD` request with the same `Upload-Client-Identifier` header to the
-same URL on the Server, which - upon success - MUST respond with the `200 OK` or `204 No Content`
+Upload URL, which - upon success - MUST respond with the `200 OK` or `204 No Content`
 status, and the resource's URL in the response's `Location` header.
 
 A successful response MUST also contain the `Tus-Version` header. An `Upload-Offset` header that
