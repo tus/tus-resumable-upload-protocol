@@ -755,6 +755,9 @@ Clients can then use the returned `Location` to resume the upload.
 If an `Upload-Client-Identifier` is not or no longer known by the Server, it MUST respond to
 `HEAD` requests with the `404 Not Found` or `410 Gone` status.
 
+If an `Upload-Client-Identifier` is already used for another in-progress upload, the Server MUST
+respond to the  `POST` request initiating the upload with a `409 Conflict` status.
+
 #### Headers
 
 ##### Upload-Client-Identifier
