@@ -727,47 +727,74 @@ Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
 
-### Client Identifier
+### Client Reference
 
-With this extension, Clients can provide an Identifier for an upload - with which they
+With this extension, Clients can provide a Reference for an upload - with which they
 can later retrieve the URL for the created resource.
 
 This allows Clients to resume an upload initiated through the [Creation With Upload](#creation-with-upload)
 or [Creation](#creation) extensions for which they did not receive the response with
-the newly created resource's URL (i.e. due to a broken connection).
+the newly created resource's URL (for example due to a broken connection).
 
-If the Server supports this extension, it MUST add `client-identifier` to the `Tus-Extension`
+If the Server supports this extension, it MUST add `client-reference` to the `Tus-Extension`
 header.
 
-To initiate an upload with Client Identifier, Clients MUST include an `Upload-Client-Identifier`
+To initiate an upload with Client Reference, Clients MUST include an `Upload-Client-Reference`
 header with the initial `POST` request (as specified in the [Creation](#creation) and
 [Creation With Upload](#creation-with-upload) extensions) made to the Upload URL.
 
-Clients can then send a `HEAD` request with the same `Upload-Client-Identifier` header to the
+Clients can then send a `HEAD` request with the same `Upload-Client-Reference` header to the
 Upload URL, which - upon success - MUST respond with the `200 OK` or `204 No Content`
 status, and the resource's URL in the response's `Location` header.
 
-A successful response MUST also contain the `Tus-Version` header. An `Upload-Offset` header that
-indicates how many bytes have already been received by the server MAY also be returned.
+A successful response MUST also contain the `Tus-Version` header. An `Upload-Offset` header
+that indicates how many bytes have already been received by the server MAY also be returned.
 
 Clients can then use the returned `Location` to resume the upload.
 
-If an `Upload-Client-Identifier` is not or no longer known by the Server, it MUST respond to
+If an `Upload-Client-Reference` is not or no longer known by the Server, it MUST respond to
 `HEAD` requests with the `404 Not Found` or `410 Gone` status.
 
-If an `Upload-Client-Identifier` is already used for another in-progress upload, the Server MUST
-respond to the  `POST` request initiating the upload with a `409 Conflict` status.
+If an `Upload-Client-Reference` is already in use for a different, ongoing upload, the Server
+MUST respond to the `POST` request initiating the upload with a `409 Conflict` status.
+
+The Server MAY require the `Upload-Client-Reference` to follow a certain format. If it does,
+the `Tus-Client-Reference-Format` header MUST be included in the response to `OPTIONS`
+requests and provide a comma-seperated list of allowed formats.
+
+If the `Upload-Client-Reference` does not meet the server's format requirements, it MUST respond
+with a `400 Bad Request` status.
 
 #### Headers
 
-##### Upload-Client-Identifier
+##### Tus-Client-Reference-Format
 
-The `Upload-Client-Identifier` request header MUST be a globally unique identifier
-created by the Client to avoid collissions. It is recommmended that Clients generate
-and use a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4) for this
-purpose.
+The `Tus-Client-Reference-Format` response header MAY be sent in response to an `OPTIONS` request, 
+as a comma-separated list of allowed formats for `Upload-Client-Reference` values. Possible
+formats include:
 
-The `Upload-Client-Identifier` header MUST be included with the `POST` request that creates
+- `v4-uuid`: [Version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4)
+- `random:[len]`: `len` number of random bytes, base-64-encoded
+
+Vendor-specific formats MUST be prefixed with the vendor's name and formatted as `[vendor-name].[format-name]`.
+
+##### Tus-Client-Reference-Validity
+
+The Server MAY indicate how long the Client can use a  `Upload-Client-Reference` to reference an upload by
+including a `Tus-Client-Reference-Validity` header in response to an `OPTIONS` request, with one of the
+following values:
+- `upload`: the  `Upload-Client-Reference` can be used until the upload completes, [expires](#expiration) or is [terminated](#termination).
+- `resource`: the `Upload-Client-Reference`  can be used even after the upload completed, until the uploaded resource is removed from the Server.
+- `seconds:[number of seconds]`: the `Upload-Client-Reference` can be used for at least `[number of seconds]` after the last completed request uploading data to the Server.
+
+##### Upload-Client-Reference
+
+The `Upload-Client-Reference` request header MUST be an identifier
+created by the Client that's unique within its storage space, to avoid collisions.
+
+Clients can satisfy this requirement by generating and using a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4).
+
+The `Upload-Client-Reference` header MUST be included with the `POST` request that creates
 the resource. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
 `Location` of the newly created resource.
 
@@ -782,7 +809,7 @@ POST /files HTTP/1.1
 Host: tus.example.org
 Content-Length: 100
 Upload-Length: 100
-Upload-Client-Identifier: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF 
+Upload-Client-Reference: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF 
 Tus-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 
@@ -793,7 +820,7 @@ The connection is then interrupted, so that only the first 5 bytes of the upload
 by the Server. Meanwhile the Client could not receive the response with the `Location` header.
 
 To resume the upload, the Client sends a `HEAD` request to the same URL and includes the same
-`Upload-Client-Identifier` as in the `POST` request:
+`Upload-Client-Reference` as in the `POST` request:
 
 **Request:**
 
@@ -801,10 +828,11 @@ To resume the upload, the Client sends a `HEAD` request to the same URL and incl
 HEAD /files HTTP/1.1
 Host: tus.example.org
 Tus-Resumable: 1.0.0
-Upload-Client-Identifier: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
+Upload-Client-Reference: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
 ```
 
-The Server responds with a `204 No Content` status, the URL of the created resource in the `Location` header and the number of received bytes in the `Upload-Offset` header:
+The Server responds with a `204 No Content` status, the URL of the created resource in the `Location`
+header and the number of received bytes in the `Upload-Offset` header:
 
 **Response:**
 
@@ -815,7 +843,9 @@ Location: https://tus.example.org/files/0e460e21624c387f1ae533e02ec3bc40
 Upload-Offset: 5
 ```
 
-The Client can now resume the upload using the `Location` URL and `Upload-Offset` header. If an `Upload-Offset` header is not included, the Client can use another `HEAD` request to the URL returned in `Location` to retrieve it.
+The Client can now resume the upload using the `Location` URL and `Upload-Offset` header. If an
+`Upload-Offset` header is not included, the Client can use another `HEAD` request to the URL
+returned in `Location` to retrieve it.
 
 ## FAQ
 
