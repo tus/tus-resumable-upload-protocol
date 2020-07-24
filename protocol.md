@@ -743,7 +743,7 @@ To initiate an upload with Client Reference, Clients MUST include an `Upload-Cli
 header with the initial `POST` request (as specified in the [Creation](#creation) and
 [Creation With Upload](#creation-with-upload) extensions) made to the Upload URL.
 
-Clients can then send a `HEAD` request with the same `Upload-Client-Reference` header to the
+Clients can then send a [`HEAD`](#head) request with the same `Upload-Client-Reference` header to the
 Upload URL, which - upon success - MUST respond with the `200 OK` or `204 No Content`
 status, and the resource's URL in the response's `Location` header.
 
@@ -752,8 +752,8 @@ that indicates how many bytes have already been received by the server MAY also 
 
 Clients can then use the returned `Location` to resume the upload.
 
-If an `Upload-Client-Reference` is not or no longer known by the Server, it MUST respond to
-`HEAD` requests with the `404 Not Found` or `410 Gone` status.
+If an `Upload-Client-Reference` is unknown or no longer known by the Server, it MUST
+respond to `HEAD` requests with the `404 Not Found` or `410 Gone` status.
 
 If an `Upload-Client-Reference` is already in use for a different, ongoing upload, the Server
 MUST respond to the `POST` request initiating the upload with a `409 Conflict` status.
@@ -778,10 +778,10 @@ formats include:
 
 Vendor-specific formats MUST be prefixed with the vendor's name and formatted as `[vendor-name].[format-name]`.
 
-##### Tus-Client-Reference-Validity
+##### Tus-Client-Reference-TTL
 
 The Server MAY indicate how long the Client can use a  `Upload-Client-Reference` to reference an upload by
-including a `Tus-Client-Reference-Validity` header in response to an `OPTIONS` request, with one of the
+including a `Tus-Client-Reference-TTL` header in response to an `OPTIONS` request, with one of the
 following values:
 - `upload`: the  `Upload-Client-Reference` can be used until the upload completes, [expires](#expiration) or is [terminated](#termination).
 - `resource`: the `Upload-Client-Reference`  can be used even after the upload completed, until the uploaded resource is removed from the Server.
