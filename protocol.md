@@ -775,7 +775,7 @@ the resource. It MUST also be sent with a follow-up `HEAD` request used to retri
 
 ##### Upload-Tag-Secret
 
-The `Upload-Tag-Secret` MUST be a high-entropy cryptographic random [base64 alphabet](https://tools.ietf.org/html/rfc3986#section-2.3) string
+The `Upload-Tag-Secret` MUST be a high-entropy cryptographic random [base64 alphabet](https://tools.ietf.org/html/rfc4648#section-4) string
 with a minimum length of 48 characters and a maximum length of 256 characters.
 
 For unauthenticated uploads, Clients MUST send the `Upload-Tag-Secret` header
