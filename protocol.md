@@ -773,6 +773,47 @@ The `Upload-Tag` header MUST be included with the `POST` request that creates
 the resource. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
 `Location` of the newly created resource.
 
+##### Upload-Tag-Secret
+
+The `Upload-Tag-Secret` MUST be a high-entropy cryptographic random [base64 alphabet](https://tools.ietf.org/html/rfc3986#section-2.3) string
+with a minimum length of 48 characters and a maximum length of 256 characters.
+
+For unauthenticated uploads, Clients MUST send the `Upload-Tag-Secret` header
+alongside the `Upload-Tag` header with the `POST` request that creates the upload
+resource.
+
+Servers MUST return a `400 Bad Request` status for unauthenticated `POST` requests
+that contain an `Upload-Tag` header, but do not also include a valid `Upload-Tag-Secret`
+header.
+
+For authenticated uploads, Servers MUST respond to `PATCH` and `HEAD` requests with
+a `404 Not Found` or `401 Unauthorized` status, if they include an `Upload-Tag` header
+identifying an upload resource that was created by a different user.
+
+Clients MAY include an `Upload-Tag-Secret` header for authenticated uploads, but are
+not REQUIRED to do so.
+
+##### Upload-Tag-Challenge
+
+If an `Upload-Tag-Secret` header was sent with the `POST` request that created
+the upload resource, Clients MUST include an `Upload-Tag-Challenge` header with every
+subsequent `HEAD` and `PATCH` request that also contains an `Upload-Tag`.
+
+The value of `Upload-Tag-Secret` is defined as follows:
+
+```
+Upload-Tag-Challenge = SHA256([Upload-Tag-Secret] + SHA256([Upload-Tag-Secret] + [Upload-Offset] + [Content-Length]))
+```
+
+For `HEAD` requests, `Upload-Tag-Challenge` is computed using `0` in place of `Upload-Offset`
+and `Content-Length`.
+
+For `PATCH` requests, `Upload-Tag-Challenge` is computed using the respective `Upload-Offset`
+and `Content-Length` values also sent in the header of the HTTP request.
+
+Servers receiving a `HEAD` or `PATCH` request with an invalid `Upload-Tag-Challenge` value
+MUST respond with a `404 Not Found` or `401 Unauthorized` status.
+
 #### Example
 
 The Client attempts to create and upload a file that is 100 bytes in length:
@@ -782,6 +823,7 @@ The Client attempts to create and upload a file that is 100 bytes in length:
 ```
 POST /files HTTP/1.1
 Host: tus.example.org
+Authorization: …
 Content-Length: 100
 Upload-Length: 100
 Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF 
@@ -791,23 +833,25 @@ Content-Type: application/offset+octet-stream
 hello[connection breaks down]
 ```
 
-The connection is then interrupted, so that only the first 5 bytes of the upload are received
-by the Server. Meanwhile the Client could not receive the response with the `Location` header.
+The connection is then interrupted, so that only the first 5 bytes of the upload are
+received by the Server. Meanwhile the Client could not receive the response with the
+`Location` header.
 
-To resume the upload, the Client sends a `HEAD` request to the same URL and includes the same
-`Upload-Tag` as in the `POST` request:
+To resume the upload, the Client sends a `HEAD` request to the same URL and includes
+the same `Upload-Tag` as in the `POST` request:
 
 **Request:**
 
 ```
 HEAD /files HTTP/1.1
 Host: tus.example.org
+Authorization: …
 Tus-Resumable: 1.0.0
 Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
 ```
 
-The Server responds with a `204 No Content` status, the URL of the created resource in the `Location`
-header and the number of received bytes in the `Upload-Offset` header:
+The Server responds with a `204 No Content` status, the URL of the created resource in
+the `Location` header and the number of received bytes in the `Upload-Offset` header:
 
 **Response:**
 
@@ -818,9 +862,9 @@ Location: https://tus.example.org/files/0e460e21624c387f1ae533e02ec3bc40
 Upload-Offset: 5
 ```
 
-The Client can now resume the upload using the `Location` URL and `Upload-Offset` header. If an
-`Upload-Offset` header is not included, the Client can use another `HEAD` request to the URL
-returned in `Location` to retrieve it.
+The Client can now resume the upload using the `Location` URL and `Upload-Offset` header.
+If an `Upload-Offset` header is not included, the Client can use another `HEAD` request
+to the URL returned in `Location` to retrieve it.
 
 ## FAQ
 
