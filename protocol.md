@@ -775,23 +775,28 @@ the resource. It MUST also be sent with a follow-up `HEAD` request used to retri
 
 ##### Upload-Tag-Secret
 
-The `Upload-Tag-Secret` MUST be a high-entropy cryptographic random [base64 alphabet](https://tools.ietf.org/html/rfc4648#section-4) string
-with a minimum length of 48 characters and a maximum length of 256 characters.
+The `Upload-Tag-Secret` MUST be a high-entropy cryptographic random string, consisting
+of 48 to 256 characters from the [base64 alphabet](https://tools.ietf.org/html/rfc4648#section-4).
+That's 36 to 192 bytes encoded as base64.
 
 For unauthenticated uploads, Clients MUST send the `Upload-Tag-Secret` header
 alongside the `Upload-Tag` header with the `POST` request that creates the upload
 resource.
 
-Servers MUST return a `400 Bad Request` status for unauthenticated `POST` requests
+Servers MUST return a `403 Forbidden` status for unauthenticated `POST` requests
 that contain an `Upload-Tag` header, but do not also include a valid `Upload-Tag-Secret`
 header.
 
 For authenticated uploads, Servers MUST respond to `PATCH` and `HEAD` requests with
-a `404 Not Found` or `401 Unauthorized` status, if they include an `Upload-Tag` header
-identifying an upload resource that was created by a different user.
+a `404 Not Found` status, if they include an `Upload-Tag` header identifying an upload
+resource that was created by a different user.
 
 Clients MAY include an `Upload-Tag-Secret` header for authenticated uploads, but are
 not REQUIRED to do so.
+
+The `Upload-Tag-Secret` header MUST NOT be included with anything but `POST` requests
+creating a new upload resource. Servers receiving an `Upload-Tag-Secret` header with
+any other request MUST respond with a `400 Bad Request` status.
 
 ##### Upload-Tag-Challenge
 
@@ -802,7 +807,7 @@ subsequent `HEAD` and `PATCH` request that also contains an `Upload-Tag`.
 The value of `Upload-Tag-Secret` is defined as follows:
 
 ```
-Upload-Tag-Challenge = SHA256([Upload-Tag-Secret] + SHA256([Upload-Tag-Secret] + [Upload-Offset] + [Content-Length]))
+Upload-Tag-Challenge = SHA256([Upload-Tag-Secret] + SHA256([Upload-Offset] + [Upload-Tag-Secret] + [Content-Length]))
 ```
 
 For `HEAD` requests, `Upload-Tag-Challenge` is computed using `0` in place of `Upload-Offset`
