@@ -727,6 +727,47 @@ Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
 
+### Challenge
+
+With this extension, Clients can authenticate follow-up requests to a [Creation](#creation) or [Creation With Upload](#creation-with-upload) 
+`POST` request using a high-entropy cryptographic random shared secret - and challenges
+based thereon.
+
+If the Server supports this extension, it MUST add `challenge` to the `Tus-Extension` header.
+
+#### Headers
+
+##### Upload-Secret
+
+The `Upload-Secret` MUST be a high-entropy cryptographic random string, consisting
+of 48 to 256 characters from the [base64 alphabet](https://tools.ietf.org/html/rfc4648#section-4).
+That's 36 to 192 bytes encoded as base64.
+
+The `Upload-Secret` header MUST NOT be included with anything but `POST` requests
+that create a new upload resource. Servers receiving an `Upload-Secret` header with
+any other request MUST respond with a `400 Bad Request` status.
+
+##### Upload-Challenge
+
+If an `Upload-Secret` header was sent with the `POST` request that created
+the upload resource, Clients MUST include an `Upload-Challenge` header with every
+subsequent `HEAD` and `PATCH` request targeting that upload resource.
+
+The value of `Upload-Secret` is defined as follows:
+
+```
+Upload-Challenge = SHA256([Upload-Secret] + SHA256([Upload-Offset] + [Upload-Secret] + [Content-Length]))
+```
+
+For `HEAD` requests, `Upload-Challenge` is computed using `0` in place of `Upload-Offset`
+and `Content-Length`.
+
+For `PATCH` requests, `Upload-Challenge` is computed using the respective `Upload-Offset`
+and `Content-Length` values also sent in the header of the HTTP request.
+
+Servers receiving a `HEAD` or `PATCH` request with a missing or invalid `Upload-Challenge` value
+MUST respond with a `404 Not Found` status.
+
 ### Client Tag
 
 With this extension, Clients can provide a Tag for an upload - with which they
@@ -758,12 +799,36 @@ respond to `HEAD` requests with the `404 Not Found` or `410 Gone` status.
 If an `Upload-Tag` is already in use for a different, ongoing upload, the Server
 MUST respond to the `POST` request initiating the upload with a `409 Conflict` status.
 
+#### Security Considerations
+
+To protect against attackers trying to guess an `Upload-Tag` and subsequently
+use it to inject malicious content into an upload, Servers MUST take measures to
+ensure that only the party that created a resource with an `Upload-Tag` can use it
+for subseqeuent `PATCH` and `HEAD` requests.
+
+If uploading to a Server is only possible for authenticated users, the Server can
+satisfy this requirement by leveraging the available authentication information to
+bind the `Upload-Tag` to a particular user, so that only that user can use it.
+
+##### Unauthenticated Uploads
+
+Servers and Clients that allow unauthenticated uploads with `Upload-Tag` MUST
+also implement the [Challenge](#challenge) extension.
+
+For unauthenticated uploads, Clients MUST send the `Upload-Secret` header
+alongside the `Upload-Tag` header with the `POST` request that creates the upload
+resource.
+
+Servers MUST return a `403 Forbidden` status for unauthenticated `POST` requests
+that contain an `Upload-Tag` header, but do not also include a valid `Upload-Secret`
+header.
+
 #### Headers
 
 ##### Upload-Tag
 
-The `Upload-Tag` request header MUST be an identifier
-created by the Client that's unique within its storage space, to avoid collisions.
+The `Upload-Tag` request header MUST be an identifier created by the
+Client that's unique within its storage space, to avoid collisions.
 
 Clients can satisfy this requirement by generating and using a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4).
 
@@ -773,51 +838,9 @@ The `Upload-Tag` header MUST be included with the `POST` request that creates
 the resource. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
 `Location` of the newly created resource.
 
-##### Upload-Tag-Secret
-
-The `Upload-Tag-Secret` MUST be a high-entropy cryptographic random string, consisting
-of 48 to 256 characters from the [base64 alphabet](https://tools.ietf.org/html/rfc4648#section-4).
-That's 36 to 192 bytes encoded as base64.
-
-For unauthenticated uploads, Clients MUST send the `Upload-Tag-Secret` header
-alongside the `Upload-Tag` header with the `POST` request that creates the upload
-resource.
-
-Servers MUST return a `403 Forbidden` status for unauthenticated `POST` requests
-that contain an `Upload-Tag` header, but do not also include a valid `Upload-Tag-Secret`
-header.
-
-For authenticated uploads, Servers MUST respond to `PATCH` and `HEAD` requests with
-a `404 Not Found` status, if they include an `Upload-Tag` header identifying an upload
-resource that was created by a different user.
-
-Clients MAY include an `Upload-Tag-Secret` header for authenticated uploads, but are
-not REQUIRED to do so.
-
-The `Upload-Tag-Secret` header MUST NOT be included with anything but `POST` requests
-creating a new upload resource. Servers receiving an `Upload-Tag-Secret` header with
-any other request MUST respond with a `400 Bad Request` status.
-
-##### Upload-Tag-Challenge
-
-If an `Upload-Tag-Secret` header was sent with the `POST` request that created
-the upload resource, Clients MUST include an `Upload-Tag-Challenge` header with every
-subsequent `HEAD` and `PATCH` request that also contains an `Upload-Tag`.
-
-The value of `Upload-Tag-Secret` is defined as follows:
-
-```
-Upload-Tag-Challenge = SHA256([Upload-Tag-Secret] + SHA256([Upload-Offset] + [Upload-Tag-Secret] + [Content-Length]))
-```
-
-For `HEAD` requests, `Upload-Tag-Challenge` is computed using `0` in place of `Upload-Offset`
-and `Content-Length`.
-
-For `PATCH` requests, `Upload-Tag-Challenge` is computed using the respective `Upload-Offset`
-and `Content-Length` values also sent in the header of the HTTP request.
-
-Servers receiving a `HEAD` or `PATCH` request with an invalid `Upload-Tag-Challenge` value
-MUST respond with a `404 Not Found` or `401 Unauthorized` status.
+Servers MUST respond to `PATCH` and `HEAD` requests with a `404 Not Found` status,
+if they include an `Upload-Tag` header identifying an upload resource that was created
+by a different user.
 
 #### Example
 
@@ -831,7 +854,7 @@ Host: tus.example.org
 Authorization: …
 Content-Length: 100
 Upload-Length: 100
-Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF 
+Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
 Tus-Resumable: 1.0.0
 Content-Type: application/offset+octet-stream
 
