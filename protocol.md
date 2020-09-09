@@ -45,6 +45,7 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [J. Ryan Stinnett](https://convolv.es),
 [Ifedapo Olarewaju](https://github.com/ifedapoolarewaju)
 [Robert Nagy](https://github.com/ronag)
+[Nils Goroll](https://github.com/nigoroll)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -299,7 +300,7 @@ Host: tus.example.org
 Content-Length: 0
 Upload-Length: 100
 Tus-Resumable: 1.0.0
-Upload-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==,is_confidential
+Upload-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==,filetype YXBwbGljYXRpb24vcGRm,is_confidential
 ```
 
 **Response:**
@@ -333,6 +334,34 @@ the key and the value, MAY be left out.
 Since metadata can contain arbitrary binary values, Servers SHOULD
 carefully validate metadata values or sanitize them before using them
 as header values to avoid header smuggling.
+
+Clients and servers SHOULD implement the metadata key ``filetype``
+with the value containing the actual ``Content-Type`` of the Upload
+(because the ``Content-Type`` header is formally required to be set to
+``application/offset+octet-stream`` for [Creation with
+Upload](#creation-with-upload)).
+
+Clients and servers MAY support additional well known metadata keys:
+
+* ``filename`` for a common file name
+
+The specific metadata keys documented herein are reserved for the
+respective use and MUST NOT be used for other purposes.
+
+##### [Content-Encoding](https://httpwg.org/specs/rfc7231.html#header.content-encoding)
+
+Clients MUST set the ``Content-Encoding`` header correctly IFF a
+content encoding is used.
+
+As per RFC7231, Servers MUST respond with status 415 if they can not
+accept the ``Content-Encoding`` chosen by the client.
+
+Servers MUST either store the ``Content-Encoding`` and deliver it with
+subsequent requests, or properly decode the content before storing it.
+
+##### [Content-Language](https://httpwg.org/specs/rfc7231.html#header.content-language)
+
+Clients and Servers SHOULD support the ``Content-Language`` header.
 
 #### Requests
 
