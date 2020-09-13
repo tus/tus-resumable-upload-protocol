@@ -727,47 +727,6 @@ Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
 
-### Challenge
-
-With this extension, Clients can authenticate follow-up requests to a [Creation](#creation) or [Creation With Upload](#creation-with-upload) 
-`POST` request using a high-entropy cryptographic random shared secret - and challenges
-based thereon.
-
-If the Server supports this extension, it MUST add `challenge` to the `Tus-Extension` header.
-
-#### Headers
-
-##### Upload-Secret
-
-The `Upload-Secret` MUST be a high-entropy cryptographic random string, consisting
-of 48 to 256 characters from the [base64 alphabet](https://tools.ietf.org/html/rfc4648#section-4).
-That's 36 to 192 bytes encoded as base64.
-
-The `Upload-Secret` header MUST NOT be included with anything but `POST` requests
-that create a new upload resource. Servers receiving an `Upload-Secret` header with
-any other request MUST respond with a `400 Bad Request` status.
-
-##### Upload-Challenge
-
-If an `Upload-Secret` header was sent with the `POST` request that created
-the upload resource, Clients MUST include an `Upload-Challenge` header with every
-subsequent `HEAD` and `PATCH` request targeting that upload resource.
-
-The value of `Upload-Secret` is defined as follows:
-
-```
-Upload-Challenge = SHA256([Upload-Secret] + SHA256([Upload-Offset] + [Upload-Secret] + [Content-Length]))
-```
-
-For `HEAD` requests, `Upload-Challenge` is computed using `0` in place of `Upload-Offset`
-and `Content-Length`.
-
-For `PATCH` requests, `Upload-Challenge` is computed using the respective `Upload-Offset`
-and `Content-Length` values also sent in the header of the HTTP request.
-
-Servers receiving a `HEAD` or `PATCH` request with a missing or invalid `Upload-Challenge` value
-MUST respond with a `404 Not Found` status.
-
 ### Client Tag
 
 With this extension, Clients can provide a Tag for an upload - with which they
@@ -810,18 +769,8 @@ If uploading to a Server is only possible for authenticated users, the Server ca
 satisfy this requirement by leveraging the available authentication information to
 bind the `Upload-Tag` to a particular user, so that only that user can use it.
 
-##### Unauthenticated Uploads
-
-Servers and Clients that allow unauthenticated uploads with `Upload-Tag` MUST
-also implement the [Challenge](#challenge) extension.
-
-For unauthenticated uploads, Clients MUST send the `Upload-Secret` header
-alongside the `Upload-Tag` header with the `POST` request that creates the upload
-resource.
-
-Servers MUST return a `403 Forbidden` status for unauthenticated `POST` requests
-that contain an `Upload-Tag` header, but do not also include a valid `Upload-Secret`
-header.
+Servers MUST return a `403 Forbidden` status for unauthenticated requests that
+contain an `Upload-Tag` header.
 
 #### Headers
 
@@ -850,13 +799,12 @@ The Client attempts to create and upload a file that is 100 bytes in length:
 
 ```
 POST /files HTTP/1.1
-Host: tus.example.org
 Authorization: …
-Content-Length: 100
-Upload-Length: 100
 Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
-Tus-Resumable: 1.0.0
+Upload-Length: 100
+Content-Length: 100
 Content-Type: application/offset+octet-stream
+Tus-Resumable: 1.0.0
 
 hello[connection breaks down]
 ```
@@ -872,10 +820,9 @@ the same `Upload-Tag` as in the `POST` request:
 
 ```
 HEAD /files HTTP/1.1
-Host: tus.example.org
 Authorization: …
-Tus-Resumable: 1.0.0
 Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
+Tus-Resumable: 1.0.0
 ```
 
 The Server responds with a `204 No Content` status, the URL of the created resource in
@@ -885,9 +832,9 @@ the `Location` header and the number of received bytes in the `Upload-Offset` he
 
 ```
 HTTP/1.1 204 No Content
-Tus-Resumable: 1.0.0
 Location: https://tus.example.org/files/0e460e21624c387f1ae533e02ec3bc40
 Upload-Offset: 5
+Tus-Resumable: 1.0.0
 ```
 
 The Client can now resume the upload using the `Location` URL and `Upload-Offset` header.
