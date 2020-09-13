@@ -751,148 +751,116 @@ any other request MUST respond with a `400 Bad Request` status.
 
 If an `Upload-Secret` header was sent with the `POST` request that created
 the upload resource, Clients MUST include an `Upload-Challenge` header with every
-subsequent `HEAD` and `PATCH` request targeting that upload resource.
+subsequent request targeting that upload resource.
 
-The value of `Upload-Secret` is defined as follows:
+The value of `Upload-Challenge` is defined as follows:
 
 ```
-Upload-Challenge = SHA256([Upload-Secret] + SHA256([Upload-Offset] + [Upload-Secret] + [Content-Length]))
+Upload-Challenge = SHA256([Upload-Secret] + SHA256(`[HTTP Method]` + [Upload-Offset] + [Upload-Secret] + [Content-Length]))
 ```
 
-For `HEAD` requests, `Upload-Challenge` is computed using `0` in place of `Upload-Offset`
-and `Content-Length`.
+The *effective* HTTP method of the request that the `Upload-Challenge` is sent with MUST be
+used in place of `HTTP Method`. If `X-HTTP-Method-Override` is used in the same request,
+`HTTP method` needs to be replaced with the value of `X-HTTP-Method-Override`.
 
-For `PATCH` requests, `Upload-Challenge` is computed using the respective `Upload-Offset`
-and `Content-Length` values also sent in the header of the HTTP request.
+Where `Upload-Offset` and `Content-Length` headers are used in the same request, their
+values MUST be used as the respective `Upload-Offset` and `Content-Length` values. A
+value of `0` MUST be used for `Upload-Offset` and `Content-Length` where no headers
+of the same name are sent with the request.
 
 Servers receiving a `HEAD` or `PATCH` request with a missing or invalid `Upload-Challenge` value
 MUST respond with a `404 Not Found` status.
 
-### Client Tag
+For requests that reference multiple upload resources, the `Upload-Challenge` is computed by
+concatenating the `Upload-Challenge`s of the individual upload resources for the request in the
+order they are referenced. The SHA256 checksum computed over the concatenated `Upload-Challenge`s
+is then used as the `Upload-Challenge` for the request:
 
-With this extension, Clients can provide a Tag for an upload - with which they
-can later retrieve the URL for the created resource.
+```
+Upload-Challenge = SHA256([Upload-Challenge for resource 1] + … + [Upload-Challenge for resource n])
+```
 
-This allows Clients to resume an upload initiated through the [Creation With Upload](#creation-with-upload)
-or [Creation](#creation) extensions for which they did not receive the response with
-the newly created resource's URL (for example due to a broken connection).
+#### Examples
 
-If the Server supports this extension, it MUST add `client-tag` to the `Tus-Extension`
-header.
-
-To initiate an upload with Client Tag, Clients MUST include an `Upload-Tag`
-header with the initial `POST` request (as specified in the [Creation](#creation) and
-[Creation With Upload](#creation-with-upload) extensions) made to the Upload URL.
-
-Clients can then send a `HEAD` request with the same `Upload-Tag` header to the
-Upload URL, which - upon success - MUST respond with the `200 OK` or `204 No Content`
-status, and the resource's URL in the response's `Location` header.
-
-A successful response MUST also contain the `Tus-Version` header. An `Upload-Offset` header
-that indicates how many bytes have already been received by the server MAY also be returned.
-
-Clients can then use the returned `Location` to resume the upload.
-
-If an `Upload-Tag` is unknown or no longer known by the Server, it MUST
-respond to `HEAD` requests with the `404 Not Found` or `410 Gone` status.
-
-If an `Upload-Tag` is already in use for a different, ongoing upload, the Server
-MUST respond to the `POST` request initiating the upload with a `409 Conflict` status.
-
-#### Security Considerations
-
-To protect against attackers trying to guess an `Upload-Tag` and subsequently
-use it to inject malicious content into an upload, Servers MUST take measures to
-ensure that only the party that created a resource with an `Upload-Tag` can use it
-for subseqeuent `PATCH` and `HEAD` requests.
-
-If uploading to a Server is only possible for authenticated users, the Server can
-satisfy this requirement by leveraging the available authentication information to
-bind the `Upload-Tag` to a particular user, so that only that user can use it.
-
-##### Unauthenticated Uploads
-
-Servers and Clients that allow unauthenticated uploads with `Upload-Tag` MUST
-also implement the [Challenge](#challenge) extension.
-
-For unauthenticated uploads, Clients MUST send the `Upload-Secret` header
-alongside the `Upload-Tag` header with the `POST` request that creates the upload
-resource.
-
-Servers MUST return a `403 Forbidden` status for unauthenticated `POST` requests
-that contain an `Upload-Tag` header, but do not also include a valid `Upload-Secret`
-header.
-
-#### Headers
-
-##### Upload-Tag
-
-The `Upload-Tag` request header MUST be an identifier created by the
-Client that's unique within its storage space, to avoid collisions.
-
-Clients can satisfy this requirement by generating and using a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4).
-
-A `Upload-Tag` MUST consist of ASCII characters and MUST NOT exceed 200 bytes.
-
-The `Upload-Tag` header MUST be included with the `POST` request that creates
-the resource. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
-`Location` of the newly created resource.
-
-Servers MUST respond to `PATCH` and `HEAD` requests with a `404 Not Found` status,
-if they include an `Upload-Tag` header identifying an upload resource that was created
-by a different user.
-
-#### Example
-
-The Client attempts to create and upload a file that is 100 bytes in length:
-
-**Request:**
+An upload resource is created with [Creation With Upload](#creation-with-upload) and an `Upload-Secret`:
 
 ```
 POST /files HTTP/1.1
-Host: tus.example.org
-Authorization: …
-Content-Length: 100
 Upload-Length: 100
-Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
-Tus-Resumable: 1.0.0
+Upload-Secret: R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg
+Content-Length: 5
 Content-Type: application/offset+octet-stream
-
-hello[connection breaks down]
-```
-
-The connection is then interrupted, so that only the first 5 bytes of the upload are
-received by the Server. Meanwhile the Client could not receive the response with the
-`Location` header.
-
-To resume the upload, the Client sends a `HEAD` request to the same URL and includes
-the same `Upload-Tag` as in the `POST` request:
-
-**Request:**
-
-```
-HEAD /files HTTP/1.1
-Host: tus.example.org
-Authorization: …
 Tus-Resumable: 1.0.0
-Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
+
+hello
 ```
 
-The Server responds with a `204 No Content` status, the URL of the created resource in
-the `Location` header and the number of received bytes in the `Upload-Offset` header:
-
-**Response:**
+The upload is continued with a `PATCH` request, including an `Upload-Challenge` computed as
 
 ```
-HTTP/1.1 204 No Content
-Tus-Resumable: 1.0.0
-Location: https://tus.example.org/files/0e460e21624c387f1ae533e02ec3bc40
+Upload-Challenge = SHA256("R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + SHA256("PATCH" + "5" + "R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + "50"))
+```
+
+and included in the request:
+
+```
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Upload-Offset: 5
+Upload-Challenge: ed9e63743b8073e97a1bd54d0f92161fa32c27bff130f11ff896e6e0271f2688
+Content-Length: 50
+Content-Type: application/offset+octet-stream
+Tus-Resumable: 1.0.0
+
+[50 bytes of content]
 ```
 
-The Client can now resume the upload using the `Location` URL and `Upload-Offset` header.
-If an `Upload-Offset` header is not included, the Client can use another `HEAD` request
-to the URL returned in `Location` to retrieve it.
+Then, a `DELETE` request for the upload is sent, including an `Upload-Challenge` computed as
+
+```
+Upload-Challenge = SHA256("R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + SHA256("DELETE" + "0" + "R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + "0"))
+```
+
+and included in the request:
+
+```
+DELETE /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Content-Length: 0
+Upload-Challenge: 59ca949f7eed4c4a1f7e40da7c119fb7cb1095262a12eab770685711ea5a176a
+Tus-Resumable: 1.0.0
+
+[50 bytes of content]
+```
+
+Two uploads - each with its own `Upload-Secret` - are concatenated, including an `Upload-Challenge`. For `/files/a`, the `Upload-Challenge` is computed as:
+
+```
+Upload-Challenge-1 = SHA256("VGhpcyBpc24ndCBoaWdoLWVudHJvcHkgZWl0aGVyLiBEb24ndCB0cnkgdGhpcyBhdCBob21lLCBraWRzIQ" + SHA256("POST" + "0" + "VGhpcyBpc24ndCBoaWdoLWVudHJvcHkgZWl0aGVyLiBEb24ndCB0cnkgdGhpcyBhdCBob21lLCBraWRzIQ" + "0"))
+Upload-Challenge-1 = 1824949792ae9040811f1888f992608de8da7c17f6f6f5bc966dc5c95a1acba3
+```
+
+For `/files/b`, the `Upload-Challenge` is computed as:
+
+```
+Upload-Challenge-2 = SHA256("M3JkIHRpbWUncyBhIGNoYXJtISBPciBzbyB0aGV5IHNheS4gRG8gdGhpcyBwcm9wZXJseSBpbiBjb2RlLg" + SHA256("POST" + "0" + "M3JkIHRpbWUncyBhIGNoYXJtISBPciBzbyB0aGV5IHNheS4gRG8gdGhpcyBwcm9wZXJseSBpbiBjb2RlLg" + "0"))
+Upload-Challenge-2 = a6d9d1d453d60a743c13dda02768e131175818e71b52c8a0621f4c34515c78fe
+```
+
+Finally, the challenges of the two files are concatenated in the order they are referenced in the request, and then hashed:
+
+```
+Upload-Challenge = SHA256("1824949792ae9040811f1888f992608de8da7c17f6f6f5bc966dc5c95a1acba3" + "a6d9d1d453d60a743c13dda02768e131175818e71b52c8a0621f4c34515c78fe")
+Upload-Challenge = c42da6af39150e107bdaa5209f9c0645f1a4ee2f756285fd15f240481d971d0b
+```
+
+The resulting `Upload-Challenge` is then sent with the request:
+
+```
+POST /files HTTP/1.1
+Upload-Concat: final;/files/a /files/b
+Upload-Challenge: c42da6af39150e107bdaa5209f9c0645f1a4ee2f756285fd15f240481d971d0b
+Content-Length: 0
+Tus-Resumable: 1.0.0
+```
 
 ## FAQ
 
