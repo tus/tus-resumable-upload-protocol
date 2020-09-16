@@ -330,6 +330,10 @@ ASCII encoded and the value MUST be Base64 encoded. All keys MUST be unique.
 The value MAY be empty. In these cases, the space, which would normally separate
 the key and the value, MAY be left out.
 
+Since metadata can contain arbitrary binary values, Servers SHOULD
+carefully validate metadata values or sanitize them before using them
+as header values to avoid header smuggling.
+
 #### Requests
 
 ##### POST
