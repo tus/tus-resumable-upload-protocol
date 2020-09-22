@@ -768,8 +768,9 @@ values MUST be used as the respective `Upload-Offset` and `Content-Length` value
 value of `0` MUST be used for `Upload-Offset` and `Content-Length` where no headers
 of the same name are sent with the request.
 
-Servers receiving a `HEAD` or `PATCH` request with a missing or invalid `Upload-Challenge` value
-MUST respond with a `404 Not Found` status.
+Servers MUST respond with a `404 Not Found` status to requests with a missing or invalid
+`Upload-Challenge` value if they relate to an upload resource for which an `Upload-Secret`
+was provided upon creation - including, but not limited to, `HEAD` and `PATCH` requests.
 
 For requests that reference multiple upload resources, the `Upload-Challenge` is computed by
 concatenating the `Upload-Challenge`s of the individual upload resources for the request in the
@@ -827,8 +828,6 @@ DELETE /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
 Content-Length: 0
 Upload-Challenge: 59ca949f7eed4c4a1f7e40da7c119fb7cb1095262a12eab770685711ea5a176a
 Tus-Resumable: 1.0.0
-
-[50 bytes of content]
 ```
 
 Two uploads - each with its own `Upload-Secret` - are concatenated, including an `Upload-Challenge`. For `/files/a`, the `Upload-Challenge` is computed as:
