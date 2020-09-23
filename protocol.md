@@ -727,28 +727,26 @@ Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
 
-### Client Tag
+### Upload Tag
 
 With this extension, Clients can provide a Tag for an upload - with which they
 can later retrieve the URL for the created resource.
 
-This allows Clients to resume an upload initiated through the [Creation With Upload](#creation-with-upload)
-or [Creation](#creation) extensions for which they did not receive the response with
-the newly created resource's URL (for example due to a broken connection).
+This allows Clients to resume an upload they initiated, but for which they did
+not receive the response with the newly created resource's URL (for example
+due to a broken connection).
 
-If the Server supports this extension, it MUST add `client-tag` to the `Tus-Extension`
+If the Server supports this extension, it MUST add `upload-tag` to the `Tus-Extension`
 header.
 
-To initiate an upload with Client Tag, Clients MUST include an `Upload-Tag`
+To initiate an upload with Upload Tag, Clients MUST include an `Upload-Tag`
 header with the initial `POST` request (as specified in the [Creation](#creation) and
 [Creation With Upload](#creation-with-upload) extensions) made to the Upload URL.
 
 Clients can then send a `HEAD` request with the same `Upload-Tag` header to the
-Upload URL, which - upon success - MUST respond with the `200 OK` or `204 No Content`
-status, and the resource's URL in the response's `Location` header.
-
-A successful response MUST also contain the `Tus-Version` header. An `Upload-Offset` header
-that indicates how many bytes have already been received by the server MAY also be returned.
+Upload Creation URL, which - upon success - MUST respond with the `200 OK` or `204 No Content`
+status, the resource's URL in the response's `Location` header and all other headers
+that a [`HEAD`](#head) request to the upload's Upload URL would also return.
 
 Clients can then use the returned `Location` to resume the upload.
 
@@ -758,26 +756,12 @@ respond to `HEAD` requests with the `404 Not Found` or `410 Gone` status.
 If an `Upload-Tag` is already in use for a different, ongoing upload, the Server
 MUST respond to the `POST` request initiating the upload with a `409 Conflict` status.
 
-#### Security Considerations
-
-To protect against attackers trying to guess an `Upload-Tag` and subsequently
-use it to inject malicious content into an upload, Servers MUST take measures to
-ensure that only the party that created a resource with an `Upload-Tag` can use it
-for subseqeuent `PATCH` and `HEAD` requests.
-
-If uploading to a Server is only possible for authenticated users, the Server can
-satisfy this requirement by leveraging the available authentication information to
-bind the `Upload-Tag` to a particular user, so that only that user can use it.
-
-Servers MUST return a `403 Forbidden` status for unauthenticated requests that
-contain an `Upload-Tag` header.
-
 #### Headers
 
 ##### Upload-Tag
 
-The `Upload-Tag` request header MUST be an identifier created by the
-Client that's unique within its storage space, to avoid collisions.
+The `Upload-Tag` request header MUST be an identifier created by the Client. The
+identifier SHOULD be unique to avoid collisions with identifiers created by other Clients.
 
 Clients can satisfy this requirement by generating and using a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4).
 
@@ -787,9 +771,18 @@ The `Upload-Tag` header MUST be included with the `POST` request that creates
 the resource. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
 `Location` of the newly created resource.
 
-Servers MUST respond to `PATCH` and `HEAD` requests with a `404 Not Found` status,
-if they include an `Upload-Tag` header identifying an upload resource that was created
-by a different user.
+To protect against attackers trying to guess an `Upload-Tag` and subsequently
+use it to inject malicious content into an upload, Servers MUST take measures to
+ensure that only the party that created a resource with an `Upload-Tag` can use it
+for subseqeuent `HEAD` requests.
+
+One way servers can satisfy this requirement is to leverage available authentication
+information to bind the `Upload-Tag` to a particular user, so that only that user can
+use it.
+
+Servers MUST respond with a `404 Not Found` status to `HEAD` requests that include an
+`Upload-Tag` header if the request can't be attributed to the original creator of the
+referenced upload resource.
 
 #### Example
 
