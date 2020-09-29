@@ -753,6 +753,12 @@ Clients MAY then use the returned upload URL in the `Location` header to resume 
 If the upload tag in a `HEAD` request is unknown or no longer known by the Server, it MUST
 respond with the `404 Not Found` or `410 Gone` status.
 
+If the `Upload-Tag` header in a `HEAD` request to the upload creation URL is missing, the
+Server MUST respond with the `400 Bad Request` status.
+
+If the `Upload-Tag`  header is invalid in a `POST` or `HEAD` request, the Server MUST
+respond with the `400 Bad Request` status.
+
 If the upload tag in a `POST` request is already in use for a different, ongoing upload, the Server
 MUST respond with a `409 Conflict` status.
 
