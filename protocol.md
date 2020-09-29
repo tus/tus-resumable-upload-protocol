@@ -335,18 +335,11 @@ Since metadata can contain arbitrary binary values, Servers SHOULD
 carefully validate metadata values or sanitize them before using them
 as header values to avoid header smuggling.
 
-Clients and servers SHOULD implement the metadata key ``filetype``
-with the value containing the actual ``Content-Type`` of the Upload
-(because the ``Content-Type`` header is formally required to be set to
-``application/offset+octet-stream`` for [Creation with
-Upload](#creation-with-upload)).
-
-Clients and servers MAY support additional well known metadata keys:
-
-* ``filename`` for a common file name
-
-The specific metadata keys documented herein are reserved for the
-respective use and MUST NOT be used for other purposes.
+Servers and Clients SHOULD use the metadata key `filename` to communicate the file name
+of the uploaded data, if such a name is available. The metadata key `filetype` SHOULD
+be used communicate the [media type](https://www.iana.org/assignments/media-types/media-types.xhtml)
+of the uploaded data. These metadata keys SHOULD not be used for any other purposes as
+described here.
 
 ##### [Content-Encoding](https://httpwg.org/specs/rfc7231.html#header.content-encoding)
 
