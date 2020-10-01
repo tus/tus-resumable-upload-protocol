@@ -1,0 +1,221 @@
+
+---
+swagger: "2.0"
+basePath: "/tus/1.0.0"
+info:
+  title: Swagger definition of the tus core protocol and official extensions.
+  description: Swagger definition of the tus core protocol and official extensions. The paths are not normative, but showcase the example definition at https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md
+  version: "1.0.0"
+  contact:
+    email: garcia@lrz.de
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+paths:
+  /files:
+    post:
+      summary: An empty POST request is used to create a new upload resource. The Upload-Length header indicates the size of the entire upload in bytes.
+      description: Endpoint for the Creation extension
+      parameters:
+        - in: header
+          name: Content-Length
+          type: integer
+          description: Must be 0 for creation extension. May be a positive number for creation-with-upload extension.
+        - in: header
+          name: Upload-Length
+          type: integer
+          description: "The Upload-Length request and response header indicates the size of the entire upload in bytes. The value MUST be a non-negative integer. In the concatenation extension, the Client MUST NOT include the Upload-Length header in the final upload creation"
+          required: false
+        - in: header
+          name: Tus-Resumable
+          type: string
+          enum: 
+            - "1.0.0"
+          required: true
+          description: Protocol version    
+        - in: header
+          name: Upload-Metadata
+          type: string
+          description: "Added by the Creation extension. The Upload-Metadata request and response header MUST consist of one or more comma-separated key-value pairs. The key and value MUST be separated by a space. The key MUST NOT contain spaces and commas and MUST NOT be empty. The key SHOULD be ASCII encoded and the value MUST be Base64 encoded. All keys MUST be unique. The value MAY be empty. In these cases, the space, which would normally separate the key and the value, MAY be left out. Since metadata can contain arbitrary binary values, Servers SHOULD carefully validate metadata values or sanitize them before using them as header values to avoid header smuggling."
+          required: false
+        - in: header
+          name: Upload-Concat
+          type: string
+          description: "Added by the Concatenation extension. The Upload-Concat request and response header MUST be set in both partial and final upload creation requests. It indicates whether the upload is either a partial or final upload. If the upload is a partial one, the header value MUST be partial. In the case of a final upload, its value MUST be final followed by a semicolon and a space-separated list of partial upload URLs that will be concatenated. The partial uploads URLs MAY be absolute or relative and MUST NOT contain spaces as defined in RFC 3986."
+          required: false
+        - in: header
+          name: Upload-Defer-Length
+          type: integer
+          enum:
+            - 1
+          description: "Added by the creation-defer-length extension. The Upload-Defer-Length request and response header indicates that the size of the upload is not known currently and will be transferred later. Its value MUST be 1. If the length of an upload is not deferred, this header MUST be omitted."
+          required: false
+          
+      responses:
+        201:
+          description: Created
+          headers:
+            Location:
+              type: string
+              description: Url of the created resource.
+        413:
+          description: If the length of the upload exceeds the maximum, which MAY be specified using the Tus-Max-Size header, the Server MUST respond with the 413 Request Entity Too Large status.
+          
+    options:
+      summary:  Request to gather information about the Server's current configuration
+      description: An OPTIONS request MAY be used to gather information about the Server's current configuration. A successful response indicated by the 204 No Content or 200 OK status MUST contain the Tus-Version header. It MAY include the Tus-Extension and Tus-Max-Size headers.
+      responses:
+        200:
+          description: Success
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version
+            Tus-Max-Size:
+              type: integer
+              description: The Tus-Max-Size response header MUST be a non-negative integer indicating the maximum allowed size of an entire upload in bytes. The Server SHOULD set this header if there is a known hard limit.
+            Tus-Extension:
+              type: string
+              description: The Tus-Extension response header MUST be a comma-separated list of the extensions supported by the Server. If no extensions are supported, the Tus-Extension header MUST be omitted.
+            Tus-Checksum-Algorithm:
+              type: string
+              description: Added by the checksum extension. The Tus-Checksum-Algorithm response header MUST be a comma-separated list of the checksum algorithms supported by the server.
+        204:
+          description: Success
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+            Tus-Max-Size:
+              type: integer  
+              description: The Tus-Max-Size response header MUST be a non-negative integer indicating the maximum allowed size of an entire upload in bytes. The Server SHOULD set this header if there is a known hard limit.
+            Tus-Extension:
+              type: string
+              description: The Tus-Extension response header MUST be a comma-separated list of the extensions supported by the Server. If no extensions are supported, the Tus-Extension header MUST be omitted.    
+  /files/{id}:
+    parameters: 
+        - in: path
+          name: id
+          type: string
+          required: true
+    delete:
+      summary: Added by the Termination extension. 
+      operationId: FilesDelete
+      description: When receiving a DELETE request for an existing upload the Server SHOULD free associated resources and MUST respond with the 204 No Content status confirming that the upload was terminated. For all future requests to this URL, the Server SHOULD respond with the 404 Not Found or 410 Gone status.
+      responses:
+        204:
+          description: Upload was terminated
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
+    head:
+      summary: Used to determine the offset at which the upload should be continued.
+      operationId: FilesHead
+      description: Used to determine the offset at which the upload should be continued.
+      parameters:
+        - in: header
+          name: Tus-Resumable
+          type: string
+          enum: 
+            - "1.0.0"
+          required: true
+          description: Protocol version
+      responses:
+        '200':
+          description: Returns offset
+          headers:
+            Upload-Offset: 
+              type: integer
+              description: The Upload-Offset request and response header indicates a byte offset within a resource. The value MUST be a non-negative integer. Offset at which the upload should be continued.
+            Upload-Length:
+               type: integer
+               description: If the size of the upload is known, the Server MUST include the Upload-Length header in the response.
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version   
+            Cache-Control: 
+              type: string
+              enum:
+                - "no-store"
+        '404':
+          description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.
+        '410':
+           description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.
+        '403':
+           description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.          
+
+    patch:
+      summary: Used to resume the upload
+      operationId: FilePatch
+      description: "The Server SHOULD accept PATCH requests against any upload URL and apply the bytes contained in the message at the given offset specified by the Upload-Offset header. All PATCH requests MUST use Content-Type: application/offset+octet-stream, otherwise the server SHOULD return a 415 Unsupported Media Type status."
+      consumes:
+        - application/offset+octet-stream
+      parameters:
+        - in: header
+          name: Content-Length
+          type: integer
+          required: true
+        - in: header
+          name: Upload-offset
+          type: integer
+          required: true
+        - in: header
+          name: Tus-Resumable
+          type: string
+          enum: 
+            - "1.0.0"
+          required: true
+          description: Protocol version   
+        - in: header
+          name: Upload-Checksum
+          type: string
+          description: Added by the checksum extension. The Upload-Checksum request header contains information about the checksum of the current body payload. The header MUST consist of the name of the used checksum algorithm and the Base64 encoded checksum separated by a space.
+      responses:
+        '204':
+          description: Upload offset was updated
+          headers:
+            Upload-Offset: 
+              type: integer
+              description: The Upload-Offset request and response header indicates a byte offset within a resource. The value MUST be a non-negative integer. 
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version
+            Upload-Expires:
+              type: string
+              description: "Added by the expiration extension. The Upload-Expires response header indicates the time after which the unfinished upload expires. A Server MAY wish to remove incomplete uploads after a given period of time to prevent abandoned uploads from taking up extra storage. The Client SHOULD use this header to determine if an upload is still valid before attempting to resume the upload. This header MUST be included in every PATCH response if the upload is going to expire. If the expiration is known at the creation, the Upload-Expires header MUST be included in the response to the initial POST request. Its value MAY change over time. If a Client does attempt to resume an upload which has since been removed by the Server, the Server SHOULD respond with the 404 Not Found or 410 Gone status. The latter one SHOULD be used if the Server is keeping track of expired uploads. In both cases the Client SHOULD start a new upload. The value of the Upload-Expires header MUST be in RFC 7231 datetime format."
+        '415':
+          description: Content-Type was not application/offset+octet-stream
+        '404':
+          description: PATCH request against a non-existent resource
+        '410':
+          description: PATCH request against a non-existent resource
+        '403':
+          description: "In the concatenation extension, the Server MUST respond with the 403 Forbidden status to PATCH requests against a final upload URL and MUST NOT modify the final or its partial uploads."
+        '400':
+          description: "Added by the checksum extension. The checksum algorithm is not supported by the server"
+        '460':
+          description: "Added by the checksum extension. Checksums mismatch"
+        
+
+    
+
+    
+
+

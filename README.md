@@ -10,3 +10,8 @@ Licensed under the MIT license, see
 [LICENSE.txt](https://github.com/tus/tus-resumable-upload-protocol/blob/master/LICENSE.txt).
 
 Copyright (c) 2013-2016 Transloadit Ltd and Contributors.
+
+## OpenAPI specification
+
+The directory OpenAPI contains the v2 and v3 OpenAPI definitions of the tus protocol. Since implementators
+are free to use different endpoints, the endpoints documented there are to be considered examples.
