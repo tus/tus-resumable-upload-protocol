@@ -176,6 +176,14 @@ paths:
         required: true
         schema:
           type: string
+      - name: Tus-Resumable
+        in: header
+        description: Protocol version
+        required: true
+        schema:
+          type: string
+          enum:
+          - 1.0.0
       responses:
         204:
           description: Upload was terminated
