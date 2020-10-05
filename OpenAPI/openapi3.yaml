@@ -89,6 +89,12 @@ paths:
             be specified using the Tus-Max-Size header, the Server MUST respond with
             the 413 Request Entity Too Large status.
           content: {}
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.      
     options:
       summary: Request to gather information about the Server's current configuration
       description: An OPTIONS request MAY be used to gather information about the
@@ -195,6 +201,13 @@ paths:
                 enum:
                 - 1.0.0
           content: {}
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.      
+
     head:
       summary: Used to determine the offset at which the upload should be continued.
       description: Used to determine the offset at which the upload should be continued.
@@ -255,6 +268,13 @@ paths:
             the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset
             header.
           content: {}
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.      
+
     patch:
       summary: Used to resume the upload
       description: 'The Server SHOULD accept PATCH requests against any upload URL
@@ -350,3 +370,9 @@ paths:
         460:
           description: Added by the checksum extension. Checksums mismatch
           content: {}
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.      

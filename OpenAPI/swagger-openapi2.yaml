@@ -61,7 +61,12 @@ paths:
               description: Url of the created resource.
         413:
           description: If the length of the upload exceeds the maximum, which MAY be specified using the Tus-Max-Size header, the Server MUST respond with the 413 Request Entity Too Large status.
-          
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.      
     options:
       summary:  Request to gather information about the Server's current configuration
       description: An OPTIONS request MAY be used to gather information about the Server's current configuration. A successful response indicated by the 204 No Content or 200 OK status MUST contain the Tus-Version header. It MAY include the Tus-Extension and Tus-Max-Size headers.
@@ -108,6 +113,13 @@ paths:
           name: id
           type: string
           required: true
+        - in: header
+          name: Tus-Resumable
+          type: string
+          enum: 
+            - "1.0.0"
+          required: true
+          description: Protocol version   
     delete:
       summary: Added by the Termination extension. 
       operationId: FilesDelete
@@ -128,6 +140,12 @@ paths:
               enum: 
                 - "1.0.0"
               description: Protocol version 
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
     head:
       summary: Used to determine the offset at which the upload should be continued.
       operationId: FilesHead
@@ -165,7 +183,13 @@ paths:
            description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.
         '403':
            description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.          
-
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
+                                                                                                            type: string                                                                                                            description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
     patch:
       summary: Used to resume the upload
       operationId: FilePatch
@@ -219,10 +243,10 @@ paths:
           description: "Added by the checksum extension. The checksum algorithm is not supported by the server"
         '460':
           description: "Added by the checksum extension. Checksums mismatch"
-        
-
-    
-
-    
-
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Version:
+              type: string
+              description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
 
