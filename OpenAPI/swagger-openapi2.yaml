@@ -120,6 +120,9 @@ paths:
             Tus-Extension:
               type: string
               description: The Tus-Extension response header MUST be a comma-separated list of the extensions supported by the Server. If no extensions are supported, the Tus-Extension header MUST be omitted.    
+            Tus-Checksum-Algorithm:
+              type: string
+              description: Added by the checksum extension. The Tus-Checksum-Algorithm response header MUST be a comma-separated list of the checksum algorithms supported by the server.
   /files/{id}:
     parameters: 
         - in: path
@@ -137,13 +140,6 @@ paths:
       summary: Added by the Termination extension. 
       operationId: FilesDelete
       description: When receiving a DELETE request for an existing upload the Server SHOULD free associated resources and MUST respond with the 204 No Content status confirming that the upload was terminated. For all future requests to this URL, the Server SHOULD respond with the 404 Not Found or 410 Gone status.
-      parameters:
-        - in: header
-          name: Tus-Resumable                                                                                                     type: string
-          enum:
-            - "1.0.0"
-          required: true
-          description: Protocol version
       responses:
         204:
           description: Upload was terminated
@@ -168,14 +164,6 @@ paths:
       summary: Used to determine the offset at which the upload should be continued.
       operationId: FilesHead
       description: Used to determine the offset at which the upload should be continued.
-      parameters:
-        - in: header
-          name: Tus-Resumable
-          type: string
-          enum: 
-            - "1.0.0"
-          required: true
-          description: Protocol version
       responses:
         '200':
           description: Returns offset
@@ -245,13 +233,6 @@ paths:
           name: Upload-offset
           type: integer
           required: true
-        - in: header
-          name: Tus-Resumable
-          type: string
-          enum: 
-            - "1.0.0"
-          required: true
-          description: Protocol version   
         - in: header
           name: Upload-Checksum
           type: string
