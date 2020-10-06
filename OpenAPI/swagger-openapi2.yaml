@@ -59,11 +59,24 @@ paths:
             Location:
               type: string
               description: Url of the created resource.
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
         413:
           description: If the length of the upload exceeds the maximum, which MAY be specified using the Tus-Max-Size header, the Server MUST respond with the 413 Request Entity Too Large status.
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
         412:
           description: Precondition Failed
           headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
             Tus-Version:
               type: string
               description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.      
@@ -143,6 +156,11 @@ paths:
         412:
           description: Precondition Failed
           headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
             Tus-Version:
               type: string
               description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
@@ -179,17 +197,39 @@ paths:
                 - "no-store"
         '404':
           description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         '410':
-           description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.
+          description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         '403':
-           description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.          
+          description: If the resource is not found, the Server SHOULD return either the 404 Not Found, 410 Gone or 403 Forbidden status without the Upload-Offset header.          
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         412:
           description: Precondition Failed
           headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
             Tus-Version:
               type: string
               description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
-                                                                                                            type: string                                                                                                            description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
     patch:
       summary: Used to resume the upload
       operationId: FilePatch
@@ -233,20 +273,60 @@ paths:
               description: "Added by the expiration extension. The Upload-Expires response header indicates the time after which the unfinished upload expires. A Server MAY wish to remove incomplete uploads after a given period of time to prevent abandoned uploads from taking up extra storage. The Client SHOULD use this header to determine if an upload is still valid before attempting to resume the upload. This header MUST be included in every PATCH response if the upload is going to expire. If the expiration is known at the creation, the Upload-Expires header MUST be included in the response to the initial POST request. Its value MAY change over time. If a Client does attempt to resume an upload which has since been removed by the Server, the Server SHOULD respond with the 404 Not Found or 410 Gone status. The latter one SHOULD be used if the Server is keeping track of expired uploads. In both cases the Client SHOULD start a new upload. The value of the Upload-Expires header MUST be in RFC 7231 datetime format."
         '415':
           description: Content-Type was not application/offset+octet-stream
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         '404':
           description: PATCH request against a non-existent resource
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         '410':
           description: PATCH request against a non-existent resource
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         '403':
           description: "In the concatenation extension, the Server MUST respond with the 403 Forbidden status to PATCH requests against a final upload URL and MUST NOT modify the final or its partial uploads."
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         '400':
           description: "Added by the checksum extension. The checksum algorithm is not supported by the server"
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         '460':
           description: "Added by the checksum extension. Checksums mismatch"
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
         412:
           description: Precondition Failed
           headers:
             Tus-Version:
               type: string
               description: The Tus-Version response header MUST be a comma-separated list of protocol versions supported by the Server. The list MUST be sorted by Server's preference where the first one is the most preferred one.
-
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
