@@ -16,7 +16,9 @@ paths:
   /files:
     post:
       summary: An empty POST request is used to create a new upload resource. The Upload-Length header indicates the size of the entire upload in bytes.
-      description: Endpoint for the Creation extension
+      description: Endpoint for the Creation extension. Modified by the Creation With Upload extension.
+      consumes:
+        - application/offset+octet-stream
       parameters:
         - in: header
           name: Content-Length
@@ -63,6 +65,36 @@ paths:
               type: string
               enum: 
                 - "1.0.0"
+            Upload-Offset: 
+              type: integer
+              description: Added by the Creation With Upload Extension. The Upload-Offset request and response header indicates a byte offset within a resource. The value MUST be a non-negative integer. 
+            Upload-Expires:
+              type: string
+              description: "Added by the Creation With Upload Extension in combination with the expiration extension. The Upload-Expires response header indicates the time after which the unfinished upload expires. A Server MAY wish to remove incomplete uploads after a given period of time to prevent abandoned uploads from taking up extra storage. The Client SHOULD use this header to determine if an upload is still valid before attempting to resume the upload. This header MUST be included in every PATCH response if the upload is going to expire. If the expiration is known at the creation, the Upload-Expires header MUST be included in the response to the initial POST request. Its value MAY change over time. If a Client does attempt to resume an upload which has since been removed by the Server, the Server SHOULD respond with the 404 Not Found or 410 Gone status. The latter one SHOULD be used if the Server is keeping track of expired uploads. In both cases the Client SHOULD start a new upload. The value of the Upload-Expires header MUST be in RFC 7231 datetime format."
+        '415':
+          description: Added by the Creation With Upload Extension. Content-Type was not application/offset+octet-stream
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
+        '400':
+          description: "Added by the Creation With Upload Extension in combination with the checksum extension. The checksum algorithm is not supported by the server"
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version 
+        '460':
+          description: "Added by the Creation With Upload Extension in combination with the checksum extension. Checksums mismatch"
+          headers:
+            Tus-Resumable:
+              type: string
+              enum: 
+                - "1.0.0"
+              description: Protocol version               
         413:
           description: If the length of the upload exceeds the maximum, which MAY be specified using the Tus-Max-Size header, the Server MUST respond with the 413 Request Entity Too Large status.
           headers:
