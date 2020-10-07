@@ -53,7 +53,15 @@ paths:
             - 1
           description: "Added by the creation-defer-length extension. The Upload-Defer-Length request and response header indicates that the size of the upload is not known currently and will be transferred later. Its value MUST be 1. If the length of an upload is not deferred, this header MUST be omitted."
           required: false
-          
+        - in: header
+          name: Upload-offset
+          type: integer
+          required: false
+        - in: header
+          name: Upload-Checksum
+          type: string
+          description: Added by the checksum extension. The Upload-Checksum request header contains information about the checksum of the current body payload. The header MUST consist of the name of the used checksum algorithm and the Base64 encoded checksum separated by a space.
+          required: false
       responses:
         201:
           description: Created
