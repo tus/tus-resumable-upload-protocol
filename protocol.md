@@ -748,7 +748,7 @@ status and the corresponding upload URL in the response's `Location` header. The
 response MUST also include all other headers that a [`HEAD`](#head) request to
 the upload URL would also return, such as the `Upload-Offset` header.
 
-Clients MAY then use the returned upload URL in the `Location` header to resume the upload.
+Clients SHOULD then use the returned upload URL in the `Location` header to resume the upload.
 
 If the upload tag in a `HEAD` request is unknown or no longer known by the Server, it MUST
 respond with the `404 Not Found` or `410 Gone` status.
