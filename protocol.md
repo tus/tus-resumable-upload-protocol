@@ -756,7 +756,7 @@ respond with the `404 Not Found` or `410 Gone` status.
 If the `Upload-Tag` header in a `HEAD` request to the upload creation URL is missing, the
 Server MUST respond with the `400 Bad Request` status.
 
-If the `Upload-Tag`  header is invalid in a `POST` or `HEAD` request, the Server MUST
+If the `Upload-Tag` header is invalid in a `POST` or `HEAD` request, the Server MUST
 respond with the `400 Bad Request` status.
 
 If the upload tag in a `POST` request is already in use for a different, ongoing upload, the Server
@@ -770,7 +770,7 @@ The `Upload-Tag` request header MUST be an identifier created by the Client. The
 identifier SHOULD be unique to avoid collisions with identifiers created by other Clients.
 Clients can satisfy this requirement by generating and using a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4).
 
-The header's value MUST consist of ASCII characters and MUST NOT exceed 265 characters.
+The header's value MUST consist of ASCII characters and MUST NOT exceed 256 characters.
 
 The `Upload-Tag` header MUST be included with the `POST` request that creates
 the upload. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
@@ -783,7 +783,7 @@ use it to inject malicious content into an upload, Servers SHOULD take measures 
 ensure that only the party that created a resource with an `Upload-Tag` header can use it
 for subseqeuent `HEAD` requests.
 
-One way servers can satisfy this requirement is to leverage available authentication
+One way servers can satisfy this recommendation is to leverage available authentication
 information to bind the upload tag to a particular user, so that only this specific user can
 use the upload tag.
 
