@@ -13,5 +13,13 @@ Copyright (c) 2013-2016 Transloadit Ltd and Contributors.
 
 ## OpenAPI specification
 
+The OpenAPI Specification ([OAS](https://swagger.io/specification/)) defines a standard, language-agnostic 
+interface to RESTful APIs which allows both humans and computers to discover and understand the capabilities 
+of the service without access to source code, documentation, or through network traffic inspection. 
+
+There exists tools to create http servers and clients to access APIs using the OpenAPI description as input, e.g.:
+- [go-swagger](https://github.com/go-swagger/go-swagger)
+- Various generators in [https://swagger.io](https://swagger.io).
+
 The directory OpenAPI contains the v2 and v3 OpenAPI definitions of the tus protocol. Since implementators
 are free to use different endpoints, the endpoints documented there are to be considered examples.
