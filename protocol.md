@@ -774,7 +774,17 @@ The `Upload-Tag` request header MUST be an identifier created by the Client. The
 identifier SHOULD be unique to avoid collisions with identifiers created by other Clients.
 Clients can satisfy this requirement by generating and using a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4).
 
-The header's value MUST consist of ASCII characters and MUST NOT exceed 256 characters.
+The header's value MUST only consist of following, printable ASCII characters:
+
+```
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+```
+
+This list contains the ASCII characters with a decimal code in the range of `[33, 126]`. Be aware
+that this list does neither contain the "space" character (decimal code: 32) nor the "delete" character
+(decimal code: 127).
+
+In addition, the length of the header's value MUST NOT exceed 256 characters.
 
 The `Upload-Tag` header MUST be included with the `POST` request that creates
 the upload. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
