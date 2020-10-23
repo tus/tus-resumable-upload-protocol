@@ -44,7 +44,8 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [Rick Olson](https://github.com/technoweenie),
 [J. Ryan Stinnett](https://convolv.es),
 [Ifedapo Olarewaju](https://github.com/ifedapoolarewaju)
-[Robert Nagy](https://github.com/ronag)
+[Robert Nagy](https://github.com/ronag),
+[Felix Schwarz](https://github.com/felix-schwarz)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -728,6 +729,140 @@ HEAD /files/ab HTTP/1.1
 HTTP/1.1 200 OK
 Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
+```
+
+### Challenge
+
+With this extension, Clients can authenticate follow-up requests to a [Creation](#creation) or [Creation With Upload](#creation-with-upload) 
+`POST` request using a high-entropy cryptographic random shared secret - and challenges
+based thereon.
+
+If the Server supports this extension, it MUST add `challenge` to the `Tus-Extension` header.
+
+#### Headers
+
+##### Upload-Secret
+
+The `Upload-Secret` MUST be a high-entropy cryptographic random string, consisting
+of 48 to 256 characters from the [base64 alphabet](https://tools.ietf.org/html/rfc4648#section-4).
+That's 36 to 192 bytes encoded as base64.
+
+The `Upload-Secret` header MUST NOT be included with anything but `POST` requests
+that create a new upload resource. Servers receiving an `Upload-Secret` header with
+any other request MUST respond with a `400 Bad Request` status.
+
+##### Upload-Challenge
+
+If an `Upload-Secret` header was sent with the `POST` request that created
+the upload resource, Clients MUST include an `Upload-Challenge` header with every
+subsequent request targeting that upload resource.
+
+The value of `Upload-Challenge` is defined as follows:
+
+```
+Upload-Challenge = SHA256([Upload-Secret] + SHA256(`[HTTP Method]` + [Upload-Offset] + [Upload-Secret] + [Content-Length]))
+```
+
+The *effective* HTTP method of the request that the `Upload-Challenge` is sent with MUST be
+used in place of `HTTP Method`. If `X-HTTP-Method-Override` is used in the same request,
+`HTTP method` needs to be replaced with the value of `X-HTTP-Method-Override`.
+
+Where `Upload-Offset` and `Content-Length` headers are used in the same request, their
+values MUST be used as the respective `Upload-Offset` and `Content-Length` values. A
+value of `0` MUST be used for `Upload-Offset` and `Content-Length` where no headers
+of the same name are sent with the request.
+
+Servers MUST respond with a `404 Not Found` status to requests with a missing or invalid
+`Upload-Challenge` value if they relate to an upload resource for which an `Upload-Secret`
+was provided upon creation - including, but not limited to, `HEAD` and `PATCH` requests.
+
+For requests that reference multiple upload resources, the `Upload-Challenge` is computed by
+concatenating the `Upload-Challenge`s of the individual upload resources for the request in the
+order they are referenced. The SHA256 checksum computed over the concatenated `Upload-Challenge`s
+is then used as the `Upload-Challenge` for the request:
+
+```
+Upload-Challenge = SHA256([Upload-Challenge for resource 1] + … + [Upload-Challenge for resource n])
+```
+
+#### Examples
+
+An upload resource is created with [Creation With Upload](#creation-with-upload) and an `Upload-Secret`:
+
+```
+POST /files HTTP/1.1
+Upload-Length: 100
+Upload-Secret: R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg
+Content-Length: 5
+Content-Type: application/offset+octet-stream
+Tus-Resumable: 1.0.0
+
+hello
+```
+
+The upload is continued with a `PATCH` request, including an `Upload-Challenge` computed as
+
+```
+Upload-Challenge = SHA256("R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + SHA256("PATCH" + "5" + "R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + "50"))
+```
+
+and included in the request:
+
+```
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Upload-Offset: 5
+Upload-Challenge: ed9e63743b8073e97a1bd54d0f92161fa32c27bff130f11ff896e6e0271f2688
+Content-Length: 50
+Content-Type: application/offset+octet-stream
+Tus-Resumable: 1.0.0
+
+[50 bytes of content]
+```
+
+Then, a `DELETE` request for the upload is sent, including an `Upload-Challenge` computed as
+
+```
+Upload-Challenge = SHA256("R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + SHA256("DELETE" + "0" + "R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3VyY2UgaW4gcmVhbCBjb2RlIDspCg" + "0"))
+```
+
+and included in the request:
+
+```
+DELETE /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Content-Length: 0
+Upload-Challenge: 59ca949f7eed4c4a1f7e40da7c119fb7cb1095262a12eab770685711ea5a176a
+Tus-Resumable: 1.0.0
+```
+
+Two uploads - each with its own `Upload-Secret` - are concatenated, including an `Upload-Challenge`. For `/files/a`, the `Upload-Challenge` is computed as:
+
+```
+Upload-Challenge-1 = SHA256("VGhpcyBpc24ndCBoaWdoLWVudHJvcHkgZWl0aGVyLiBEb24ndCB0cnkgdGhpcyBhdCBob21lLCBraWRzIQ" + SHA256("POST" + "0" + "VGhpcyBpc24ndCBoaWdoLWVudHJvcHkgZWl0aGVyLiBEb24ndCB0cnkgdGhpcyBhdCBob21lLCBraWRzIQ" + "0"))
+Upload-Challenge-1 = 1824949792ae9040811f1888f992608de8da7c17f6f6f5bc966dc5c95a1acba3
+```
+
+For `/files/b`, the `Upload-Challenge` is computed as:
+
+```
+Upload-Challenge-2 = SHA256("M3JkIHRpbWUncyBhIGNoYXJtISBPciBzbyB0aGV5IHNheS4gRG8gdGhpcyBwcm9wZXJseSBpbiBjb2RlLg" + SHA256("POST" + "0" + "M3JkIHRpbWUncyBhIGNoYXJtISBPciBzbyB0aGV5IHNheS4gRG8gdGhpcyBwcm9wZXJseSBpbiBjb2RlLg" + "0"))
+Upload-Challenge-2 = a6d9d1d453d60a743c13dda02768e131175818e71b52c8a0621f4c34515c78fe
+```
+
+Finally, the challenges of the two files are concatenated in the order they are referenced in the request, and then hashed:
+
+```
+Upload-Challenge = SHA256("1824949792ae9040811f1888f992608de8da7c17f6f6f5bc966dc5c95a1acba3" + "a6d9d1d453d60a743c13dda02768e131175818e71b52c8a0621f4c34515c78fe")
+Upload-Challenge = c42da6af39150e107bdaa5209f9c0645f1a4ee2f756285fd15f240481d971d0b
+```
+
+The resulting `Upload-Challenge` is then sent with the request:
+
+```
+POST /files HTTP/1.1
+Upload-Concat: final;/files/a /files/b
+Upload-Challenge: c42da6af39150e107bdaa5209f9c0645f1a4ee2f756285fd15f240481d971d0b
+Content-Length: 0
+Tus-Resumable: 1.0.0
 ```
 
 ## FAQ
