@@ -44,7 +44,8 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [Rick Olson](https://github.com/technoweenie),
 [J. Ryan Stinnett](https://convolv.es),
 [Ifedapo Olarewaju](https://github.com/ifedapoolarewaju)
-[Robert Nagy](https://github.com/ronag)
+[Robert Nagy](https://github.com/ronag),
+[Felix Schwarz](https://github.com/felix-schwarz)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -733,6 +734,129 @@ HTTP/1.1 200 OK
 Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
+
+### Upload Tag
+
+With this extension, Clients can provide a tag for an upload, with which they
+can later retrieve the upload URL for the created upload. This allows Clients
+to resume an upload they initiated, but for which they did not receive the response
+with the newly created upload's URL (for example due to a broken connection).
+
+If the Server supports this extension, it MUST add `upload-tag` to the `Tus-Extension`
+header.
+
+To initiate an upload with Upload Tag, Clients MUST include an `Upload-Tag`
+header with the initial `POST` request (as specified in the [Creation](#creation),
+[Creation With Upload](#creation-with-upload) and [Concatenation](#concatenation)
+extensions) made to the upload creation URL.
+
+Clients MAY then send a `HEAD` request with the same `Upload-Tag` header to the
+Upload Creation URL. Upon success, the Server MUST respond with the `200 OK` or `204 No Content`
+status and the corresponding upload URL in the response's `Location` header. The
+response MUST also include all other headers that a [`HEAD`](#head) request to
+the upload URL would also return, such as the `Upload-Offset` header.
+
+Clients SHOULD then use the returned upload URL in the `Location` header to resume the upload.
+
+If the upload tag in a `HEAD` request is unknown or no longer known by the Server, it MUST
+respond with the `404 Not Found` or `410 Gone` status.
+
+If the `Upload-Tag` header in a `HEAD` request to the upload creation URL is missing, the
+Server MUST respond with the `400 Bad Request` status.
+
+If the `Upload-Tag` header is invalid in a `POST` or `HEAD` request, the Server MUST
+respond with the `400 Bad Request` status.
+
+If the upload tag in a `POST` request is already in use for a different, ongoing upload, the Server
+MUST respond with a `409 Conflict` status.
+
+#### Headers
+
+##### Upload-Tag
+
+The `Upload-Tag` request header MUST be an identifier created by the Client. The
+identifier SHOULD be unique to avoid collisions with identifiers created by other Clients.
+Clients can satisfy this requirement by generating and using a [version 4 UUID](https://tools.ietf.org/html/rfc4122#section-4.4).
+
+The header's value MUST only consist of following, [printable ASCII characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters):
+
+```
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+```
+
+This list contains the ASCII characters with a decimal code in the range of `[33, 126]`. Be aware
+that this list does neither contain the "space" character (decimal code: 32) nor the "delete" character
+(decimal code: 127).
+
+In addition, the length of the header's value MUST NOT exceed 256 characters.
+
+The `Upload-Tag` header MUST be included with the `POST` request that creates
+the upload. It MUST also be sent with a follow-up `HEAD` request used to retrieve the
+`Location` header of the newly created upload.
+
+#### Security Considerations
+
+To protect against attackers trying to guess an upload tag and subsequently
+use it to inject malicious content into an upload, Servers SHOULD take measures to
+ensure that only the party that created a resource with an `Upload-Tag` header can use it
+for subseqeuent `HEAD` requests.
+
+One way servers can satisfy this recommendation is to leverage available authentication
+information to bind the upload tag to a particular user, so that only this specific user can
+use the upload tag.
+
+Servers SHOULD respond with a `404 Not Found` status to `HEAD` requests that include an
+`Upload-Tag` header if the request can't be attributed to the original creator of the
+referenced upload resource.
+
+#### Example
+
+The Client attempts to create and upload a file that is 100 bytes in length:
+
+**Request:**
+
+```
+POST /files HTTP/1.1
+Authorization: …
+Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
+Upload-Length: 100
+Content-Length: 100
+Content-Type: application/offset+octet-stream
+Tus-Resumable: 1.0.0
+
+hello[connection breaks down]
+```
+
+The connection is then interrupted, so that only the first 5 bytes of the upload are
+received by the Server. Meanwhile the Client could not receive the response with the
+`Location` header.
+
+To resume the upload, the Client sends a `HEAD` request to the same URL and includes
+the same `Upload-Tag` as in the `POST` request:
+
+**Request:**
+
+```
+HEAD /files HTTP/1.1
+Authorization: …
+Upload-Tag: 0CAF16BD-F7A6-47A9-B3D9-CA98BA7DF5EF
+Tus-Resumable: 1.0.0
+```
+
+The Server responds with a `204 No Content` status, the URL of the created resource in
+the `Location` header and the number of received bytes in the `Upload-Offset` header:
+
+**Response:**
+
+```
+HTTP/1.1 204 No Content
+Location: https://tus.example.org/files/0e460e21624c387f1ae533e02ec3bc40
+Upload-Offset: 5
+Upload-Length: 100
+Tus-Resumable: 1.0.0
+```
+
+The Client can now resume the upload using the `Location` URL and `Upload-Offset` header.
 
 ## FAQ
 
