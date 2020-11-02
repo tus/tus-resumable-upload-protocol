@@ -825,9 +825,10 @@ is then used as the `Upload-Challenge` for the request:
 Upload-Challenge = [Hash Name] + " " + Hash([Upload-Challenge for resource 1] + … + [Upload-Challenge for resource n])
 ```
 
-For upload resources that were created without an `Upload-Secret`, an  `Upload-Challenge` of
-`none` MUST be used when computing the `Upload-Challenge` for requests that reference multiple
-upload resources, of which at least one was created with an `Upload-Secret`.
+For upload resources that were created without an `Upload-Secret`, the path to the upload resource
+MUST be used as `Upload-Challenge` for the purpose of computing the `Upload-Challenge` for
+requests that reference multiple upload resources - of which at least one MUST have been created with
+an `Upload-Secret`.
 
 ##### Tus-Challenge-Algorithm
 
