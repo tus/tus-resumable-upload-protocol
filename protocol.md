@@ -737,7 +737,7 @@ Upload-Concat: final;/files/a /files/b
 
 ### Challenge
 
-With this extension, Clients can authenticate follow-up requests to a [Creation](#creation) or [Creation With Upload](#creation-with-upload) 
+With this extension, Clients can authenticate follow-up requests to a [Creation](#creation), [Creation With Upload](#creation-with-upload) or [Concatenation](#concatenation)
 `POST` request using a high-entropy cryptographic random shared secret - and challenges
 based thereon. The goal is that only the user, who created the upload, should be able to
 obtain information about the upload and continue the upload.
