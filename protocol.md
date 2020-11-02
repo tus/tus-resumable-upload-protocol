@@ -806,6 +806,7 @@ as contained in the `Tus-Challenge-Algorithm` response header.
 * `[HTTP Method]` MUST be replaced by the *effective* HTTP method of the request
 that the `Upload-Challenge` is sent with. If the `X-HTTP-Method-Override` header is
 used in the same request, it MUST be replaced with the value of `X-HTTP-Method-Override`.
+The HTTP method MUST be upper-case.
 * `[Upload-Offset]` MUST be replaced with the value of the request's `Upload-Offset` header,
 if the request includes this header (e.g. for `PATCH` requests). If the request does not include
 the `Upload-Offset` header, it MUST be replaced with the character `#`.
