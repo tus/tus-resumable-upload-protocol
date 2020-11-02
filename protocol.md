@@ -204,7 +204,9 @@ SHOULD return either the `404 Not Found`, `410 Gone` or `403 Forbidden` status
 without the `Upload-Offset` header.
 
 The Server MUST prevent the client and/or proxies from caching the response by
-adding the `Cache-Control: no-store` header to the response.
+adding the `Cache-Control: no-store` header to the response while the upload is
+not finished. After the upload has been finished, the Server MAY set or omit the
+`Cache-Control` header as it desires.
 
 #### PATCH
 
@@ -218,7 +220,9 @@ The `Upload-Offset` header's value MUST be equal to the current offset of the
 resource. In order to achieve parallel upload the
 [Concatenation](#concatenation) extension MAY be used. If the offsets do not
 match, the Server MUST respond with the `409 Conflict` status without modifying
-the upload resource.
+the upload resource. This response SHOULD include the upload's current offset
+in the `Upload-Offset` header to enable the Client to resume the upload from
+the correct offset without issuing an additional `HEAD` request first.
 
 The Client SHOULD send all the remaining bytes of an upload in a single `PATCH`
 request, but MAY also use multiple small requests successively for scenarios
