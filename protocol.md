@@ -813,7 +813,7 @@ an ASCII string. Its output MUST be Base64 encoded.
 
 For requests that reference multiple upload resources (e.g. when using the [Concatenation](#concatenation) extension),
 the `Upload-Challenge` is computed by concatenating the `Upload-Challenge`s of the individual upload resources for the request in the
-order they are referenced. The SHA256 checksum computed over the concatenated `Upload-Challenge`s
+order they are referenced. The checksum computed over the concatenated `Upload-Challenge`s
 is then used as the `Upload-Challenge` for the request:
 
 ```
