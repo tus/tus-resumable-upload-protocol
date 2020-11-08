@@ -827,7 +827,8 @@ Upload-Challenge = [Hash Name] + " " + Hash([Upload-Challenge for resource 1] + 
 
 For upload resources that were created without an `Upload-Secret`, the path to the upload resource
 MUST be used as `Upload-Challenge` for the purpose of computing the `Upload-Challenge` for
-requests that reference multiple upload resources - of which at least one MUST have been created with
+requests that reference multiple upload resources. The `Upload-Challenge` header SHOULD only be used
+for requests referencing multiple upload resources if at least one of them has been created with
 an `Upload-Secret`.
 
 ##### Tus-Challenge-Algorithm
@@ -914,6 +915,24 @@ The resulting `Upload-Challenge` is then sent with the request:
 POST /files HTTP/1.1
 Upload-Concat: final;/files/a /files/b
 Upload-Challenge: sha256 c1mU3n1Dn1qKFAgV08Tj6JPjfcDavuMBq15jM0j4svw=
+Content-Length: 0
+Tus-Resumable: 1.0.0
+```
+
+Extending this example with a third file, `/files/c` - uploaded without `Upload-Secret`, the computation of `Upload-Challenge` uses the file's path:
+
+```
+Upload-Challenge
+	= "sha256" + " " + SHA256("sha256 Visz7P4U/MLdQn1qqRTRZ7OUfhkiidxsAR2M14VcigY=" + "sha256 vAIgwoKFKtNujEDNnk2zARj8oFQbuJLLzehLIQ9Q1iI=" + "/files/c")
+	= "sha256 kqefPn7i1b6q4TbGaE3gp5WWoRo/BF6KkmuuNqpBmg8="
+```
+
+The resulting `Upload-Challenge` is then sent with the request:
+
+```
+POST /files HTTP/1.1
+Upload-Concat: final;/files/a /files/b /files/c
+Upload-Challenge: sha256 kqefPn7i1b6q4TbGaE3gp5WWoRo/BF6KkmuuNqpBmg8=
 Content-Length: 0
 Tus-Resumable: 1.0.0
 ```
