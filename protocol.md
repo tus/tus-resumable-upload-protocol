@@ -735,6 +735,208 @@ Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
 
+### Challenge
+
+With this extension, Clients can authenticate follow-up requests to a [Creation](#creation), [Creation With Upload](#creation-with-upload) or [Concatenation](#concatenation)
+`POST` request using a high-entropy cryptographic random shared secret - and challenges
+based thereon. The goal is that only the user, who created the upload, should be able to
+obtain information about the upload and continue the upload.
+
+If the Server supports this extension, it MUST add `challenge` to the `Tus-Extension` header.
+
+The Client MAY add the `Upload-Secret` header to `POST` requests, if it wants to protect the
+upload using the Challenge extension. All subsequent request targeting that upload resource MUST contain
+the corresponding `Upload-Challenge` header. These requests include, but are not limited to:
+- `HEAD` requests to an upload URL
+- `PATCH` requests to an upload URL
+- `DELETE` requests to an upload URL
+- `HEAD` requests to the upload creation URL with an `Upload-Tag` header
+- `POST` requests to the upload creation URL with an `Upload-Concat` header
+
+The Server MUST support at least the SHA256 challenge algorithm identified
+by `sha256`. The names of the challenge algorithms MUST only consist of ASCII
+characters with the modification that uppercase characters are excluded.
+
+The `Tus-Challenge-Algorithm` header MUST be included in the response to an
+`OPTIONS` request.
+
+If the request includes a challenge algorithm which is not supported by the Server or an
+otherwise syntactically invalid `Upload-Challenge` header, the Server MUST respond with
+a `400 Bad Request` status. Furthermore, Servers MUST respond with a `404 Not Found`
+status to requests with a missing or mismatching `Upload-Challenge` value if they
+relate to an upload resource for which an `Upload-Secret` was provided upon creation.
+
+The connection between the Client and the Server SHOULD be encrypted and protected against tampering
+and eavesdropping using HTTPS. Otherwise the protection provided by the Challenge extension can be
+undermined.
+
+#### Headers
+
+##### Upload-Secret
+
+The `Upload-Secret` MUST be a high-entropy cryptographic random string consisting
+of only following, [printable ASCII characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters):
+
+```
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+```
+
+This list contains the ASCII characters with a decimal code in the range of `[33, 126]`. Be aware
+that this list does neither contain the "space" character (decimal code: 32) nor the "delete" character
+(decimal code: 127).
+
+In addition, the length of the header's value MUST be between 48 and 256 characters.
+
+The `Upload-Secret` header MUST NOT be included with anything but `POST` requests
+that create a new upload resource. Servers receiving an `Upload-Secret` header with
+any other request MUST respond with a `400 Bad Request` status.
+
+##### Upload-Challenge
+
+The value of `Upload-Challenge` MUST be computed as follows:
+
+```
+Upload-Challenge = [Hash Name] + " " + Hash([HTTP Method] + [Upload-Offset] + [Upload-Secret]))
+```
+
+with following replacements:
+
+* `[Hash Name]` MUST be replaced by the hashing algorithm used for computing the challenge value
+as contained in the `Tus-Challenge-Algorithm` response header.
+* `[HTTP Method]` MUST be replaced by the *effective* HTTP method of the request
+that the `Upload-Challenge` is sent with. If the `X-HTTP-Method-Override` header is
+used in the same request, it MUST be replaced with the value of `X-HTTP-Method-Override`.
+The HTTP method MUST be upper-case.
+* `[Upload-Offset]` MUST be replaced with the value of the request's `Upload-Offset` header,
+if the request includes this header (e.g. for `PATCH` requests). If the request does not include
+the `Upload-Offset` header, it MUST be replaced with the character `#`.
+* `[Upload-Secret]` MUST be replaced with the value of the `Upload-Secret` header from the
+`POST` request that created the upload resource.
+
+The input of the hash algorithm (denoted by `Hash` in the above formula) MUST be encoded as
+an ASCII string. The raw output of the hash algorithm MUST then be Base64 encoded.
+
+For requests that reference multiple upload resources (e.g. when using the [Concatenation](#concatenation) extension),
+the `Upload-Challenge` is computed by concatenating the `Upload-Challenge`s of the individual upload resources for the request in the
+order they are referenced. The checksum computed over the concatenated `Upload-Challenge`s
+is then used as the `Upload-Challenge` for the request:
+
+```
+Upload-Challenge = [Hash Name] + " " + Hash([Upload-Challenge for resource 1] + … + [Upload-Challenge for resource n])
+```
+
+For upload resources that were created without an `Upload-Secret`, the path to the upload resource
+MUST be used as `Upload-Challenge` for the purpose of computing the `Upload-Challenge` for
+requests that reference multiple upload resources. The `Upload-Challenge` header SHOULD only be used
+for requests referencing multiple upload resources if at least one of them has been created with
+an `Upload-Secret`.
+
+##### Tus-Challenge-Algorithm
+
+The `Tus-Challenge-Algorithm` response header MUST be a comma-separated list of
+the challenge algorithms supported by the server.
+
+#### Examples
+
+An upload resource is created with [Creation With Upload](#creation-with-upload) and an `Upload-Secret`:
+
+```
+POST /files HTTP/1.1
+Upload-Length: 100
+Upload-Secret: R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3
+Content-Length: 5
+Content-Type: application/offset+octet-stream
+Tus-Resumable: 1.0.0
+
+hello
+```
+
+The upload is continued with a `PATCH` request, including an `Upload-Challenge` computed as
+
+```
+Upload-Challenge = "sha256" + " " + SHA256("PATCH" + "5" + "R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3")
+```
+
+and included in the request:
+
+```
+PATCH /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Upload-Offset: 5
+Upload-Challenge: sha256 B6KrLwZkX3ZLYk5AjZJ6aaOt9G90+h7k/f/0P2bDTDc=
+Content-Length: 50
+Content-Type: application/offset+octet-stream
+Tus-Resumable: 1.0.0
+
+[50 bytes of content]
+```
+
+Then, a `DELETE` request for the upload is sent, including an `Upload-Challenge` computed as
+
+```
+Upload-Challenge = "sha256" + " " + SHA256("DELETE" + "#" + "R290Y2hhISBVc2UgYW4gYWN0dWFsIGhpZ2gtZW50cm9weSBzb3")
+```
+
+and included in the request:
+
+```
+DELETE /files/24e533e02ec3bc40c387f1a0e460e216 HTTP/1.1
+Content-Length: 0
+Upload-Challenge: sha256 2ziZxDsTmDLSP2j84hrwUqnMpWfVd4bdiCTXdGNRmig=
+Tus-Resumable: 1.0.0
+```
+
+Two uploads - each with its own `Upload-Secret` - are concatenated, including an `Upload-Challenge`. For `/files/a`, the `Upload-Challenge` is computed as:
+
+```
+Upload-Challenge A
+	= "sha256" + " " + SHA256("POST" + "#" + "VGhpcyBpc24ndCBoaWdoLWVudHJvcHkgZWl0aGVyLiBEb24ndC")
+	= "sha256 Visz7P4U/MLdQn1qqRTRZ7OUfhkiidxsAR2M14VcigY="
+```
+
+For `/files/b`, the `Upload-Challenge` is computed as:
+
+```
+Upload-Challenge B
+	= "sha256" + " " + SHA256("POST" + "#" + "M3JkIHRpbWUncyBhIGNoYXJtISBPciBzbyB0aGV5IHNheS4gRG")
+	= "sha256 vAIgwoKFKtNujEDNnk2zARj8oFQbuJLLzehLIQ9Q1iI="
+```
+
+Finally, the challenges of the two files are concatenated in the order they are referenced in the request, and then hashed:
+
+```
+Upload-Challenge
+	= "sha256" + " " + SHA256("sha256 Visz7P4U/MLdQn1qqRTRZ7OUfhkiidxsAR2M14VcigY=" + "sha256 vAIgwoKFKtNujEDNnk2zARj8oFQbuJLLzehLIQ9Q1iI=")
+	= "sha256 c1mU3n1Dn1qKFAgV08Tj6JPjfcDavuMBq15jM0j4svw="
+```
+
+The resulting `Upload-Challenge` is then sent with the request:
+
+```
+POST /files HTTP/1.1
+Upload-Concat: final;/files/a /files/b
+Upload-Challenge: sha256 c1mU3n1Dn1qKFAgV08Tj6JPjfcDavuMBq15jM0j4svw=
+Content-Length: 0
+Tus-Resumable: 1.0.0
+```
+
+Extending this example with a third file, `/files/c` - uploaded without `Upload-Secret`, the computation of `Upload-Challenge` uses the file's path:
+
+```
+Upload-Challenge
+	= "sha256" + " " + SHA256("sha256 Visz7P4U/MLdQn1qqRTRZ7OUfhkiidxsAR2M14VcigY=" + "sha256 vAIgwoKFKtNujEDNnk2zARj8oFQbuJLLzehLIQ9Q1iI=" + "/files/c")
+	= "sha256 kqefPn7i1b6q4TbGaE3gp5WWoRo/BF6KkmuuNqpBmg8="
+```
+
+The resulting `Upload-Challenge` is then sent with the request:
+
+```
+POST /files HTTP/1.1
+Upload-Concat: final;/files/a /files/b /files/c
+Upload-Challenge: sha256 kqefPn7i1b6q4TbGaE3gp5WWoRo/BF6KkmuuNqpBmg8=
+Content-Length: 0
+Tus-Resumable: 1.0.0
+```
+
 ### Upload Tag
 
 With this extension, Clients can provide a tag for an upload, with which they
