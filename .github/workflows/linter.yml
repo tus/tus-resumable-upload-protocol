@@ -1,7 +1,6 @@
-name: Run Spectral on Pull Requests
+name: Run OpenAPI linter
 
-on:
-  - pull_request
+on: [push, pull_request]
 
 jobs:
   build:
