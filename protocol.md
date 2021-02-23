@@ -568,6 +568,119 @@ Tus-Resumable: 1.0.0
 Upload-Offset: 11
 ```
 
+### Partial Checksum
+
+This extension allows Clients using the Checksum extension to verify and confirm the
+integrity of the data from incomplete `PATCH` requests, thereby avoiding that data that
+was received intact by the Server needs to be sent again.
+
+Servers that support this extension MUST add `partial-checksum` to the `Tus-Extension` header.
+
+If a Server receives an incomplete `PATCH` request with `Upload-Checksum` header, it
+MAY store the partial data in a separate location rather than disposing of it.
+
+If the Server subsequently receives a `HEAD` request on the upload, it MAY provide range
+and checksum information for the partially received data in  `Upload-Partial-Checksum-Range`
+and `Upload-Partial-Checksum` headers.
+
+A Client can then use the range and checksum information returned by the Server to
+compute its own checksum for the range and compare it against the checksum returned
+by the Server.
+
+If the checksums match, the Client MAY confirm the partial data's integrity by sending the
+range and checksum information it wants to confirm in the `Upload-Metadata` header of
+the next `PATCH` request, and resuming from the end of the confirmed range rather than the
+`Upload-Offset` returned by the `HEAD` request.
+
+If the checksums don't match, the Client MUST continue the upload from the `Upload-Offset`
+returned by the `HEAD` request.
+
+If the Server has kept the partial data and the Client confirms its integrity by sending identical
+range and checksum information as `partial-upload-confirm-range` and
+`partial-upload-confirm-checksum` in the `Upload-Metadata` header, 
+the Server MUST append the partial data to the upload and accept new data starting from the
+new offset in the same `PATCH` request.
+
+If the Server has disposed of the partial data or if the Client sends range and checksum information
+that doesn't match those of the Server for the partial data, the Server MUST dispose of the
+partial data and MUST respond with a `409 Conflict` status.
+
+If the Server receives a `PATCH` request with an `Upload-Offset` other than the end of
+the partial data's range, it SHOULD dispose of the partial data.
+
+Clients receiving a `409 Conflict` status in response SHOULD send a new `HEAD` request to the
+Server to determine the upload's status before sending the next `PATCH` request.
+
+#### Headers
+
+##### Upload-Partial-Checksum-Range
+
+The `Upload-Partial-Checksum-Range` response header follows the format `[first included offset]-[last included offset]`
+(f.ex. `0-499` for the first 500 bytes) and MUST describe the range of the partial data within
+the upload.
+
+##### Upload-Partial-Checksum
+
+The `Upload-Partial-Checksum` response header uses the same format as the `Upload-Checksum`
+header, but MUST contain the checksum of the partial data.
+
+##### Upload-Metadata
+
+Clients confirming partial data MUST send `partial-upload-confirm-range` and `partial-upload-confirm-checksum` as
+metadata in the `Upload-Metadata` header. The formats for `partial-upload-confirm-range` and `partial-upload-confirm-checksum`
+are identical to those of `Upload-Partial-Checksum-Range` and `Upload-Metadata` respectively.
+
+#### Examples
+
+**Request**
+
+```
+PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
+Content-Length: 11
+Upload-Offset: 0
+Tus-Resumable: 1.0.0
+Upload-Checksum: sha1 Kq5sNclPz7QV2+lfQIuc6R7oRu0=
+
+hello w[connection breaks]
+```
+
+**Request**
+
+```
+HEAD /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
+Tus-Resumable: 1.0.0
+```
+
+**Response**
+
+```
+HTTP/1.1 200 OK
+Upload-Offset: 0
+Upload-Partial-Checksum-Range: 0-7
+Upload-Partial-Checksum: sha1 V2uc6R7+lKq5sfQINclPz7QoRu0=
+Tus-Resumable: 1.0.0
+```
+
+**Request**
+
+```
+PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
+Upload-Offset: 7
+Upload-Metadata: partial-upload-confirm-range GFuLnBkZg==,partial-upload-confirm-checksum sfQININclV2uc6R7+lKq5sfQINclPz7QoRu0=
+Content-Length: 4
+Tus-Resumable: 1.0.0
+
+orld
+```
+
+**Response**
+
+```
+HTTP/1.1 204 No Content
+Tus-Resumable: 1.0.0
+Upload-Offset: 11
+```
+
 ### Termination
 
 This extension defines a way for the Client to terminate completed and unfinished
