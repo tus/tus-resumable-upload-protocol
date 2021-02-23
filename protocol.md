@@ -599,8 +599,10 @@ If the Server has kept the partial data and the Client confirms its integrity by
 range and checksum information as `partial-upload-confirm-range` and
 `partial-upload-confirm-checksum` in the `Upload-Metadata` header, 
 the Server MUST append the partial data to the upload. It MUST do this even if the `PATCH`
-request that this information is part of is otherwise also not complete. The Server MUST also
-accept new data starting from the new offset in the same `PATCH` request.
+request that this information is part of is otherwise incomplete or still in transfer. This ensures
+that multiple incomplete `PATCH` requests in a row are guaranteed to be possible without requiring
+valid data to be re-sent. The Server MUST also accept an `Upload-Offset` starting from the end
+of the partial data's range, in the same `PATCH` request.
 
 If the Server has disposed of the partial data or if the Client sends range and checksum information
 that doesn't match those of the Server for the partial data, the Server MUST dispose of the
