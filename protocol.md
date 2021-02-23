@@ -598,8 +598,9 @@ returned by the `HEAD` request.
 If the Server has kept the partial data and the Client confirms its integrity by sending identical
 range and checksum information as `partial-upload-confirm-range` and
 `partial-upload-confirm-checksum` in the `Upload-Metadata` header, 
-the Server MUST append the partial data to the upload and accept new data starting from the
-new offset in the same `PATCH` request.
+the Server MUST append the partial data to the upload. It MUST do this even if the `PATCH`
+request that this information is part of is otherwise also not complete. The Server MUST also
+accept new data starting from the new offset in the same `PATCH` request.
 
 If the Server has disposed of the partial data or if the Client sends range and checksum information
 that doesn't match those of the Server for the partial data, the Server MUST dispose of the
@@ -632,6 +633,8 @@ are identical to those of `Upload-Partial-Checksum-Range` and `Upload-Metadata` 
 
 #### Examples
 
+The Client tries to append 11 bytes using a `PATCH` request:
+
 **Request**
 
 ```
@@ -644,12 +647,16 @@ Upload-Checksum: sha1 Kq5sNclPz7QV2+lfQIuc6R7oRu0=
 hello w[connection breaks]
 ```
 
+The connection breaks down before the requests completes, so the Client sends a `HEAD` request to determine the current status:
+
 **Request**
 
 ```
 HEAD /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
 Tus-Resumable: 1.0.0
 ```
+
+The Server has kept the partially received data and adds range and checksum information about it to the response:
 
 **Response**
 
@@ -660,6 +667,8 @@ Upload-Partial-Checksum-Range: 0-7
 Upload-Partial-Checksum: sha1 V2uc6R7+lKq5sfQINclPz7QoRu0=
 Tus-Resumable: 1.0.0
 ```
+
+The Client verifies that the returned checksum is valid for the returned range, confirms it and resumes the upload from the end of the confirmed range:
 
 **Request**
 
@@ -672,6 +681,8 @@ Tus-Resumable: 1.0.0
 
 orld
 ```
+
+The request completes successfully and the Server responds with the new `Upload-Offset`:
 
 **Response**
 
