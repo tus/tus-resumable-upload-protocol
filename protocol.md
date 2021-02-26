@@ -570,43 +570,42 @@ Upload-Offset: 11
 
 ### Partial Checksum
 
-This extension allows Clients using the Checksum extension to verify and confirm the
-integrity of the data from incomplete `PATCH` requests, thereby avoiding that data that
-was received intact by the Server needs to be sent again.
+This extension allows Clients that use the Checksum extension to verify and confirm the
+integrity of chunks that were not received in full by the Server - thereby avoiding that
+intact data needs to be sent again.
 
 Servers that support this extension MUST add `partial-checksum` to the `Tus-Extension` header.
 
-If a Server receives an incomplete `PATCH` request with `Upload-Checksum` header, it
-MAY store the partial data in a separate location rather than disposing of it.
+If a Server receives an incomplete `PATCH` or `POST` request with `Upload-Checksum` header, it
+MAY store the incompletely received chunk's data (hereafter referred to as *partial data*) in
+a separate location instead of discarding it.
 
-If the Server subsequently receives a `HEAD` request on the upload, it MAY provide range
-and checksum information for the partially received data in  `Upload-Partial-Checksum-Range`
-and `Upload-Partial-Checksum` headers.
+If the Server receives a `HEAD` request on the upload thereafter, it MAY compute a checksum
+on the partial data and then provide the result as well as the range of the partial data within
+the upload through the `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
+response headers.
 
-A Client can then use the range and checksum information returned by the Server to
-compute its own checksum for the range and compare it against the checksum returned
-by the Server.
+A Client can then use the range returned by the Server, compute its own checksum for the 
+same range and compare it against the checksum returned by the Server.
 
-If the checksums match, the Client MAY confirm the partial data's integrity by sending the
-range and checksum information it wants to confirm in the `Upload-Metadata` header of
-the next `PATCH` request, and resuming from the end of the confirmed range rather than the
-`Upload-Offset` returned by the `HEAD` request.
+If the checksums are identical, the Client SHOULD confirm the partial data's integrity to the
+Server by sending the checksum and range in the `Upload-Partial-Checksum` and
+`Upload-Partial-Checksum-Range` headers of the next `PATCH` request. The `Upload-Offset`
+header of the `PATCH` request MUST take the confirmed range into account and represent
+the actual offset from where the upload should be resumed.
 
 If the checksums don't match, the Client MUST continue the upload from the `Upload-Offset`
-returned by the `HEAD` request.
+returned by the `HEAD` request, at which point the Server MAY discard any partial data it may
+still be holding.
 
-If the Server has kept the partial data and the Client confirms its integrity by sending identical
-range and checksum information as `partial-upload-confirm-range` and
-`partial-upload-confirm-checksum` in the `Upload-Metadata` header, 
-the Server MUST append the partial data to the upload. It MUST do this even if the `PATCH`
-request that this information is part of is otherwise incomplete or still in transfer. This ensures
-that multiple incomplete `PATCH` requests in a row are guaranteed to be possible without requiring
-valid data to be re-sent. The Server MUST also accept an `Upload-Offset` starting from the end
-of the confirmed partial data's range, in the same `PATCH` request.
+If a Server receives  `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
+headers as part of a `PATCH` request and they match its own values for partial data stored
+for the upload, the Server MUST append it to the upload and move its internal upload offset
+forward accordingly, before processing the request any further.
 
-If the Server has disposed of the partial data or if the Client sends range and checksum information
-that doesn't match those of the Server for the partial data, the Server MUST dispose of the
-partial data and MUST respond with a `409 Conflict` status.
+If the Server has disposed of the partial data or if the Client sends range and checksum values
+that do not match those of the Server for the partial data, the Server MUST dispose of the
+partial data (if any) and MUST respond with a `409 Conflict` status.
 
 If the Server receives a `PATCH` request with an `Upload-Offset` other than the end of
 the partial data's range, it SHOULD dispose of the partial data.
@@ -618,22 +617,17 @@ Server to determine the upload's status before sending the next `PATCH` request.
 
 ##### Upload-Partial-Checksum-Range
 
-The `Upload-Partial-Checksum-Range` response header follows the format `[first included offset]-[last included offset]`
-(f.ex. `0-499` for the first 500 bytes) and MUST describe the range of the partial data within
-the upload.
+The `Upload-Partial-Checksum-Range` header MUST describe the byte range of the partial
+data within the upload, relative to the start of the upload, using this format: `[first byte offset]-[last byte offset]`
+
+For example `0-499` for the first 500 bytes, `500-999` for the second 500 bytes.
 
 ##### Upload-Partial-Checksum
 
-The `Upload-Partial-Checksum` response header uses the same format as the `Upload-Checksum`
+The `Upload-Partial-Checksum` header uses the same format as the `Upload-Checksum`
 header, but MUST contain the checksum of the partial data.
 
-##### Upload-Metadata
-
-Clients confirming partial data MUST send `partial-upload-confirm-range` and `partial-upload-confirm-checksum` as
-metadata in the `Upload-Metadata` header. The formats for `partial-upload-confirm-range` and `partial-upload-confirm-checksum`
-are identical to those of `Upload-Partial-Checksum-Range` and `Upload-Metadata` respectively.
-
-#### Examples
+#### Example
 
 The Client tries to append 11 bytes using a `PATCH` request:
 
@@ -646,10 +640,10 @@ Upload-Offset: 0
 Tus-Resumable: 1.0.0
 Upload-Checksum: sha1 Kq5sNclPz7QV2+lfQIuc6R7oRu0=
 
-hello w[connection breaks]
+hello w[connection breaks down]
 ```
 
-The connection breaks down before the requests completes, so the Client sends a `HEAD` request to determine the current status:
+Since the connection broke down before the request completed, the Client sends a `HEAD` request to determine from which offset it should resume:
 
 **Request**
 
@@ -670,14 +664,15 @@ Upload-Partial-Checksum: sha1 V2uc6R7+lKq5sfQINclPz7QoRu0=
 Tus-Resumable: 1.0.0
 ```
 
-The Client verifies that the returned checksum is valid for the returned range, confirms it and resumes the upload from the end of the confirmed range:
+The Client verifies that the checksum provided by the Server is valid for the returned range, confirms they are identical and resumes the upload from the end of the confirmed range:
 
 **Request**
 
 ```
 PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
 Upload-Offset: 7
-Upload-Metadata: partial-upload-confirm-range GFuLnBkZg==,partial-upload-confirm-checksum sfQININclV2uc6R7+lKq5sfQINclPz7QoRu0=
+Upload-Partial-Checksum-Range: 0-7
+Upload-Partial-Checksum: sha1 V2uc6R7+lKq5sfQINclPz7QoRu0=
 Content-Length: 4
 Tus-Resumable: 1.0.0
 
