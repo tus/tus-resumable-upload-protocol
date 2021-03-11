@@ -568,6 +568,127 @@ Tus-Resumable: 1.0.0
 Upload-Offset: 11
 ```
 
+### Partial Checksum
+
+This extension allows Clients that use the Checksum extension to verify and confirm the
+integrity of chunks that were not received in full by the Server - thereby avoiding that
+intact data needs to be sent again.
+
+Servers that support this extension MUST add `partial-checksum` to the `Tus-Extension` header.
+
+If a Server receives an incomplete `PATCH` or `POST` request with `Upload-Checksum` header, it
+SHOULD store the incompletely received chunk's data (hereafter referred to as *partial data*) in
+a separate location instead of discarding it.
+
+If the Server receives a `HEAD` request on the upload thereafter, it SHOULD compute a checksum
+on the partial data and then return it, alongside the partial data's start and end offsets relative to
+the beginning of the file, in the `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
+response headers respectively.
+
+A Client can then use the range returned by the Server, compute its own checksum for the 
+same range and compare it against the checksum returned by the Server.
+
+If the checksums are identical, the Client SHOULD confirm the partial data's integrity to the
+Server by sending the checksum and range in the `Upload-Partial-Checksum` and
+`Upload-Partial-Checksum-Range` headers of the next `PATCH` request. The `Upload-Offset`
+header of the `PATCH` request MUST take the confirmed range into account and represent
+the actual offset from where the upload should be resumed.
+
+If the checksums don't match, the Client MUST continue the upload from the `Upload-Offset`
+returned by the `HEAD` request, at which point the Server MAY discard any partial data it may
+still be holding.
+
+If a Server receives `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
+headers as part of a `PATCH` request and they match the Server's computed results for its stored
+partial data for the upload, the Server MUST append the partial data to the upload and move its
+internal upload offset forward accordingly, before processing the request any further.
+
+If the Server has disposed of the partial data or if the Client sends range and checksum values
+that do not match those of the Server for the partial data, the Server MUST dispose of the
+partial data (if any) and MUST respond with a `409 Conflict` status.
+
+If the Server receives a `PATCH` request with an `Upload-Offset` other than the end of
+the partial data's range, it SHOULD dispose of the partial data.
+
+Clients receiving a `409 Conflict` status in response SHOULD send a new `HEAD` request to the
+Server to determine the upload's status before sending the next `PATCH` request.
+
+#### Headers
+
+##### Upload-Partial-Checksum-Range
+
+The `Upload-Partial-Checksum-Range` header MUST describe the byte range of the partial
+data within the upload, relative to the start of the upload, using this format: `[first byte offset]-[last byte offset]`
+
+For example `0-499` for the first 500 bytes, `500-999` for the second 500 bytes.
+
+##### Upload-Partial-Checksum
+
+The `Upload-Partial-Checksum` header uses the same format as the `Upload-Checksum`
+header, but MUST contain the checksum of the partial data.
+
+#### Example
+
+The Client tries to append 11 bytes using a `PATCH` request:
+
+**Request**
+
+```
+PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
+Content-Length: 11
+Upload-Offset: 0
+Tus-Resumable: 1.0.0
+Upload-Checksum: sha1 Kq5sNclPz7QV2+lfQIuc6R7oRu0=
+
+hello w[connection breaks down]
+```
+
+Since the connection broke down before the request completed, the Client sends a `HEAD` request to determine from which offset it should resume:
+
+**Request**
+
+```
+HEAD /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
+Tus-Resumable: 1.0.0
+```
+
+The Server has kept the partially received data and adds range and checksum information about it to the response:
+
+**Response**
+
+```
+HTTP/1.1 200 OK
+Upload-Offset: 0
+Upload-Partial-Checksum-Range: 0-6
+Upload-Partial-Checksum: sha1 V2uc6R7+lKq5sfQINclPz7QoRu0=
+Tus-Resumable: 1.0.0
+```
+
+The Client verifies that the checksum provided by the Server is valid for the returned range, confirms they are identical and resumes the upload from the end of the confirmed range:
+
+**Request**
+
+```
+PATCH /files/17f44dbe1c4bace0e18ab850cf2b3a83 HTTP/1.1
+Upload-Offset: 7
+Upload-Partial-Checksum-Range: 0-7
+Upload-Partial-Checksum: sha1 V2uc6R7+lKq5sfQINclPz7QoRu0=
+Content-Length: 4
+Tus-Resumable: 1.0.0
+
+orld
+```
+
+The request completes successfully and the Server responds with the new `Upload-Offset`:
+
+**Response**
+
+```
+HTTP/1.1 204 No Content
+Tus-Resumable: 1.0.0
+Upload-Offset: 11
+```
+
 ### Termination
 
 This extension defines a way for the Client to terminate completed and unfinished
