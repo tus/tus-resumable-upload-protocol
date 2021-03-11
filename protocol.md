@@ -577,13 +577,13 @@ intact data needs to be sent again.
 Servers that support this extension MUST add `partial-checksum` to the `Tus-Extension` header.
 
 If a Server receives an incomplete `PATCH` or `POST` request with `Upload-Checksum` header, it
-MAY store the incompletely received chunk's data (hereafter referred to as *partial data*) in
+SHOULD store the incompletely received chunk's data (hereafter referred to as *partial data*) in
 a separate location instead of discarding it.
 
-If the Server receives a `HEAD` request on the upload thereafter, it MAY compute a checksum
-on the partial data and then provide the result as well as the range of the partial data within
-the upload through the `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
-response headers.
+If the Server receives a `HEAD` request on the upload thereafter, it SHOULD compute a checksum
+on the partial data and then return it, alongside the partial data's start and end offsets relative to
+the beginning of the file, in the `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
+response headers respectively.
 
 A Client can then use the range returned by the Server, compute its own checksum for the 
 same range and compare it against the checksum returned by the Server.
@@ -598,10 +598,10 @@ If the checksums don't match, the Client MUST continue the upload from the `Uplo
 returned by the `HEAD` request, at which point the Server MAY discard any partial data it may
 still be holding.
 
-If a Server receives  `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
-headers as part of a `PATCH` request and they match its own values for partial data stored
-for the upload, the Server MUST append it to the upload and move its internal upload offset
-forward accordingly, before processing the request any further.
+If a Server receives `Upload-Partial-Checksum` and `Upload-Partial-Checksum-Range`
+headers as part of a `PATCH` request and they match the Server's computed results for its stored
+partial data for the upload, the Server MUST append the partial data to the upload and move its
+internal upload offset forward accordingly, before processing the request any further.
 
 If the Server has disposed of the partial data or if the Client sends range and checksum values
 that do not match those of the Server for the partial data, the Server MUST dispose of the
@@ -659,7 +659,7 @@ The Server has kept the partially received data and adds range and checksum info
 ```
 HTTP/1.1 200 OK
 Upload-Offset: 0
-Upload-Partial-Checksum-Range: 0-7
+Upload-Partial-Checksum-Range: 0-6
 Upload-Partial-Checksum: sha1 V2uc6R7+lKq5sfQINclPz7QoRu0=
 Tus-Resumable: 1.0.0
 ```
