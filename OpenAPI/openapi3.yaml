@@ -16,6 +16,8 @@ paths:
     post:
       summary: An empty POST request is used to create a new upload resource. The
         Upload-Length header indicates the size of the entire upload in bytes.
+        If the Creation With Upload extension is available, the Client MAY include 
+        parts of the upload in the initial Creation request
       description: Endpoint for the Creation extension. Modified by the Creation With
         Upload extension.
       parameters:
@@ -76,6 +78,9 @@ paths:
         in: header
         schema:
           $ref: "#/components/schemas/Upload-Checksum"
+      requestBody:
+        description: (Possibly partial) content of the file. Required if Content-Length > 0.
+        required: false
       responses:
         201:
           description: Created
@@ -326,6 +331,9 @@ paths:
         in: header
         schema:
           $ref: "#/components/schemas/Upload-Checksum"
+      requestBody:
+        description: Remaining (possibly partial) content of the file. Required if Content-Length > 0.
+        required: false
       responses:
         204:
           description: Upload offset was updated
