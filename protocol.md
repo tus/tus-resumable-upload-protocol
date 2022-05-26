@@ -347,8 +347,8 @@ b) `Upload-Defer-Length: 1` if upload size is not known at the time.
 If the `Upload-Defer-Length` header contains any other value
 than `1` the server should return a `400 Bad Request` status.
 
-After the length was deferred using `Upload-Defer-Length: 1`, once the length is
-known the Client MUST set the `Upload-Length` header in the next `PATCH` request.
+If the length was deferred using `Upload-Defer-Length: 1`, the Client MUST set
+the `Upload-Length` header in the next `PATCH` request, once the length is known.
 Once set the length MUST NOT be changed. As long as the length of the upload is
 not known, the Server MUST set `Upload-Defer-Length: 1` in all responses to
 `HEAD` requests.
