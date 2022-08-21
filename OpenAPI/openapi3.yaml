@@ -383,6 +383,12 @@ paths:
             Tus-Resumable:
               schema:
                 $ref: "#/components/schemas/Tus-Resumable"
+        409:
+          description: PATCH request with Upload-Offset unequal to the offset of the resource on the server. The Upload-Offset header's value MUST be equal to the current offset of the resource.
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
         410:
           description: PATCH request against a non-existent resource
           headers:
