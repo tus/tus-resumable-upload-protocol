@@ -7,7 +7,7 @@ It is rendered as HTML via Jekyll/Kramdown by the tus.io repository (type `make 
 ## License
 
 Licensed under the MIT license, see
-[LICENSE.txt](https://github.com/tus/tus-resumable-upload-protocol/blob/master/LICENSE.txt).
+[LICENSE.txt](https://github.com/tus/tus-resumable-upload-protocol/blob/main/LICENSE.txt).
 
 Copyright (c) 2013-2016 Transloadit Ltd and Contributors.
 

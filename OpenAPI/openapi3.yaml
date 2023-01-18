@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Swagger definition of the tus core protocol and official extensions.
   description: Swagger definition of the tus core protocol and official extensions.
-    The paths are not normative, but showcase the example definition at https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md
+    The paths are not normative, but showcase the example definition at https://github.com/tus/tus-resumable-upload-protocol/blob/main/protocol.md
   contact:
     email: garcia@lrz.de
   license:
