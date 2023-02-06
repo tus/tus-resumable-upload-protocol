@@ -81,6 +81,11 @@ paths:
       requestBody:
         description: (Possibly partial) content of the file. Required if Content-Length > 0.
         required: false
+        content:
+          application/offset+octet-stream:
+            schema:
+              type: string
+              format: binary
       responses:
         201:
           description: Created
@@ -334,6 +339,11 @@ paths:
       requestBody:
         description: Remaining (possibly partial) content of the file. Required if Content-Length > 0.
         required: false
+        content:
+          application/offset+octet-stream:
+            schema:
+              type: string
+              format: binary
       responses:
         204:
           description: Upload offset was updated
