@@ -82,7 +82,7 @@ paths:
         description: (Possibly partial) content of the file. Required if Content-Length > 0.
         required: false
         content:
-          application/offset+octet-stream":
+          application/offset+octet-stream:
             schema:
               type: string
               format: binary
@@ -340,7 +340,7 @@ paths:
         description: Remaining (possibly partial) content of the file. Required if Content-Length > 0.
         required: false
         content:
-          application/offset+octet-stream":
+          application/offset+octet-stream:
             schema:
               type: string
               format: binary
