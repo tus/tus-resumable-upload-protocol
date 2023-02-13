@@ -457,6 +457,12 @@ paths:
           in: header
           schema:
             $ref: "#/components/schemas/Upload-Checksum"
+        - name: X-HTTP-Method-Override
+          in: header
+          schema:
+            type: string
+            enum: [PATCH]
+          required: true
       requestBody:
         description: Remaining (possibly partial) content of the file. Required if Content-Length > 0.
         required: false
