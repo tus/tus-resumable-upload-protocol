@@ -202,6 +202,9 @@ completed. If the size of the upload is known, the Server MUST include the
 SHOULD return either the `404 Not Found`, `410 Gone` or `403 Forbidden` status
 without the `Upload-Offset` header.
 
+The Server SHOULD acknowledge successful `PATCH` requests with a
+`200 OK` or `204 No Content` status.
+
 The Server MUST prevent the client and/or proxies from caching the response by
 adding the `Cache-Control: no-store` header to the response.
 
