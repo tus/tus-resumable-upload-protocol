@@ -634,8 +634,10 @@ When creating a new final upload the partial uploads' metadata SHALL NOT be
 transferred to the new final upload. All metadata SHOULD be included in the
 concatenation request using the `Upload-Metadata` header.
 
-The Server MAY delete partial uploads after concatenation. They MAY however be
-used multiple times to form a final resource.
+The Server MAY delete partial uploads after concatenation. The Client, however,
+MAY attempt to use a partial upload multiple times. The same partial upload MAY
+be present multiple times in the `Upload-Concat` header in one upload creation
+request or MAY be used in multiple upload creation requests.
 
 The Server MUST respond with the `403 Forbidden` status to `PATCH` requests against
 a final upload URL and MUST NOT modify the final or its partial uploads.
