@@ -426,6 +426,133 @@ paths:
             Tus-Resumable:
               schema:
                 $ref: "#/components/schemas/Tus-Resumable"
+    post:
+      summary: Used to resume the upload
+      description: 'This method is practically the same as the patch. Except that it uses the 
+        X-HTTP-Method-Override header to simulate a PATCH'
+      operationId: FilePatchViaPost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Tus-Resumable
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/Tus-Resumable"
+        - name: Content-Length
+          in: header
+          description: Length of the body of this request
+          required: true
+          schema:
+            type: integer
+        - name: Upload-Offset
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/Upload-Offset"
+        - name: Upload-Checksum
+          in: header
+          schema:
+            $ref: "#/components/schemas/Upload-Checksum"
+        - name: X-HTTP-Method-Override
+          in: header
+          schema:
+            type: string
+            enum: [PATCH]
+          required: true
+      requestBody:
+        description: Remaining (possibly partial) content of the file. Required if Content-Length > 0.
+        required: false
+        content:
+          application/offset+octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        204:
+          description: Upload offset was updated
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+            Upload-Offset:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+            Upload-Expires:
+              description: Added by the expiration extension. The Upload-Expires response
+                header indicates the time after which the unfinished upload expires.
+                A Server MAY wish to remove incomplete uploads after a given period
+                of time to prevent abandoned uploads from taking up extra storage.
+                The Client SHOULD use this header to determine if an upload is still
+                valid before attempting to resume the upload. This header MUST be
+                included in every PATCH (via POST) response if the upload is going to expire.
+                If the expiration is known at the creation, the Upload-Expires header
+                MUST be included in the response to the initial POST request. Its
+                value MAY change over time. If a Client does attempt to resume an
+                upload which has since been removed by the Server, the Server SHOULD
+                respond with the 404 Not Found or 410 Gone status. The latter one
+                SHOULD be used if the Server is keeping track of expired uploads.
+                In both cases the Client SHOULD start a new upload. The value of the
+                Upload-Expires header MUST be in RFC 7231 datetime format.
+              schema:
+                type: string
+        400:
+          description: Added by the checksum extension. The checksum algorithm is
+            not supported by the server
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+        403:
+          description: In the concatenation extension, the Server MUST respond with
+            the 403 Forbidden status to PATCH (via POST) requests against a final upload URL
+            and MUST NOT modify the final or its partial uploads.
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+        404:
+          description: PATCH (via POST) request against a non-existent resource
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+        409:
+          description: PATCH (via POST) request with Upload-Offset unequal to the offset of the resource on the server. The Upload-Offset header's value MUST be equal to the current offset of the resource.
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+        410:
+          description: PATCH (via POST) request against a non-existent resource
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+        412:
+          description: Precondition Failed
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+            Tus-Version:
+              schema:
+                $ref: "#/components/schemas/Tus-Version"
+        415:
+          description: Content-Type was not application/offset+octet-stream
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"
+        460:
+          description: Added by the checksum extension. Checksums mismatch
+          headers:
+            Tus-Resumable:
+              schema:
+                $ref: "#/components/schemas/Tus-Resumable"    
 components:
   schemas:
     Tus-Resumable:
