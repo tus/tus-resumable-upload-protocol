@@ -45,6 +45,7 @@ Kleidl](https://twitter.com/Acconut_)<br>
 [J. Ryan Stinnett](https://convolv.es),
 [Ifedapo Olarewaju](https://github.com/ifedapoolarewaju)
 [Robert Nagy](https://github.com/ronag)
+[Nils Goroll](https://github.com/nigoroll)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -302,7 +303,7 @@ Host: tus.example.org
 Content-Length: 0
 Upload-Length: 100
 Tus-Resumable: 1.0.0
-Upload-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==,is_confidential
+Upload-Metadata: filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==,filetype YXBwbGljYXRpb24vcGRm,is_confidential
 ```
 
 **Response:**
@@ -336,6 +337,27 @@ the key and the value, MAY be left out.
 Since metadata can contain arbitrary binary values, Servers SHOULD
 carefully validate metadata values or sanitize them before using them
 as header values to avoid header smuggling.
+
+Servers and Clients SHOULD use the metadata key `filename` to communicate the file name
+of the uploaded data, if such a name is available. The metadata key `filetype` SHOULD
+be used communicate the [media type](https://www.iana.org/assignments/media-types/media-types.xhtml)
+of the uploaded data. These metadata keys SHOULD not be used for any other purposes as
+described here.
+
+##### [Content-Encoding](https://httpwg.org/specs/rfc7231.html#header.content-encoding)
+
+Clients MUST set the ``Content-Encoding`` header correctly IFF a
+content encoding is used.
+
+As per RFC7231, Servers MUST respond with status 415 if they can not
+accept the ``Content-Encoding`` chosen by the client.
+
+Servers MUST either store the ``Content-Encoding`` and deliver it with
+subsequent requests, or properly decode the content before storing it.
+
+##### [Content-Language](https://httpwg.org/specs/rfc7231.html#header.content-language)
+
+Clients and Servers SHOULD support the ``Content-Language`` header.
 
 #### Requests
 
