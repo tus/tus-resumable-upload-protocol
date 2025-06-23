@@ -4,6 +4,12 @@ The protocol is in the [protocol.md](protocol.md) file.
 
 It is rendered as HTML via Jekyll/Kramdown by the tus.io repository (type `make preview` there).
 
+
+
+## 🧪 Try the Mock API
+
+[![Mock These APIs Instantly](https://cdn.beeceptor.com/assets/images/buttons/mock-openapi-with-beeceptor.png)](https://beeceptor.com/openapi-mock-server/?url=https://raw.githubusercontent.com/anshxpress/tus-resumable-upload-protocol/refs/heads/main/OpenAPI/openapi3.yaml)
+
 ## License
 
 Licensed under the MIT license, see
