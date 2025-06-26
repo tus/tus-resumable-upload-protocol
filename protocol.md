@@ -48,7 +48,7 @@ Kleidl](https://twitter.com/Acconut_)<br>
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
+interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119.html).
 
 ## Status
 
@@ -669,7 +669,7 @@ or final upload. If the upload is a partial one, the header value MUST be `parti
 In the case of a final upload, its value MUST be `final` followed by a
 semicolon and a space-separated list of partial upload URLs that will be
 concatenated. The partial uploads URLs MAY be absolute or relative and MUST NOT contain
-spaces as defined in [RFC 3986](https://tools.ietf.org/html/rfc3986).
+spaces as defined in [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html).
 
 #### Example
 
