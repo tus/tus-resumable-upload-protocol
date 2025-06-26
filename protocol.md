@@ -1,6 +1,6 @@
 # tus resumable upload protocol
 
-**Version:** 1.0.0 ([SemVer](http://semver.org))<br>
+**Version:** 1.0.0 ([SemVer](https://semver.org))<br>
 **Date:** 2016-03-25<br>
 **Authors:** [Felix Geisendörfer](https://twitter.com/felixge), [Kevin van
 Zonneveld](https://twitter.com/kvz), [Tim Koschützki](https://twitter.com/tim_kos),
@@ -52,7 +52,7 @@ interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
 ## Status
 
-Following [SemVer](http://semver.org), as of 1.0.0 tus is ready for general
+Following [SemVer](https://semver.org), as of 1.0.0 tus is ready for general
 adoption. We don't expect to make breaking changes, but if we do, those will
 have to be in a 2.0.0. Introducing a new extension or any backwards-compatible
 change adding new functionality will result in a bumped MINOR version.
