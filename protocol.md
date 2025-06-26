@@ -141,6 +141,7 @@ Tus-Resumable: 1.0.0
 HTTP/1.1 204 No Content
 Tus-Resumable: 1.0.0
 Upload-Offset: 100
+Content-Location: https://tus.example.org/storage/d41d8cd98f00b204e9800998ecf8427e
 ```
 
 ### Headers
@@ -190,6 +191,15 @@ The `X-HTTP-Method-Override` request header MUST be a string which MUST be
 interpreted as the request's method by the Server, if the header is presented.
 The actual method of the request MUST be ignored. The Client SHOULD use this
 header if its environment does not support the PATCH or DELETE methods.
+
+#### Content-Location
+
+The Server MAY send a `Content-Location` header with any response once
+the upload is complete (`Upload-Offset` == `Upload-Length`) to
+optionally indicate to the Client a new location of the upload.
+
+See [RFC 7231 Section
+3.1.4.2](https://httpwg.org/specs/rfc7231.html#header.content-location).
 
 ### Requests
 
