@@ -50,6 +50,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119.html).
 
+The main text of this document specificies the normative definition of the
+protocol, but we offer an [overview table appendix](#appendix-overview-table)
+the visualizes the headers and endpoints of the core protocol and its extensions.
+
 ## Status
 
 Following [SemVer](https://semver.org), as of 1.0.0 tus is ready for general
@@ -223,7 +227,7 @@ match, the Server MUST respond with the `409 Conflict` status without modifying
 the upload resource.
 
 The Client SHOULD send all the remaining bytes of an upload in a single `PATCH`
-request, but MAY also use multiple small requests successively for scenarios
+request, but MAY also use multipl requests successively for scenarios
 where this is desirable. One example for these situations is when the
 [Checksum](#checksum) extension is used.
 
@@ -738,6 +742,263 @@ HTTP/1.1 200 OK
 Upload-Length: 11
 Upload-Concat: final;/files/a /files/b
 ```
+
+## Appendix: Overview Table
+
+> [!important]
+> This section is non-normative, and is only included the clarify the primary protocol definition above.
+
+The following table summarizes which headers are required or optional for each HTTP method in the core protocol and its extensions; scroll to the bottom of the table for a legend.
+
+<table>
+  <thead>
+    <tr>
+      <th>Methods ➡️</th>
+      <th><strong>💚 HEAD</strong></th>
+      <th><strong>💚 PATCH</strong></th>
+      <th><strong>💚 OPTIONS</strong></th>
+      <th><strong>✨ POST</strong></th>
+      <th><strong>🗑️ DELETE</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>⬇️ Headers</td>
+      <td>Retrieve current state for resuming</td>
+      <td>Upload a data chunk</td>
+      <td>Discover server capabilities</td>
+      <td>Create new upload</td>
+      <td>Terminate an existing upload</td>
+    </tr>
+    <tr>
+      <td>
+        <strong>💚 Tus-Resumable</strong>
+        <br>Protocol version
+      </td>
+      <td>
+        ✅ Req<br>
+        ✅ Resp
+      </td>
+      <td>
+        ✅ Req<br>
+        ✅ Resp
+      </td>
+      <td>
+      </td>
+      <td>
+        ✅ Req<br>
+        ✅ Resp
+      </td>
+      <td>
+        ✅ Req<br>
+        ✅ Resp
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>💚 Upload-Offset</strong>
+        <br>Byte offset within upload
+      </td>
+      <td>✅ Resp</td>
+      <td>
+        ✅ Req<br>
+        ✅ Resp
+      </td>
+      <td></td>
+      <td>☑️ Resp<sup>1</sup></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>💚 Upload-Length</strong>
+        <br>Total upload size in bytes
+      </td>
+      <td>☑️ Resp<sup>2</sup></td>
+      <td>☑️ Req<sup>3</sup></td>
+      <td></td>
+      <td>☑️ Req<sup>4</sup></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>💚 Tus-Version</strong><br>Supported protocol versions</td>
+      <td>☑️ Resp <sup>5</sup></td>
+      <td>☑️ Resp <sup>5</sup></td>
+      <td>✅ Resp</td>
+      <td>☑️ Resp <sup>5</sup></td>
+      <td>☑️ Resp <sup>5</sup></td>
+    </tr>
+    <tr>
+      <td><strong>💚 Tus-Extension</strong><br>Supported extensions</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+    </tr>
+    <tr>
+      <td><strong>💚 Tus-Max-Size</strong><br>Maximum upload size</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+      <td>☑️ Resp</td>
+    </tr>
+    <tr>
+      <td><strong>💚 X-HTTP-Method-Override</strong><br>Method override for limited clients</td>
+      <td>☑️ Req</td>
+      <td>☑️ Req</td>
+      <td>☑️ Req</td>
+      <td>☑️ Req</td>
+      <td>☑️ Req</td>
+    </tr>
+    <tr>
+      <td><strong>💚 Content-Type</strong><br>Media type of request body</td>
+      <td></td>
+      <td>
+        ✅ Req<sup>12</sup><br>
+        ✅ Resp<sup>12</sup>
+      </td>
+      <td></td>
+      <td>
+        ☑️ Req<sup>13</sup><br>
+        ☑️ Resp<sup>13</sup>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>💚 Cache-Control</strong>
+        <br>Caching directive
+      </td>
+      <td>✅ Resp <sup>14</sup></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>✨ Upload-Defer-Length</strong>
+        <br>Size not yet known
+      </td>
+      <td>☑️ Resp<sup>6</sup></td>
+      <td>☑️ Req<sup>3</sup></td>
+      <td></td>
+      <td>☑️ Req<sup>4</sup></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>✨ Upload-Metadata</strong>
+        <br>Key-value pairs
+      </td>
+      <td>☑️ Resp<sup>7</sup></td>
+      <td></td>
+      <td></td>
+      <td>☑️ Req</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>✨ Location</strong>
+        <br>URL of created resource
+      </td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>✅ Resp</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>⏳ Upload-Expires</strong>
+        <br>Expiration time
+      </td>
+      <td></td>
+      <td>☑️ Resp<sup>8</sup></td>
+      <td></td>
+      <td>☑️ Resp<sup>8</sup></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>🔍 Upload-Checksum</strong>
+        <br>Data integrity
+      </td>
+      <td></td>
+      <td>☑️ Req</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>🔍 Tus-Checksum-Algorithm</strong>
+        <br>Supported algorithms
+      </td>
+      <td></td>
+      <td></td>
+      <td>☑️ Resp<sup>9</sup></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>⛓️ Upload-Concat</strong>
+        <br>Concatenation info
+      </td>
+      <td>☑️ Resp<sup>10</sup></td>
+      <td></td>
+      <td></td>
+      <td>☑️ Req<sup>11</sup></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td colspan="6"><br><br><strong>Legend</strong></td>
+    </tr>
+    <tr>
+      <td colspan="3">
+        <strong>Requirements:</strong>
+        <ul>
+          <li>✅ Required</li>
+          <li>☑️ Optional</li>
+        </ul>
+      </td>
+      <td rowspan="2" colspan="3">
+        <strong>Notes:</strong>
+        <ol>
+          <li> Only included when using Creation With Upload extension</li>
+          <li> Included if size is known</li>
+          <li> Required if length was deferred in creation</li>
+          <li> Either Upload-Length or Upload-Defer-Length must be included</li>
+          <li> Required only for 412 Precondition Failed responses</li>
+          <li> Included if length was deferred</li>
+          <li> Included if metadata was provided during creation</li>
+          <li> Included if upload has expiration (requires Expiration extension)</li>
+          <li> Included if Checksum extension is supported</li>
+          <li> Included if upload is partial or final (requires Concatenation extension)</li>
+          <li> Required for partial/final uploads (requires Concatenation extension)</li>
+          <li> Must be `application/offset+octet-stream`</li>
+          <li> Must be `application/offset+octet-stream` when body contains upload data</li>
+          <li> Must be `no-store`</li>
+        </ol>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3">
+        <strong>Modules:</strong>
+        <ul>
+          <li>💚 Core protocol</li>
+          <li>⏳ Expiration extension </li>
+          <li>✨ Creation extension</li>
+          <li>🗑️ Termination extension</li>
+          <li>🔍 Checksum extension</li>
+          <li>⛓️ Concatanation extension</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## FAQ
 
