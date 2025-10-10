@@ -481,7 +481,7 @@ header MUST be included in the response to the initial `POST` request.
 Its value MAY change over time.
 
 If a Client does attempt to resume an upload which has since been removed by the
-Server, the Server SHOULD respond with the`404 Not Found` or `410 Gone` status.
+Server, the Server SHOULD respond with the `404 Not Found` or `410 Gone` status.
 The latter one SHOULD be used if the Server is keeping track of expired uploads.
 In both cases the Client SHOULD start a new upload.
 
