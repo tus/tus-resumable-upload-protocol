@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Check out the repository
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Run Spectral
         run: npx --yes @stoplight/spectral-cli@6.16.0 lint --ruleset .spectral.yml 'OpenAPI/*.yaml'
