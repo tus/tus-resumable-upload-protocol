@@ -10,7 +10,5 @@ jobs:
       # Check out the repository
       - uses: actions/checkout@v2
 
-      # Run Spectral
-      - uses: stoplightio/spectral-action@v0.5.5
-        with:
-          file_glob: 'OpenAPI/*.yaml'
+      - name: Run Spectral
+        run: npx --yes @stoplight/spectral-cli@6.16.0 lint 'OpenAPI/*.yaml'
