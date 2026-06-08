@@ -11,4 +11,4 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Run Spectral
-        run: npx --yes @stoplight/spectral-cli@6.16.0 lint 'OpenAPI/*.yaml'
+        run: npx --yes @stoplight/spectral-cli@6.16.0 lint --ruleset .spectral.yml 'OpenAPI/*.yaml'
